@@ -14,7 +14,7 @@ export async function GET() {
 }
 
 // POST — 研究员创建需求
-const SENSITIVE = ["定增","并购","内幕","未公告","股价","收购价格","控股计划","涉密","定增价格","并购标的","未公开业绩","重大资产重组","财务造假","内幕交易","未披露","核心机密"]
+const SENSITIVE = ["定增","并购","内幕","未公告","股价","收购价格","控股计划","涉密","定增价格","并购标的","未公开业绩","重大资产重组","财务造假","内幕交易","未披露","核心机密","未公开财务","重组方案","借壳","壳资源","业绩预告","高送转","分红方案","大股东减持","增持计划","质押","平仓","对赌","回拨","做空","老鼠仓","配资","代持","抽屉协议","禁售期","解禁","做市商","大宗交易","盘后交易","操纵市场","虚假陈述"]
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -24,9 +24,15 @@ export async function POST(req: Request) {
 
   const { title, industry, subField, duration, form, budget, timeReq, outline, forbidden } = await req.json()
 
-  // 服务端合规检测：敏感词（强制，不可绕过）
+  // 服务端合规检测：发现敏感词 → 阻断提交
   const found = SENSITIVE.filter(w => (outline || "").includes(w) || (title || "").includes(w))
-  const requestStatus = found.length > 0 ? "SUBMITTED" : "COMPLIANCE_OK"
+  if (found.length > 0) {
+    return NextResponse.json({
+      error: "提纲含敏感词，请修改后重新提交",
+      sensitiveWords: found,
+      suggestion: "请删除或替换以下敏感内容：" + found.join("、"),
+    }, { status: 400 })
+  }
 
   const orderNo = "ORD-" + new Date().getFullYear() + "-" + String(Math.floor(1000 + Math.random() * 9000))
 
@@ -44,7 +50,7 @@ export async function POST(req: Request) {
   const request = await prisma.request.create({
     data: {
       orderNo, title, industry, subField, duration, form, budget, timeReq, outline, forbidden,
-      status: requestStatus,
+      status: "COMPLIANCE_OK", // 已通过服务端拦截，不含敏感词
       researcherId: (session.user as any).id,
     }
   })
@@ -62,14 +68,7 @@ export async function POST(req: Request) {
     }
   })
 
-  // 若有敏感词，写合规日志
-  if (found.length > 0) {
-    await prisma.complianceLog.create({
-      data: { targetType: "REQUEST", targetId: request.id, eventType: "敏感词检测", description: "检测到：" + found.join("、") }
-    })
-  }
-
-  return NextResponse.json({ ok: true, requestId: request.id, orderId: order.id, orderNo: order.orderNo, sensitiveWords: found })
+  return NextResponse.json({ ok: true, requestId: request.id, orderId: order.id, orderNo: order.orderNo })
 }
 
 // PATCH — 管理员修改需求状态

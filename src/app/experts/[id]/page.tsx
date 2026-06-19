@@ -35,11 +35,29 @@ export default async function ExpertDetailPage({ params }: { params: Promise<{ i
           </div>
         </div>
 
-        <div style={{fontSize:13, fontWeight:500, color:"#888", marginBottom:6}}>擅长标签</div>
+        {/* 三级标签体系 */}
+        <div style={{fontSize:13, fontWeight:500, color:"#888", marginBottom:8}}>专业标签（三级体系）</div>
         <div style={{marginBottom:12}}>
-          {tagList.map(t => <span key={t} style={{background:"#E6F1FB", color:"#185FA5", padding:"2px 8px", borderRadius:4, fontSize:11, fontWeight:500, marginRight:4, display:"inline-block", marginBottom:4}}>{t}</span>)}
-          <span style={{background:"#F1EFE8", color:"#5F5E5A", padding:"2px 8px", borderRadius:4, fontSize:11, display:"inline-block", marginBottom:4}}>{expert.roleType}</span>
-          <span style={{background:"#E1F5EE", color:"#0F6E56", padding:"2px 8px", borderRadius:4, fontSize:11, display:"inline-block", marginBottom:4}}>从业{expert.years}年</span>
+          {/* 一级：行业 */}
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <span style={{fontSize:11,color:"#888",minWidth:48}}>一级·行业</span>
+            <span style={{background:"#534AB7",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:11,fontWeight:500}}>{expert.industry1}</span>
+            {expert.industry2 && <span style={{fontSize:11,color:"#888"}}>→</span>}
+            {expert.industry2 && <span style={{background:"#7B6FE8",color:"#fff",padding:"1px 8px",borderRadius:4,fontSize:11,fontWeight:500}}>二级·{expert.industry2}</span>}
+          </div>
+          {/* 三级：岗位属性 */}
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+            <span style={{fontSize:11,color:"#888",minWidth:48}}>三级·岗位</span>
+            <span style={{background:"#E1F5EE",color:"#0F6E56",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:500}}>{expert.roleType}</span>
+            <span style={{background:"#F1EFE8",color:"#5F5E5A",padding:"2px 8px",borderRadius:4,fontSize:11}}>从业{expert.years}年</span>
+          </div>
+          {/* 技能标签 */}
+          <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
+            <span style={{fontSize:11,color:"#888",minWidth:48,flexShrink:0}}>技能标签</span>
+            <div style={{flex:1}}>
+              {tagList.map(t => <span key={t} style={{background:"#E6F1FB",color:"#185FA5",padding:"2px 8px",borderRadius:4,fontSize:11,fontWeight:500,marginRight:4,display:"inline-block",marginBottom:4}}>{t}</span>)}
+            </div>
+          </div>
         </div>
 
         <div style={{fontSize:13, fontWeight:500, color:"#888", marginBottom:6}}>擅长话题</div>

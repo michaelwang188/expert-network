@@ -114,6 +114,56 @@ async function main() {
   }
   console.log('✅ 5位演示专家创建成功')
 
+  // 5. 创建更多研究员（方便测试统计/匹配功能）
+  const moreResearchers = [
+    { email: 'liwei@demo.com', name: '李伟', orgName: '南方基金', title: '高级研究员' },
+    { email: 'wangfang@demo.com', name: '王芳', orgName: '中金公司', title: '首席分析师' },
+    { email: 'zhaolei@demo.com', name: '赵磊', orgName: '高瓴资本', title: '投资总监' },
+    { email: 'sunyue@demo.com', name: '孙悦', orgName: '红杉中国', title: 'VP' },
+  ]
+  for (const r of moreResearchers) {
+    const pwd = await hash('123456', 10)
+    await prisma.user.upsert({
+      where: { email: r.email },
+      update: { password: pwd },
+      create: { email: r.email, name: r.name, password: pwd, role: 'RESEARCHER', orgName: r.orgName, title: r.title },
+    })
+  }
+  console.log('✅ 4位研究员创建成功')
+
+  // 6. 创建更多专家
+  const moreExperts = [
+    { email: 'huangli@demo.com', name: '黄立', realName: '黄立博士', title: '新能源首席科学家', org: '隆基绿能', years: 16, region: '西安', industry1: '新能源', industry2: '光伏', roleType: '企业技术专家', tags: '光伏,钙钛矿,硅片,HJT,TOPCon', topics: '光伏技术路线对比,钙钛矿量产挑战,硅片薄片化趋势', rateHour: 220000, forms: '线上视频,线下走访', availableTime: '工作日全天' },
+    { email: 'zhouming@demo.com', name: '周明', realName: '周明', title: 'AI算法总监', org: '商汤科技', years: 10, region: '北京', industry1: 'AI算力', industry2: '大模型', roleType: '研发/工艺', tags: '大模型,深度学习,GPU集群,推理优化,多模态', topics: '大模型训练成本优化,国产GPU适配现状,多模态应用场景', rateHour: 300000, forms: '线上语音,线上视频', availableTime: '周一/周三/周五' },
+    { email: 'wujing@demo.com', name: '吴静', realName: '吴静', title: '医药注册总监', org: '药明康德', years: 13, region: '上海', industry1: '医药', industry2: 'CXO', roleType: '管理/战略', tags: 'CXO,药物发现,临床前,注册申报,中美双报', topics: '中美双报策略,创新药IND流程,CXO产能现状', rateHour: 260000, forms: '线上语音', availableTime: '周二/周四 14:00-18:00' },
+  ]
+  for (const e of moreExperts) {
+    const pwd = await hash('123456', 10)
+    const user = await prisma.user.upsert({
+      where: { email: e.email },
+      update: { password: pwd },
+      create: { email: e.email, name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title },
+    })
+    await prisma.expert.upsert({
+      where: { userId: user.id },
+      update: {
+        realName: e.realName, title: e.title, org: e.org, years: e.years, region: e.region,
+        industry1: e.industry1, industry2: e.industry2, roleType: e.roleType,
+        tags: e.tags, topics: e.topics, rateHour: e.rateHour, forms: e.forms,
+        availableTime: e.availableTime,
+        idVerified: true, empVerified: true, complianceSig: true, status: 'ACTIVE',
+      },
+      create: {
+        userId: user.id, realName: e.realName, title: e.title, org: e.org,
+        years: e.years, region: e.region, industry1: e.industry1, industry2: e.industry2,
+        roleType: e.roleType, tags: e.tags, topics: e.topics,
+        rateHour: e.rateHour, forms: e.forms, availableTime: e.availableTime,
+        idVerified: true, empVerified: true, complianceSig: true, status: 'ACTIVE',
+      },
+    })
+  }
+  console.log('✅ 3位专家创建成功')
+
   console.log('\n🎉 测试账号创建完成！')
   console.log('\n登录信息：')
   console.log('  研究员: researcher@demo.com / 123456')

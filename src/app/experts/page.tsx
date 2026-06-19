@@ -9,7 +9,7 @@ const ROLE_TYPES = ["", "研发", "供应链", "渠道", "管理", "政策"]
 const FORMS = ["", "线上语音", "线上视频", "线下走访"]
 
 type Expert = {
-  id: string; title: string; org: string; years: number; region: string;
+  id: string; realName: string; title: string; org: string; years: number; region: string;
   industry1: string; roleType: string; tags: string; rateHour: number;
   forms: string; completedOrders: number; rating: number; status: string;
 }
@@ -41,7 +41,7 @@ function ExpertsContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { const t = setTimeout(() => fetchExperts(), 400); return () => clearTimeout(t) }, [search])
 
-  const initials = (title: string) => title?.[0] || "专"
+  const initials = (name: string) => name?.[0] || "专"
   const tagList = (tags: string) => tags?.split(",").map(t => t.trim()).filter(Boolean) || []
 
   return (
@@ -89,10 +89,10 @@ function ExpertsContent() {
                   <div style={{
                     width: 42, height: 42, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 14, fontWeight: 500, background: "#E6F1FB", color: "#185FA5", flexShrink: 0,
-                  }}>{initials(e.title)}</div>
+                  }}>{initials(e.realName || e.title)}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.title}</div>
-                    <div style={{ fontSize: 12, color: "#888", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.org}</div>
+                    <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.realName || e.title}</div>
+                    <div style={{ fontSize: 12, color: "#888", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.title} · {e.org}</div>
                   </div>
                   <div style={{ fontSize: 12, color: "#BA7517", fontWeight: 500, whiteSpace: "nowrap", marginLeft: "auto" }}>¥{e.rateHour.toLocaleString()}/h</div>
                 </div>

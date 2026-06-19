@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import AuthGuard from "@/components/AuthGuard"
 
 const STEPS = ["填写需求", "提纲审核", "匹配专家", "预约确认", "访谈结算"]
-const SENSITIVE = ["定增","并购","内幕","未公告","股价","收购价格","控股计划","涉密","定增价格","并购标的","未公开业绩"]
+const SENSITIVE = ["定增","并购","内幕","未公告","股价","收购价格","控股计划","涉密","定增价格","并购标的","未公开业绩","重大资产重组","财务造假","内幕交易","未披露","核心机密","未公开财务","重组方案","借壳","操纵市场","虚假陈述","大股东减持","对赌","做空","老鼠仓","代持"]
 
 function RequestContent() {
   const { data: session } = useSession()
@@ -23,6 +23,13 @@ function RequestContent() {
   const checkSensitive = (text: string) => SENSITIVE.filter(w => text.includes(w))
 
   const handleSubmit = async () => {
+    // 前端合规检测：发现敏感词 → 直接阻断
+    const found = checkSensitive(form.outline + " " + form.title)
+    if (found.length > 0) {
+      setSensitiveFound(found)
+      return // 不提交
+    }
+
     setLoading(true)
     const res = await fetch("/api/requests", {
       method: "POST",
@@ -31,10 +38,11 @@ function RequestContent() {
     })
     const data = await res.json()
     setLoading(false)
-    if (data.orderNo) setOrderNo(data.orderNo)
-    if (data.sensitiveWords?.length > 0) {
-      setSensitiveFound(data.sensitiveWords)
+    if (!res.ok) {
+      setSensitiveFound(data.sensitiveWords || [])
+      return
     }
+    if (data.orderNo) setOrderNo(data.orderNo)
     setStep(1)
   }
 
@@ -115,7 +123,7 @@ function RequestContent() {
             </div>
           )}
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>
-            <button onClick={() => setStep(1)} disabled={!form.title || !form.outline} style={{
+            <button onClick={handleSubmit} disabled={!form.title || !form.outline || checkSensitive(form.outline + " " + form.title).length > 0} style={{
               background: "#185FA5", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer",
             }}>提交并进入合规审核 →</button>
           </div>
