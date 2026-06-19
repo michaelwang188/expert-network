@@ -4,6 +4,19 @@
 
 ---
 
+## 📚 项目文档索引（新 AI 入职必读）
+
+| 文档 | 用途 | 谁需要读 |
+|------|------|---------|
+| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | 部署全流程（Vercel + Postgres + 环境变量） | 执行者 |
+| [COLLABORATION_HANDOFF.md](COLLABORATION_HANDOFF.md) | 项目架构交接（Prisma Schema · API 设计 · 技术栈） | 架构师、质检员 |
+| [DEPLOY_HANDOFF.md](DEPLOY_HANDOFF.md) | 部署交办单（6步操作清单） | 执行者 |
+| [prisma/schema.prisma](prisma/schema.prisma) | 数据库模型（User/Expert/Request/Order） | 所有人 |
+| [src/lib/auth.ts](src/lib/auth.ts) | NextAuth 认证配置 | 架构师 |
+| [package.json](package.json) | 依赖与脚本（dev/build/seed） | 所有人 |
+
+---
+
 ## 🎯 三角色分工
 
 | # | 角色 | AI | 一句话职责 |
