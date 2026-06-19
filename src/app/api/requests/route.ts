@@ -24,6 +24,18 @@ export async function POST(req: Request) {
 
   const { title, industry, subField, duration, form, budget, timeReq, outline, forbidden } = await req.json()
 
+  // 防重复提交：同一研究员 2 分钟内相同标题的请求视为重复
+  const recentDup = await prisma.request.findFirst({
+    where: {
+      researcherId: (session.user as any).id,
+      title,
+      createdAt: { gte: new Date(Date.now() - 2 * 60 * 1000) },
+    },
+  })
+  if (recentDup) {
+    return NextResponse.json({ error: "2分钟内已提交过相同标题的调研，请勿重复提交" }, { status: 409 })
+  }
+
   // 服务端合规检测：发现敏感词 → 阻断提交
   const found = SENSITIVE.filter(w => (outline || "").includes(w) || (title || "").includes(w))
   if (found.length > 0) {

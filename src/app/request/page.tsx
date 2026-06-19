@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import AuthGuard from "@/components/AuthGuard"
@@ -15,6 +15,8 @@ function RequestContent() {
   const [loading, setLoading] = useState(false)
   const [sensitiveFound, setSensitiveFound] = useState<string[]>([])
   const [orderNo, setOrderNo] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+  const orderNoRef = useRef("")
   const [form, setForm] = useState({
     title: "", industry: "MLCC", subField: "", duration: "60分钟", form: "线上视频",
     budget: "6000-12000", timeReq: "", outline: "", forbidden: "",
@@ -23,27 +25,39 @@ function RequestContent() {
   const checkSensitive = (text: string) => SENSITIVE.filter(w => text.includes(w))
 
   const handleSubmit = async () => {
+    // 防重复提交
+    if (submitted || loading) return
+
     // 前端合规检测：发现敏感词 → 直接阻断
     const found = checkSensitive(form.outline + " " + form.title)
     if (found.length > 0) {
       setSensitiveFound(found)
-      return // 不提交
-    }
-
-    setLoading(true)
-    const res = await fetch("/api/requests", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    })
-    const data = await res.json()
-    setLoading(false)
-    if (!res.ok) {
-      setSensitiveFound(data.sensitiveWords || [])
       return
     }
-    if (data.orderNo) setOrderNo(data.orderNo)
-    setStep(1)
+
+    setSubmitted(true)
+    setLoading(true)
+    try {
+      const res = await fetch("/api/requests", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setSensitiveFound(data.sensitiveWords || [])
+        setSubmitted(false)
+        return
+      }
+      if (data.orderNo) {
+        orderNoRef.current = data.orderNo
+        setOrderNo(data.orderNo)
+      }
+      setStep(1)
+    } catch {
+      setSubmitted(false)
+    }
+    setLoading(false)
   }
 
   const role = (session?.user as any)?.role
@@ -123,7 +137,7 @@ function RequestContent() {
             </div>
           )}
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>
-            <button onClick={handleSubmit} disabled={!form.title || !form.outline || checkSensitive(form.outline + " " + form.title).length > 0} style={{
+            <button onClick={handleSubmit} disabled={!form.title || !form.outline || checkSensitive(form.outline + " " + form.title).length > 0 || loading || submitted} style={{
               background: "#185FA5", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", fontSize: 14, fontWeight: 500, cursor: "pointer",
             }}>提交并进入合规审核 →</button>
           </div>
