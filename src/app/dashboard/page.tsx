@@ -56,7 +56,7 @@ export default async function DashboardPage() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
         <StatCard label="在库活跃专家" value={expertCount.toLocaleString()} sub="可接单状态" />
         <StatCard label="本月订单" value={monthOrderCount.toString()} sub="笔" up />
-        <StatCard label="本月 GMV（元）" value={monthGMV.toLocaleString()} sub="平台总收入" up />
+        <StatCard label="本月 GMV（积分）" value={monthGMV.toLocaleString()} sub="平台总积分" up />
         <StatCard label="待处理事项" value={pendingExperts.toString()} sub="专家审核 + 合规" warn={pendingExperts > 0} />
       </div>
 
@@ -85,7 +85,7 @@ export default async function DashboardPage() {
                 <div style={{ fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.id}</div>
                 <div style={{ fontSize: 12, color: "#888" }}>{o.researcher.name || o.researcher.email} → {o.expert?.title || "待指派专家"}</div>
               </div>
-              <div style={{ fontWeight: 500, color: "#2c2c2a", whiteSpace: "nowrap" }}>¥{(o.amount / 100).toLocaleString()}</div>
+              <div style={{ fontWeight: 500, color: "#2c2c2a", whiteSpace: "nowrap" }}>{(o.amount).toLocaleString()} 积分</div>
               <div style={{
                 background: statusMap[o.status] ? statusMap[o.status].color + "18" : "#f1efe8",
                 color: statusMap[o.status]?.color || "#888",

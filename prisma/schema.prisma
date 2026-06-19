@@ -20,12 +20,14 @@ model User {
   avatar      String?
   orgName     String?
   title       String?
+  points      Int       @default(0)   // 公益积分余额
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  expertProfile  Expert?        @relation("UserExpert")
-  requests       Request[]      @relation("UserRequests")
-  ordersAsRes    Order[]        @relation("OrdersByResearcher")
+  expertProfile     Expert?               @relation("UserExpert")
+  requests          Request[]             @relation("UserRequests")
+  ordersAsRes       Order[]               @relation("OrdersByResearcher")
+  pointTransactions PointsTransaction[]   @relation("UserPoints")
 }
 
 enum Role {
@@ -53,6 +55,7 @@ model Expert {
   topics        String
 
   rateHour      Int
+  ratePoints    Int       @default(0)   // 公益积分费率（积分/小时）
   forms         String
   availableTime String?
 
@@ -177,4 +180,29 @@ model ComplianceLog {
   createdAt   DateTime @default(now())
 
   @@index([targetType, handled])
+}
+
+// ===== 公益积分交易记录 =====
+model PointsTransaction {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("UserPoints", fields: [userId], references: [id])
+
+  amount      Int      // 积分变动量（正数=获得，负数=支出）
+  type        PointType
+  description String?  // 描述：如"专家访谈完成：芯片设计技术路线调研"
+  refId       String?  // 关联的业务ID（订单号/充值单号）
+  balance     Int      // 操作后余额
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+enum PointType {
+  EARN_LABOR    // 劳动贡献获得（专家完成访谈）
+  EARN_CASH     // 现金兑换获得（研究员购买积分）
+  SPEND_ORDER   // 订单支出（研究员支付访谈费用）
+  ADMIN_ADJUST  // 管理员调整
 }

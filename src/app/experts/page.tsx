@@ -10,7 +10,7 @@ const FORMS = ["", "线上语音", "线上视频", "线下走访"]
 
 type Expert = {
   id: string; realName: string; title: string; org: string; years: number; region: string;
-  industry1: string; roleType: string; tags: string; rateHour: number;
+  industry1: string; roleType: string; tags: string; rateHour: number; ratePoints: number;
   forms: string; completedOrders: number; rating: number; status: string;
 }
 
@@ -94,7 +94,7 @@ function ExpertsContent() {
                     <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.realName || e.title}</div>
                     <div style={{ fontSize: 12, color: "#888", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{e.title} · {e.org}</div>
                   </div>
-                  <div style={{ fontSize: 12, color: "#BA7517", fontWeight: 500, whiteSpace: "nowrap", marginLeft: "auto" }}>¥{e.rateHour.toLocaleString()}/h</div>
+                  <div style={{ fontSize: 12, color: "#BA7517", fontWeight: 500, whiteSpace: "nowrap", marginLeft: "auto" }}>{e.ratePoints?.toLocaleString() || e.rateHour} 积分/h</div>
                 </div>
                 <div style={{ marginBottom: 8, display: "flex", flexWrap: "wrap", gap: 4 }}>
                   {tagList(e.tags).map(t => (

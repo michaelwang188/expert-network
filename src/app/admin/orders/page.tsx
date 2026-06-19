@@ -60,7 +60,7 @@ export default function AdminOrdersPage() {
                   {o.orderNo} · 研究员：{o.researcher?.name || o.researcher?.email} · 专家：{o.expert?.title || "未指派"}
                 </div>
               </div>
-              <div style={{ fontWeight: 500 }}>¥{((o.amount || 0) / 100).toLocaleString()}</div>
+              <div style={{ fontWeight: 500 }}>{(o.amount || 0).toLocaleString()} 积分</div>
               <span style={{
                 background: (STATUS_MAP[o.status]?.color || "#888") + "18",
                 color: STATUS_MAP[o.status]?.color || "#888",

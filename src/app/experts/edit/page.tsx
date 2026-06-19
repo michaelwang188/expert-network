@@ -27,7 +27,7 @@ function ExpertEditContent() {
     roleType: "",
     tags: "",
     topics: "",
-    rateHour: 0,
+    ratePoints: 0,
     forms: [] as string[],
     availableTime: "",
   })
@@ -49,7 +49,7 @@ function ExpertEditContent() {
             roleType: e.roleType || "",
             tags: e.tags || "",
             topics: e.topics || "",
-            rateHour: e.rateHour || 0,
+            ratePoints: e.ratePoints || 0,
             forms: e.forms ? e.forms.split(",").map((s: string) => s.trim()) : [],
             availableTime: e.availableTime || "",
           })
@@ -156,7 +156,7 @@ function ExpertEditContent() {
         {/* 报价与档期 */}
         <SectionTitle title="报价与档期" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="时薪报价（元/小时）" value={form.rateHour.toString()} onChange={v => update("rateHour", parseInt(v) || 0)} type="number" />
+          <Field label="小时费率（积分/小时）" value={form.ratePoints.toString()} onChange={v => update("ratePoints", parseInt(v) || 0)} type="number" />
           <Field label="可接待时段" value={form.availableTime} onChange={v => update("availableTime", v)} placeholder="例：工作日14:00-18:00" />
         </div>
         <div>

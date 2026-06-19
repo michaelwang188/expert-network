@@ -155,10 +155,10 @@ function AssignPanel({ order, experts, assignExpert }: any) {
           <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>匹配专家</div>
           <select name="expertId" required style={{ width: "100%", padding: 6, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13, marginBottom: 6 }}>
             <option value="">请选择专家...</option>
-            {matched.map((e: any) => <option key={e.id} value={e.id}>{e.title}（{e.org}）· {(e.rateHour || 600000) / 10000}元/小时</option>)}
+            {matched.map((e: any) => <option key={e.id} value={e.id}>{e.title}（{e.org}）· {(e.rateHour || 600000) / 10000}积分/小时</option>)}
           </select>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input name="amount" type="number" placeholder="金额(元)" required defaultValue={Math.round((order.amount || 800000) / 100)} style={{ width: 90, padding: 5, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13 }} />
+            <input name="amount" type="number" placeholder="金额(积分)" required defaultValue={Math.round((order.amount || 800000) / 100)} style={{ width: 90, padding: 5, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13 }} />
             <span style={{ fontSize: 12, color: "#888" }}>元</span>
             <button type="submit" style={{ padding: "5px 12px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>派单</button>
           </div>

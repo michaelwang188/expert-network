@@ -73,7 +73,7 @@ function OrdersContent() {
 
       {/* 费用说明 */}
       <div style={{ background: "#f8f7f4", borderRadius: 8, padding: 10, fontSize: 12, color: "#888", marginBottom: 12, lineHeight: 1.6 }}>
-        💰 <strong>费用结构</strong>：总价 = 专家酬劳（80%）+ 平台服务费（20%）。平台不参与调研结论，仅提供撮合与合规保障。
+        💰 <strong>费用结构</strong>：总积分 = 专家费 + 平台服务费。平台不参与调研结论，仅提供撮合与合规保障。
         ⚠️ 禁止私下联系专家绕开平台交易，一经发现永久封号。
       </div>
 
@@ -98,9 +98,9 @@ function OrdersContent() {
                   <td style={{ padding: 10, fontFamily: "monospace", fontSize: 12, color: "#888" }}>{o.orderNo || o.id}</td>
                   <td style={{ padding: 10, fontWeight: 500 }}>{o.request?.title || o.orderNo || o.id}</td>
                   <td style={{ padding: 10, fontSize: 12, color: "#888" }}>{o.expert?.title || "-"}</td>
-                  <td style={{ padding: 10, fontWeight: 500 }}>¥{((o.amount || 0) / 100).toLocaleString()}</td>
+                  <td style={{ padding: 10, fontWeight: 500 }}>{(o.amount || 0).toLocaleString()} 积分</td>
                   <td style={{ padding: 10, fontSize: 11, color: "#888" }}>
-                    专家 ¥{((o.expertFee || 0) / 100).toLocaleString()}<br/>平台 ¥{((o.platformFee || 0) / 100).toLocaleString()}
+                    专家 {(o.expertFee || 0).toLocaleString()} 积分<br/>平台 {(o.platformFee || 0).toLocaleString()} 积分
                   </td>
                   <td style={{ padding: 10 }}>
                     <span style={{

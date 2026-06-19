@@ -10,6 +10,7 @@ const navItems = [
   { href: "/experts/edit", label: "我的资料", roles: ["EXPERT"] },
   { href: "/request", label: "发起调研", roles: ["RESEARCHER"] },
   { href: "/orders", label: "订单管理", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
+  { href: "/leaderboard", label: "积分排行", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/compliance", label: "合规中心", roles: ["ADMIN"] },
   { href: "/admin", label: "平台管理", roles: ["ADMIN"] },
 ]

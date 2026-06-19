@@ -27,7 +27,7 @@ export default async function ExpertDetailPage({ params }: { params: Promise<{ i
           <div style={{flex:1}}>
             <div style={{fontSize:16, fontWeight:500}}>{expert.title}</div>
             <div style={{fontSize:13, color:"#888"}}>{expert.org} · {expert.region}</div>
-            <div style={{fontSize:12, color:"#BA7517", fontWeight:500, marginTop:2}}>¥{expert.rateHour.toLocaleString()}/小时</div>
+            <div style={{fontSize:12, color:"#BA7517", fontWeight:500, marginTop:2}}>{expert.ratePoints || expert.rateHour} 积分/小时</div>
           </div>
           <div style={{textAlign:"right"}}>
             <div style={{fontSize:12, color:"#888"}}>⭐ {expert.rating || "-"} · {expert.completedOrders}单</div>

@@ -66,7 +66,7 @@ export default function AdminExpertsPage() {
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 500 }}>{e.title}</div>
                 <div style={{ fontSize: 12, color: "#888" }}>{e.org} · {e.region} · {e.years}年 · {e.industry1} · {e.roleType}</div>
-                <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>标签：{e.tags || "无"} · ¥{e.rateHour?.toLocaleString()}/h · {e.forms}</div>
+                <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>标签：{e.tags || "无"} · {e.ratePoints || e.rateHour} 积分/h · {e.forms}</div>
               </div>
               <span style={{
                 background: (STATUS_MAP[e.status]?.color || "#888") + "18",

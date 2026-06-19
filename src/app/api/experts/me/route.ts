@@ -39,7 +39,7 @@ export async function PATCH(req: Request) {
   const allowed = [
     "realName", "title", "org", "years", "region",
     "industry1", "industry2", "roleType", "tags", "topics",
-    "rateHour", "forms", "availableTime",
+    "rateHour", "ratePoints", "forms", "availableTime",
   ]
   const data: any = {}
   for (const key of allowed) {

@@ -37,12 +37,12 @@ export async function POST(req: Request) {
   const orderNo = "ORD-" + new Date().getFullYear() + "-" + String(Math.floor(1000 + Math.random() * 9000))
 
   // 解析预算范围，取中间值作为预估金额（单位：分）
-  let estimatedAmount = 800000 // 默认 8000元
+  let estimatedAmount = 800 // 默认 800 积分
   if (budget) {
     const match = budget.match(/(\d+)/g)
     if (match && match.length >= 2) {
-      const low = parseInt(match[0]) * 100
-      const high = parseInt(match[1]) * 100
+      const low = parseInt(match[0])
+      const high = parseInt(match[1])
       estimatedAmount = Math.round((low + high) / 2)
     }
   }
@@ -62,8 +62,8 @@ export async function POST(req: Request) {
       requestId: request.id,
       researcherId: (session.user as any).id,
       amount: estimatedAmount,
-      expertFee: Math.round(estimatedAmount * 0.8),
-      platformFee: Math.round(estimatedAmount * 0.2),
+      expertFee: Math.round(estimatedAmount * 0.8),   // 积分：80% 给专家
+      platformFee: Math.round(estimatedAmount * 0.2),  // 积分：20% 平台服务费
       status: "PENDING",
     }
   })
