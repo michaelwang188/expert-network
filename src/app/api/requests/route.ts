@@ -3,6 +3,17 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
+// GET — 管理员查看所有需求
+export async function GET() {
+  const requests = await prisma.request.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { researcher: { select: { name: true, email: true } } },
+    take: 50,
+  })
+  return NextResponse.json(requests)
+}
+
+// POST — 研究员创建需求
 const SENSITIVE = ["定增","并购","内幕","未公告","股价","收购价格","控股计划","涉密","定增价格","并购标的","未公开业绩","重大资产重组","财务造假","内幕交易","未披露","核心机密"]
 
 export async function POST(req: Request) {
@@ -59,4 +70,11 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ ok: true, requestId: request.id, orderId: order.id, orderNo: order.orderNo, sensitiveWords: found })
+}
+
+// PATCH — 管理员修改需求状态
+export async function PATCH(req: Request) {
+  const { requestId, status } = await req.json()
+  await prisma.request.update({ where: { id: requestId }, data: { status } })
+  return NextResponse.json({ ok: true })
 }

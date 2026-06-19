@@ -31,3 +31,16 @@ export async function GET(req: Request) {
 
   return NextResponse.json({ experts, total, page, limit })
 }
+
+// PATCH — 管理员更新专家状态
+export async function PATCH(req: Request) {
+  const { id, status } = await req.json()
+  const data: any = { status }
+  if (status === "ACTIVE") {
+    data.idVerified = true
+    data.empVerified = true
+    data.complianceSig = true
+  }
+  const expert = await prisma.expert.update({ where: { id }, data })
+  return NextResponse.json({ ok: true, expert })
+}
