@@ -1,0 +1,19 @@
+NEXTAUTH_SECRET                targets=['production'] type=sensitive
+POSTGRES_URL                   targets=['production', 'preview', 'development'] type=encrypted
+PGPASSWORD                     targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_USER                  targets=['production', 'preview', 'development'] type=encrypted
+PGDATABASE                     targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_HOST                  targets=['production', 'preview', 'development'] type=encrypted
+PGHOST                         targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_URL_NO_SSL            targets=['production', 'preview', 'development'] type=encrypted
+NEON_PROJECT_ID                targets=['production', 'preview', 'development'] type=encrypted
+PGUSER                         targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_PRISMA_URL            targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_URL_NON_POOLING       targets=['production', 'preview', 'development'] type=encrypted
+DATABASE_URL                   targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_DATABASE              targets=['production', 'preview', 'development'] type=encrypted
+NEON_AUTH_BASE_URL             targets=['production', 'preview', 'development'] type=encrypted
+VITE_NEON_AUTH_URL             targets=['production', 'preview', 'development'] type=encrypted
+POSTGRES_PASSWORD              targets=['production', 'preview', 'development'] type=encrypted
+PGHOST_UNPOOLED                targets=['production', 'preview', 'development'] type=encrypted
+DATABASE_URL_UNPOOLED          targets=['production', 'preview', 'development'] type=encrypted

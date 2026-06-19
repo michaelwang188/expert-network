@@ -1,0 +1,5 @@
+Project: expert-network
+Framework: nextjs
+BuildCmd: npx prisma generate && npx prisma db push && npm run build
+GitRepo: expert-network
+Domains: []

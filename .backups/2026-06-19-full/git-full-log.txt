@@ -1,0 +1,18 @@
+b3b6e57f28f9dacf0d689c1e054ac8da91c04c4f 2026-06-19 18:10:56 +0800 Add REQUIREMENTS.md as north-star doc, link from message board, upgrade QA criteria
+698960cd06701a668057cee4412e2663afbfd750 2026-06-19 18:10:09 +0800 Add project document index for new AI onboarding
+2efe8186e2c1c2773882f5a50ba6284dad1fc32c 2026-06-19 18:09:17 +0800 Introduce 3-role QA system: architect → executor → auditor
+be973d84a81463279fda67632f2b86c2752edc71 2026-06-19 16:08:15 +0800 Clarify task: executor needs to run seed in production DB
+f840dcf809ea5efda0f57abe6026ea178a3a0a1f 2026-06-19 16:04:29 +0800 Fix login, add permission allowlist, update message board
+2783fbe4ec9a1fe1cbaee14d7e9436b7acc33c67 2026-06-19 15:58:06 +0800 Define clear roles: WorkBuddy as architect, other AI as executor
+7a8f9e212ddbbf825a54a0df6bd33a1717acd77b 2026-06-19 15:56:15 +0800 Upgrade polling to 1min, update architect workflow instructions
+b1a8cb48a5334726127d9f4a0a40acc29014a53b 2026-06-19 15:53:38 +0800 Update message board: seed script bug fixed
+b4a253af104292be4bc2d4c2e334305c4eaa855a 2026-06-19 15:53:21 +0800 Fix seed script: update passwords on upsert (fix test account login)
+a9a4d114df76ee5b4475e862f839492db0963d38 2026-06-19 15:50:26 +0800 Add auto-polling mechanism for inter-AI collaboration
+6729265d1a5955a64b6d29ab9af8a6003001aef4 2026-06-19 15:48:15 +0800 Restructure message board: clear roles, handoff to architect AI
+1e200a433297b0db6c8b40e10ad872e30c1ea4f5 2026-06-19 15:36:07 +0800 Update message board with deployment status, add deploy handoff docs
+ff32cd836407496bd35b2e7c402be45e5af6444b 2026-06-19 14:55:55 +0800 Remove vercel.json, add handoff docs to gitignore
+7b12ae42cd4359f9140e55adc10880e9b475c48e 2026-06-19 14:34:31 +0800 Add seed script for test accounts
+d094792e40e282c81d000f66c9230304198eb6ec 2026-06-19 14:32:20 +0800 Prepare for Vercel deployment: PostgreSQL schema, vercel.json, deployment guide
+9ceb8ac338a786a3707fa1fc7b6d92d88bfd2425 2026-06-19 14:30:10 +0800 Remove prisma/dev.db from tracking and update .gitignore
+6a1f061027067ea1ce11a2c1d65b7b5ef92ddc8f 2026-06-19 14:24:39 +0800 Add .gitignore, remove node_modules/.next/.env from tracking
+a593ad5cb76275150175495b72af08c2c3c643bd 2026-06-19 13:18:53 +0800 init: expert network platform

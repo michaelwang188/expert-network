@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open *)",
+      "Bash(source .env.local *)",
+      "Bash(curl -sI *)",
+      "Bash(curl -s *)",
+      "Bash(vercel env pull *)",
+      "Bash(vercel ls *)",
+      "Bash(vercel env ls *)",
+      "Bash(vercel integration ls *)",
+      "Bash(vercel project ls *)",
+      "Bash(vercel link *)",
+      "Bash(vercel deploy *)",
+      "Bash(vercel --prod *)",
+      "Bash(vercel redeploy *)",
+      "Bash(npm run db:seed)",
+      "Bash(npm run db:push)",
+      "Bash(npm run db:generate)",
+      "Bash(git -C *)",
+      "Bash(which *)"
+    ]
+  }
+}

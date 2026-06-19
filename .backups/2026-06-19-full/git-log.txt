@@ -1,0 +1,18 @@
+b3b6e57f Add REQUIREMENTS.md as north-star doc, link from message board, upgrade QA criteria
+698960cd Add project document index for new AI onboarding
+2efe8186 Introduce 3-role QA system: architect → executor → auditor
+be973d84 Clarify task: executor needs to run seed in production DB
+f840dcf8 Fix login, add permission allowlist, update message board
+2783fbe4 Define clear roles: WorkBuddy as architect, other AI as executor
+7a8f9e21 Upgrade polling to 1min, update architect workflow instructions
+b1a8cb48 Update message board: seed script bug fixed
+b4a253af Fix seed script: update passwords on upsert (fix test account login)
+a9a4d114 Add auto-polling mechanism for inter-AI collaboration
+6729265d Restructure message board: clear roles, handoff to architect AI
+1e200a43 Update message board with deployment status, add deploy handoff docs
+ff32cd83 Remove vercel.json, add handoff docs to gitignore
+7b12ae42 Add seed script for test accounts
+d094792e Prepare for Vercel deployment: PostgreSQL schema, vercel.json, deployment guide
+9ceb8ac3 Remove prisma/dev.db from tracking and update .gitignore
+6a1f0610 Add .gitignore, remove node_modules/.next/.env from tracking
+a593ad5c init: expert network platform
