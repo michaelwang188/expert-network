@@ -1,0 +1,46 @@
+b0775c33 Add business flow diagram: order lifecycle from submit to settlement
+5ad3a26f Fix double-submit: frontend guard + server-side dedup + clean duplicate orders
+4cb469ce QA Audit #3 re-check: C1 + H1 both fixed, audit #3 closed
+27d69ae6 QA Audit #3 fixes: red block warning + profile ¥→积分
+7af62e69 QA Audit #3: Full regression + points system (26.5/28, 95% pass)
+84940b69 Add Audit #3: 28-item full regression test + points system audit
+a9af7ff4 Update message board: points system deployed
+fa80bf37 Public welfare points system: Schema + API + leaderboard + all ¥→积分
+70e0dc46 QA Audit #2 fixes: sensitive word blocking + order flow + real names + 3-level tags + 7 more demo users
+d0341cad QA Audit #2: 深度复核 — 驳回(2致命)
+98d9547d Add Audit #2 deep review task for QA auditor
+f9f181e4 Self-audit: 60% completeness, all QA #1 items addressed
+2a04e870 P2: Anti-bypass protection + fee breakdown + contact masking
+4b81543a P2 fixes: profile page, real order numbers, form validation
+7d1e6979 WorkBuddy takes over: Chief Architect + Executive Architect. Clean message board.
+71933cea 🔔 测试消息 #1 - 轮询器检测测试
+38cd0b78 测试轮询器：更新时间戳
+4207b3d7 Update message board: Task #2 complete
+6f648887 Task #2: Admin sub-pages (experts/orders/users/review/audit) + 5 expert seed data + new APIs
+499fe55a 任务 #2: 管理员后台子页面 + 专家演示数据
+9f406bd3 Update message board: P0 fixes deployed, awaiting QA re-review
+62da8599 QA Audit #1 fixes P0-P1: AuthGuard + /orders crash fix + expert profile editor + budget/duration fields
+140e5284 QA Audit #1: Full baseline review
+f6ad568e Fix: local file monitoring - all 3 AIs on same machine, no GitHub roundtrip needed
+679bdcc5 Add Iron Rules v1.1: 32 rules across 8 categories including network proxy & WeChat DB
+b2f551ef Restructure roles: Chief Architect (1st AI) + Executive Architect (WorkBuddy) + QA Auditor (3rd AI)
+bd825a2d Add QA onboarding manual + first baseline audit task for 3rd AI
+01716df7 Full project backup 2026-06-19: 50 files, source+docs+config+rebuild manual
+b3b6e57f Add REQUIREMENTS.md as north-star doc, link from message board, upgrade QA criteria
+698960cd Add project document index for new AI onboarding
+2efe8186 Introduce 3-role QA system: architect → executor → auditor
+be973d84 Clarify task: executor needs to run seed in production DB
+f840dcf8 Fix login, add permission allowlist, update message board
+2783fbe4 Define clear roles: WorkBuddy as architect, other AI as executor
+7a8f9e21 Upgrade polling to 1min, update architect workflow instructions
+b1a8cb48 Update message board: seed script bug fixed
+b4a253af Fix seed script: update passwords on upsert (fix test account login)
+a9a4d114 Add auto-polling mechanism for inter-AI collaboration
+6729265d Restructure message board: clear roles, handoff to architect AI
+1e200a43 Update message board with deployment status, add deploy handoff docs
+ff32cd83 Remove vercel.json, add handoff docs to gitignore
+7b12ae42 Add seed script for test accounts
+d094792e Prepare for Vercel deployment: PostgreSQL schema, vercel.json, deployment guide
+9ceb8ac3 Remove prisma/dev.db from tracking and update .gitignore
+6a1f0610 Add .gitignore, remove node_modules/.next/.env from tracking
+a593ad5c init: expert network platform

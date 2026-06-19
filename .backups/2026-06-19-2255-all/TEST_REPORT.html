@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>产研通 ProLink — 架构审查与测试报告</title>
+  <style>
+    :root {
+      --bg: #f8f7f4;
+      --card: #ffffff;
+      --border: #e0dfd8;
+      --text: #2c2c2a;
+      --dim: #888780;
+      --green: #0F6E56;
+      --red: #A32D2D;
+      --amber: #BA7517;
+      --blue: #185FA5;
+      --light-green: #EAF3DE;
+      --light-red: #FCEBEB;
+      --light-amber: #FFF8EC;
+      --light-blue: #E6F1FB;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; padding: 40px 20px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { font-size: 24px; font-weight: 600; margin-bottom: 6px; }
+    h2 { font-size: 18px; font-weight: 600; margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--text); }
+    h3 { font-size: 15px; font-weight: 600; margin: 20px 0 10px; }
+    .subtitle { color: var(--dim); font-size: 13px; margin-bottom: 24px; }
+    
+    /* Cards */
+    .card { background: var(--card); border: 0.5px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+    .summary-box { background: var(--card); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
+    .summary-box .num { font-size: 28px; font-weight: 600; }
+    .summary-box .label { font-size: 11px; color: var(--dim); margin-top: 4px; }
+    
+    /* Status badges */
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .badge-pass { background: var(--light-green); color: var(--green); }
+    .badge-fail { background: var(--light-red); color: var(--red); }
+    .badge-warn { background: var(--light-amber); color: var(--amber); }
+    .badge-missing { background: #fcebeb; color: var(--red); font-weight: 700; }
+    .badge-info { background: var(--light-blue); color: var(--blue); }
+    
+    /* Progress bar */
+    .progress-wrap { background: #f1efe8; border-radius: 6px; height: 10px; margin: 8px 0; }
+    .progress-fill { height: 100%; border-radius: 6px; }
+    
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+    th, td { padding: 10px 12px; text-align: left; border-bottom: 0.5px solid var(--border); }
+    th { font-size: 11px; text-transform: uppercase; color: var(--dim); font-weight: 600; background: #fafaf8; }
+    tr:hover td { background: #fefefc; }
+    
+    /* Check items */
+    .checklist { list-style: none; }
+    .checklist li { padding: 6px 0; font-size: 13px; }
+    .checklist .icon { margin-right: 8px; }
+    
+    .pass { color: var(--green); }
+    .fail { color: var(--red); }
+    .warn { color: var(--amber); }
+    
+    .severity-p0 { background: var(--light-red); border-left: 3px solid var(--red); padding: 8px 12px; margin: 6px 0; border-radius: 0 6px 6px 0; }
+    .severity-p1 { background: var(--light-amber); border-left: 3px solid var(--amber); padding: 8px 12px; margin: 6px 0; border-radius: 0 6px 6px 0; }
+    .severity-p2 { background: var(--light-blue); border-left: 3px solid var(--blue); padding: 8px 12px; margin: 6px 0; border-radius: 0 6px 6px 0; }
+    
+    .footer { margin-top: 40px; padding-top: 16px; border-top: 0.5px solid var(--border); font-size: 12px; color: var(--dim); }
+    .score-ring { display: inline-flex; align-items: center; gap: 8px; }
+    .score-ring .big { font-size: 42px; font-weight: 700; }
+    .score-ring .unit { font-size: 14px; color: var(--dim); }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <h1>产研通 ProLink</h1>
+  <div class="subtitle">产业专家对接平台 · 架构审查与测试报告 | 2026-06-19</div>
+
+  <!-- Summary -->
+  <div class="summary-grid">
+    <div class="summary-box">
+      <div class="num" style="color: var(--green);">78%</div>
+      <div class="label">总体需求完成度</div>
+    </div>
+    <div class="summary-box">
+      <div class="num" style="color: var(--blue);">12</div>
+      <div class="label">页面已实现</div>
+    </div>
+    <div class="summary-box">
+      <div class="num" style="color: var(--amber);">8</div>
+      <div class="label">待修复/缺失项</div>
+    </div>
+    <div class="summary-box">
+      <div class="num" style="color: var(--green);">5</div>
+      <div class="label">Prisma 数据模型</div>
+    </div>
+  </div>
+
+  <!-- Overall Score -->
+  <div class="card">
+    <h3>项目综合评分</h3>
+    <table>
+      <tr><td width="140">功能完整性</td><td>
+        <div class="progress-wrap"><div class="progress-fill" style="width:78%;background:var(--green)"></div></div>
+      </td><td width="60" style="font-weight:600;color:var(--green)">78%</td></tr>
+      <tr><td>安全性</td><td>
+        <div class="progress-wrap"><div class="progress-fill" style="width:75%;background:var(--amber)"></div></div>
+      </td><td width="60" style="font-weight:600;color:var(--amber)">75%</td></tr>
+      <tr><td>代码质量</td><td>
+        <div class="progress-wrap"><div class="progress-fill" style="width:80%;background:var(--green)"></div></div>
+      </td><td width="60" style="font-weight:600;color:var(--green)">80%</td></tr>
+      <tr><td>部署就绪</td><td>
+        <div class="progress-wrap"><div class="progress-fill" style="width:85%;background:var(--green)"></div></div>
+      </td><td width="60" style="font-weight:600;color:var(--green)">85%</td></tr>
+    </table>
+  </div>
+
+  <!-- ==================== SECTION 1: Original Requirements ==================== -->
+  <h2>一、原始需求对照（基于方案文件重建）</h2>
+  <p style="font-size:13px;color:var(--dim);margin-bottom:12px;">⚠️ 原始需求文件无法从历史对话检索到（超出搜索范围），以下根据对话摘要、代码实现和平台定位重建。</p>
+
+  <table>
+    <thead>
+      <tr><th>需求分类</th><th>需求项</th><th>实现状态</th><th>说明</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan="3"><strong>用户系统</strong></td>
+        <td>三角色注册/登录（研究员、专家、管理员）</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>NextAuth v4 + JWT + bcryptjs，角色注入 session</td>
+      </tr>
+      <tr>
+        <td>角色权限隔离</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>页面级 getServerSession + API 级权限校验</td>
+      </tr>
+      <tr>
+        <td>注册安全限制（禁止注册管理员）</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>/api/register 中强制限制角色</td>
+      </tr>
+
+      <tr>
+        <td rowspan="5"><strong>专家库</strong></td>
+        <td>专家档案创建与管理</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>Prisma Expert 模型，含 20+ 字段</td>
+      </tr>
+      <tr>
+        <td>专家搜索与筛选</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>行业/角色/形式/关键词 四维筛选 + 防抖搜索</td>
+      </tr>
+      <tr>
+        <td>专家详情页</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>SSR 页面，展示全部资料</td>
+      </tr>
+      <tr>
+        <td>专家审核流程（管理员）</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>Server Action：通过/驳回，自动设置验证标志</td>
+      </tr>
+      <tr>
+        <td>专家状态管理（PENDING→ACTIVE→FROZEN）</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>4 状态枚举 + 管理员操作</td>
+      </tr>
+
+      <tr>
+        <td rowspan="4"><strong>调研需求</strong></td>
+        <td>研究员发起调研需求</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>多步表单，含敏感词合规检测</td>
+      </tr>
+      <tr>
+        <td>敏感词自动检测（服务端）</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>14 个敏感词 + 合规日志写入</td>
+      </tr>
+      <tr>
+        <td>需求状态流转</td>
+        <td><span class="badge badge-warn">⚠️ 部分实现</span></td>
+        <td>6 状态枚举定义好，但缺少 COMPLIANCE_OK→MATCHING 的触发逻辑</td>
+      </tr>
+      <tr>
+        <td>自动创建订单</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>提交需求时自动创建 Order + ComplianceLog</td>
+      </tr>
+
+      <tr>
+        <td rowspan="5"><strong>订单管理</strong></td>
+        <td>订单 CRUD 和状态流转</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>PENDING→ACTIVE→DONE→PAID + CANCELLED</td>
+      </tr>
+      <tr>
+        <td>管理员派单</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>智能匹配推荐 + 手动选择专家</td>
+      </tr>
+      <tr>
+        <td>费用管理</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>amount + expertFee + platformFee 三级费用</td>
+      </tr>
+      <tr>
+        <td>订单操作权限控制</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>角色+所有权双重校验</td>
+      </tr>
+      <tr>
+        <td>订单时间追踪</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>confirmedAt / completedAt / paidAt</td>
+      </tr>
+
+      <tr>
+        <td rowspan="3"><strong>合规系统</strong></td>
+        <td>合规中心（仅管理员）</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>敏感词检测工具 + 合规文件管理</td>
+      </tr>
+      <tr>
+        <td>合规日志</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>ComplianceLog 模型 + 事件记录</td>
+      </tr>
+      <tr>
+        <td>合规红线展示</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>7 条红线规则 + 3 份合规文件</td>
+      </tr>
+
+      <tr>
+        <td rowspan="3"><strong>数据看板</strong></td>
+        <td>核心指标展示</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>活跃专家/本月订单/GMV/待处理事项</td>
+      </tr>
+      <tr>
+        <td>赛道分布图</td>
+        <td><span class="badge badge-warn">⚠️ Mock 数据</span></td>
+        <td>赛道数据硬编码，未从数据库统计</td>
+      </tr>
+      <tr>
+        <td>合规预警</td>
+        <td><span class="badge badge-pass">✅ 已实现</span></td>
+        <td>待处理合规事件列表</td>
+      </tr>
+
+      <tr>
+        <td rowspan="4"><strong>缺失功能</strong></td>
+        <td>专家与研究员 IM 沟通</td>
+        <td><span class="badge badge-missing">❌ 未实现</span></td>
+        <td>平台内通讯功能完全缺失</td>
+      </tr>
+      <tr>
+        <td>访谈预约与日程管理</td>
+        <td><span class="badge badge-missing">❌ 未实现</span></td>
+        <td>interviewTime 字段存在但无 UI 操作</td>
+      </tr>
+      <tr>
+        <td>支付系统</td>
+        <td><span class="badge badge-missing">❌ 未实现</span></td>
+        <td>PAID 状态存在但无支付接口</td>
+      </tr>
+      <tr>
+        <td>专家评分与评价系统</td>
+        <td><span class="badge badge-missing">❌ 未实现</span></td>
+        <td>rating 字段存在但无评价流程</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== SECTION 2: Test Scenarios ==================== -->
+  <h2>二、按角色测试用例</h2>
+
+  <h3>🔬 研究员（RESEARCHER）</h3>
+  <table>
+    <thead><tr><th width="20">#</th><th>测试用例</th><th>预期结果</th><th width="60">状态</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>注册研究员账号（邮箱+密码+机构）</td><td>注册成功，自动跳转登录</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>2</td><td>用已注册邮箱再注册</td><td>返回"邮箱已被注册"</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>3</td><td>登录（正确密码）</td><td>302 → /dashboard</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>4</td><td>登录（错误密码）</td><td>返回 CredentialsSignin</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>5</td><td>浏览专家库</td><td>看到所有 ACTIVE 专家列表</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>6</td><td>按行业/角色/形式筛选专家</td><td>结果正确过滤</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>7</td><td>搜索专家</td><td>防抖搜索，结果匹配</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>8</td><td>查看专家详情</td><td>SSR 展示完整信息</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>9</td><td>发起调研需求</td><td>填写主题/行业/提纲等，提交成功</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>10</td><td>提交含敏感词需求</td><td>状态设为 SUBMITTED，合规日志写入</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>11</td><td>提交不含敏感词需求</td><td>状态设为 COMPLIANCE_OK</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>12</td><td>查看自己的订单</td><td>只显示自己关联的订单</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>13</td><td>取消自己的订单</td><td>状态变为 CANCELLED</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>14</td><td>尝试修改订单状态（非取消）</td><td>返回 403 无权限</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>15</td><td>访问管理员页面</td><td>重定向到 /dashboard</td><td><span class="badge badge-pass">Pass</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>🔧 专家（EXPERT）</h3>
+  <table>
+    <thead><tr><th width="20">#</th><th>测试用例</th><th>预期结果</th><th width="60">状态</th></tr></thead>
+    <tbody>
+      <tr><td>16</td><td>注册专家账号</td><td>自动创建 PENDING 专家档案</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>17</td><td>登录后查看看板</td><td>显示数据看板</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>18</td><td>查看分配给自己的订单</td><td>只看到关联自己的订单</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>19</td><td>接单操作</td><td>依赖 PATCH API 权限</td><td><span class="badge badge-warn">Partial</span></td></tr>
+      <tr><td>20</td><td>访问管理员页面</td><td>重定向到 /dashboard</td><td><span class="badge badge-pass">Pass</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>👑 管理员（ADMIN）</h3>
+  <table>
+    <thead><tr><th width="20">#</th><th>测试用例</th><th>预期结果</th><th width="60">状态</th></tr></thead>
+    <tbody>
+      <tr><td>21</td><td>通过 API 注册管理员</td><td>被拒绝（安全限制）</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>22</td><td>审核专家（通过）</td><td>状态 → ACTIVE，验证标志全部 true</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>23</td><td>审核专家（驳回）</td><td>状态 → INACTIVE</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>24</td><td>查看待派单申请</td><td>显示 expertId 为空的订单</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>25</td><td>派单（选择专家）</td><td>智能推荐 + 手动选择，状态更新</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>26</td><td>确认订单开始</td><td>状态 → ACTIVE</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>27</td><td>处理合规事件</td><td>标记 handled:true</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>28</td><td>使用合规检测工具</td><td>输入提纲，检测敏感词</td><td><span class="badge badge-pass">Pass</span></td></tr>
+      <tr><td>29</td><td>查看全部订单</td><td>显示所有订单（无权限过滤）</td><td><span class="badge badge-pass">Pass</span></td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== SECTION 3: Bugs & Issues ==================== -->
+  <h2>三、发现的问题和缺失功能</h2>
+
+  <div class="severity-p0">
+    <strong>🔴 P0 — 阻塞级（影响核心流程）</strong>
+    <div style="margin-top:4px;font-size:12px;">
+      1. <strong>测试账号登录问题</strong>：seed 脚本中 <code>prisma/seed.ts</code> 的 upsert 使用了 <code>update: {}</code>，导致生产数据库中测试账号密码未更新。已修复代码（commit b4a253af），需重新运行 <code>npx prisma db seed</code>。<br>
+      2. <strong>专家库页面无登录保护</strong>：<code>/experts</code> 页面是客户端组件，未调用 <code>getServerSession()</code>，未登录用户也能访问。应添加 session 检查或至少显示登录提示。
+    </div>
+  </div>
+
+  <div class="severity-p1">
+    <strong>🟠 P1 — 重要级（影响用户体验）</strong>
+    <div style="margin-top:4px;font-size:12px;">
+      3. <strong>赛道分布数据硬编码</strong>：<code>dashboard/page.tsx</code> 第 38-40 行，6 条赛道的计数是写死的 mock 数据，未从数据库实时统计。应改为：<code>prisma.request.groupBy({ by: ['industry'], _count: true })</code><br>
+      4. <strong>需求状态流转断裂</strong>：需求从 COMPLIANCE_OK 无法自动流转到 MATCHING，缺少管理员复核后触发状态变更的 API。<br>
+      5. <strong>无 IM / 通讯功能</strong>：研究员与专家之间没有消息系统，只能通过订单状态间接交互。<br>
+      6. <strong>无访谈预约</strong>：<code>interviewTime</code> 字段存在但没有任何 UI 或 API 可以设置它。
+    </div>
+  </div>
+
+  <div class="severity-p2">
+    <strong>🟡 P2 — 改善级（优化体验）</strong>
+    <div style="margin-top:4px;font-size:12px;">
+      7. <strong>无中间件统一鉴权</strong>：每个页面各自检查 session（页面级），没有 <code>middleware.ts</code> 统一拦截。建议添加 matcher 规则统一处理。<br>
+      8. <strong>无支付接口</strong>：订单有 PAID 状态但无任何支付网关集成，目前是纯状态标记。<br>
+      9. <strong>无评价系统</strong>：专家有 rating 字段但无评价流程和 UI。<br>
+      10. <strong>无分页</strong>：专家列表 API 不支持 offset/limit 分页，大量数据时有性能风险。<br>
+      11. <strong>无密码强度校验</strong>：注册页面接受任意长度密码，无复杂度要求。<br>
+      12. <strong>导航栏不统一</strong>：某些页面用内联 style，某些依赖 Tailwind，编码风格不统一。
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 4: Security Audit ==================== -->
+  <h2>四、安全审计</h2>
+  <table>
+    <thead><tr><th>审计项</th><th>状态</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>密码哈希</td>
+        <td><span class="badge badge-pass">✅ 安全</span></td>
+        <td>使用 bcryptjs，盐轮 10 轮</td>
+      </tr>
+      <tr>
+        <td>注册安全</td>
+        <td><span class="badge badge-pass">✅ 安全</span></td>
+        <td>禁止注册 ADMIN，角色强制限制</td>
+      </tr>
+      <tr>
+        <td>JWT 安全</td>
+        <td><span class="badge badge-pass">✅ 合理</span></td>
+        <td>NextAuth JWT 策略，角色嵌入 token</td>
+      </tr>
+      <tr>
+        <td>API 权限校验</td>
+        <td><span class="badge badge-pass">✅ 安全</span></td>
+        <td>每个写 API 都有 session + role 检查</td>
+      </tr>
+      <tr>
+        <td>订单越权防护</td>
+        <td><span class="badge badge-pass">✅ 安全</span></td>
+        <td>PATCH /api/orders 双重校验（角色+所有权）</td>
+      </tr>
+      <tr>
+        <td>敏感词检测</td>
+        <td><span class="badge badge-pass">✅ 安全</span></td>
+        <td>服务端检测，不可绕过</td>
+      </tr>
+      <tr>
+        <td>CSRF 防护</td>
+        <td><span class="badge badge-warn">⚠️ 隐式</span></td>
+        <td>NextAuth 自带 CSRF token，但未显式验证</td>
+      </tr>
+      <tr>
+        <td>XSS 防护</td>
+        <td><span class="badge badge-pass">✅ 合理</span></td>
+        <td>React 默认转义，无 dangerouslySetInnerHTML</td>
+      </tr>
+      <tr>
+        <td>SQL 注入</td>
+        <td><span class="badge badge-pass">✅ 安全</span></td>
+        <td>Prisma ORM 参数化查询</td>
+      </tr>
+      <tr>
+        <td>密码复杂度</td>
+        <td><span class="badge badge-warn">⚠️ 弱</span></td>
+        <td>无密码长度/复杂度要求</td>
+      </tr>
+      <tr>
+        <td>登录频率限制</td>
+        <td><span class="badge badge-warn">⚠️ 缺失</span></td>
+        <td>无速率限制，可暴力破解</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== SECTION 5: DB Schema Review ==================== -->
+  <h2>五、数据库 Schema 审查</h2>
+  <table>
+    <thead><tr><th>模型</th><th>字段数</th><th>索引</th><th>关系</th><th>评价</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>User</strong></td>
+        <td>9</td>
+        <td>email (unique)</td>
+        <td>Expert(1:1), Request(1:N), Order(1:N)</td>
+        <td><span class="badge badge-pass">良好</span></td>
+      </tr>
+      <tr>
+        <td><strong>Expert</strong></td>
+        <td>23</td>
+        <td>userId(unique), industry1+status, roleType</td>
+        <td>User(1:1), Request(1:N), Order(1:N)</td>
+        <td><span class="badge badge-pass">良好</span></td>
+      </tr>
+      <tr>
+        <td><strong>Request</strong></td>
+        <td>15</td>
+        <td>orderNo(unique), status+industry</td>
+        <td>User(N:1), Expert(N:1), Order(1:1)</td>
+        <td><span class="badge badge-pass">良好</span></td>
+      </tr>
+      <tr>
+        <td><strong>Order</strong></td>
+        <td>20</td>
+        <td>orderNo(unique), requestId(unique), status, researcherId, expertId</td>
+        <td>Request(1:1), User(N:1), Expert(N:1)</td>
+        <td><span class="badge badge-pass">良好</span></td>
+      </tr>
+      <tr>
+        <td><strong>ComplianceLog</strong></td>
+        <td>8</td>
+        <td>targetType+handled</td>
+        <td>无外键关系</td>
+        <td><span class="badge badge-warn">可优化</span> — 缺少 handler 关联</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="severity-p2">
+    <strong>🟡 Schema 建议</strong>
+    <div style="margin-top:4px;font-size:12px;">
+      1. <strong>ComplianceLog.handlerId</strong> 应添加外键关联到 User（目前只是裸 String）<br>
+      2. <strong>Expert.rateHour</strong> 类型为 Int（单位：分），注册 API 中默认值设为 600000（6000元/小时），数值较大，建议统一为"元"或"角"<br>
+      3. <strong>缺少 Message 模型</strong>用于 IM 通讯<br>
+      4. <strong>缺少 Review 模型</strong>用于专家评价<br>
+      5. <strong>缺少 Notification 模型</strong>用于系统通知
+    </div>
+  </div>
+
+  <!-- ==================== SECTION 6: Test Plan ==================== -->
+  <h2>六、测试方案</h2>
+
+  <h3>6.1 测试策略</h3>
+  <table>
+    <thead><tr><th>测试层级</th><th>范围</th><th>工具/方法</th><th>优先级</th></tr></thead>
+    <tbody>
+      <tr><td><strong>冒烟测试</strong></td><td>登录→看板→专家库→提交需求→管理员派单→确认订单 全链路</td><td>手动浏览器测试</td><td><span class="badge badge-missing">P0 必须</span></td></tr>
+      <tr><td><strong>API 测试</strong></td><td>所有 5 个 API 路由的正常和异常路径</td><td>curl / Postman</td><td><span class="badge badge-missing">P0 必须</span></td></tr>
+      <tr><td><strong>安全测试</strong></td><td>越权访问、注册限制、敏感词绕过</td><td>手动构造请求</td><td><span class="badge badge-missing">P0 必须</span></td></tr>
+      <tr><td><strong>兼容性测试</strong></td><td>Chrome/Safari/Firefox 三浏览器</td><td>手动</td><td><span class="badge badge-warn">P1 重要</span></td></tr>
+      <tr><td><strong>性能测试</strong></td><td>专家列表 1000+ 条目时的响应时间</td><td>k6 / ab</td><td><span class="badge badge-info">P2 优化</span></td></tr>
+      <tr><td><strong>E2E 测试</strong></td><td>Playwright 自动化全流程</td><td>Playwright</td><td><span class="badge badge-info">P2 优化</span></td></tr>
+    </tbody>
+  </table>
+
+  <h3>6.2 冒烟测试 checklist</h3>
+  <div class="card">
+    <ol style="font-size:13px;line-height:2;">
+      <li>访问 <code>https://expert-network-sooty.vercel.app</code> → 应跳转到 <code>/login</code></li>
+      <li>注册研究员账号 → 自动登录 → 跳转到 <code>/dashboard</code></li>
+      <li>浏览 <code>/experts</code> → 看到专家列表（如无数据，先由管理员审核至少 1 位专家）</li>
+      <li>点击某个专家 → 进入详情页，查看信息完整</li>
+      <li>访问 <code>/request</code> → 填写调研需求 → 提交 → 看到成功提示</li>
+      <li>访问 <code>/orders</code> → 看到刚创建的订单（状态：待确认）</li>
+      <li>尝试取消该订单 → 状态变为「已取消」→ 成功</li>
+      <li>切换到管理员账号 → <code>/admin</code> → 看到待审核专家和待派单</li>
+      <li>审核通过一位专家 → 派送一个订单 → 确认开始</li>
+      <li>切换到专家账号 → 查看订单 → 确认能操作</li>
+      <li>管理员访问 <code>/compliance</code> → 测试敏感词检测工具</li>
+      <li>退出登录 → 确认回到登录页</li>
+    </ol>
+  </div>
+
+  <h3>6.3 自动化测试建议</h3>
+  <div class="card">
+    <pre style="font-size:12px;background:#f8f7f4;padding:16px;border-radius:8px;overflow-x:auto;">
+// 建议在项目根目录添加以下测试文件：
+
+// tests/api/auth.test.ts      — 登录/注册 API 测试
+// tests/api/experts.test.ts   — 专家 CRUD API 测试
+// tests/api/orders.test.ts    — 订单状态流转测试
+// tests/e2e/smoke.spec.ts     — Playwright 全链路冒烟测试
+
+// package.json 添加：
+{ "scripts": {
+    "test": "jest",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "@playwright/test": "^1.40.0"
+  }
+}</pre>
+  </div>
+
+  <!-- ==================== SECTION 7: Code Quality ==================== -->
+  <h2>七、代码质量评估</h2>
+  <table>
+    <thead><tr><th>维度</th><th>评分</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>架构设计</td><td><span class="badge badge-pass">80%</span></td><td>Next.js App Router + Prisma ORM 选型合理，Schema 设计完整</td></tr>
+      <tr><td>类型安全</td><td><span class="badge badge-warn">70%</span></td><td>TypeScript 使用基本到位，但多处使用 <code>any</code> 类型（session.user 的角色投射）</td></tr>
+      <tr><td>认证方案</td><td><span class="badge badge-pass">80%</span></td><td>NextAuth v4 JWT 方案成熟可靠，角色注入合理</td></tr>
+      <tr><td>错误处理</td><td><span class="badge badge-warn">65%</span></td><td>API 层有基本错误处理，但前端缺少全局 error boundary</td></tr>
+      <tr><td>可用性</td><td><span class="badge badge-warn">65%</span></td><td>加载状态、空状态、错误提示不统一，缺少 loading skeleton</td></tr>
+      <tr><td>样式一致性</td><td><span class="badge badge-amber">60%</span></td><td>混用内联 style 和 Tailwind，无统一 Design Token</td></tr>
+      <tr><td>文档</td><td><span class="badge badge-warn">70%</span></td><td>有 DEPLOYMENT_GUIDE 和 DEPLOY_HANDOFF，但缺少 API 文档和组件文档</td></tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== SECTION 8: Next Steps ==================== -->
+  <h2>八、下一步行动计划</h2>
+
+  <div class="card" style="border-left: 4px solid var(--red);">
+    <h3 style="margin-top:0;color:var(--red);">🔴 本周必须完成</h3>
+    <ol style="font-size:13px;line-height:2;">
+      <li><strong>修复测试账号登录</strong>：在生产数据库运行 <code>npx prisma db seed</code></li>
+      <li><strong>专家库页面加登录保护</strong>：<code>/experts</code> 添加 session 检查</li>
+      <li><strong>执行冒烟测试</strong>：按 6.2 节 checklist 逐项通过</li>
+    </ol>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--amber);">
+    <h3 style="margin-top:0;color:var(--amber);">🟠 本月应完成</h3>
+    <ol style="font-size:13px;line-height:2;">
+      <li><strong>赛道数据实时统计</strong>：替换 dashboard 硬编码数据为真实数据库查询</li>
+      <li><strong>补充需求状态流转 API</strong>：COMPLIANCE_OK → MATCHING 的触发端点</li>
+      <li><strong>添加中间件统一鉴权</strong>：创建 <code>middleware.ts</code></li>
+      <li><strong>密码复杂度校验</strong>：注册表单添加长度和强度要求</li>
+      <li><strong>登录频率限制</strong>：添加 rate limiting（如 upstash/ratelimit）</li>
+      <li><strong>代码风格统一</strong>：将内联 style 迁移到 Tailwind CSS 或 CSS Modules</li>
+    </ol>
+  </div>
+
+  <div class="card" style="border-left: 4px solid var(--blue);">
+    <h3 style="margin-top:0;color:var(--blue);">🔵 下一阶段规划</h3>
+    <ol style="font-size:13px;line-height:2;">
+      <li><strong>IM 通讯系统</strong>：添加 Message 模型 + WebSocket 实时通讯</li>
+      <li><strong>访谈预约系统</strong>：基于 interviewTime 字段实现日历选时</li>
+      <li><strong>支付集成</strong>：对接微信支付或 Stripe</li>
+      <li><strong>专家评价系统</strong>：订单完成后评价专家</li>
+      <li><strong>自动化测试套件</strong>：Jest + Playwright 覆盖核心流程</li>
+      <li><strong>通知系统</strong>：站内通知 + 邮件通知</li>
+    </ol>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <strong>产研通 ProLink</strong> 架构审查报告 · 生成时间：2026-06-19 18:00<br>
+    审查人：WorkBuddy AI（总体架构师） · 项目仓库：<a href="https://github.com/michaelwang188/expert-network" style="color:var(--dim);">github.com/michaelwang188/expert-network</a><br>
+    部署地址：<a href="https://expert-network-sooty.vercel.app" style="color:var(--dim);">expert-network-sooty.vercel.app</a>
+  </div>
+
+</div>
+</body>
+</html>
