@@ -181,6 +181,29 @@
 
 ---
 
+### 2026-06-19 19:35 | 任务 #2 完成 ✅
+
+**执行人**: WorkBuddy AI | **分配者**: 总架构师（第1个AI）
+
+**P1-5: 管理员后台子页面**:
+- ✅ `/admin/experts` — 专家管理（搜索 + 状态筛选 + 通过/驳回/冻结）
+- ✅ `/admin/orders` — 订单管理（状态筛选 + 状态流转）
+- ✅ `/admin/users` — 用户管理（角色筛选）
+- ✅ `/admin/review` — 提纲审核（合规通过/进入匹配/驳回）
+- ✅ `/admin/audit` — 合规日志（标记已处理）
+- ✅ 侧边栏导航（AdminSidebar + layout.tsx 复用）
+
+**P2-12: 5位演示专家**:
+- ✅ 张伟 - 芯片设计 2500元/h | 李芳 - 电池技术 2000元/h | 王强 - 创新药 3500元/h | 赵敏 - 供应链 1800元/h | 陈杰 - SaaS架构 2800元/h
+- ✅ 含三级标签（行业/细分/岗位）+ topics + availability + forms
+- ✅ 密码 123456，角色 EXPERT，状态 ACTIVE
+
+**新增 API**: `/api/users` GET, `/api/compliance` GET/PATCH, `/api/experts` PATCH, `/api/requests` GET/PATCH
+
+**待部署**: 正在 Vercel 构建中
+
+---
+
 ### 2026-06-19 | 部署与基础设施就绪 ✅
 
 **执行人**: WorkBuddy AI
