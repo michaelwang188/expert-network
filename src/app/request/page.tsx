@@ -14,6 +14,7 @@ function RequestContent() {
   const [step, setStep] = useState(0)
   const [loading, setLoading] = useState(false)
   const [sensitiveFound, setSensitiveFound] = useState<string[]>([])
+  const [orderNo, setOrderNo] = useState("")
   const [form, setForm] = useState({
     title: "", industry: "MLCC", subField: "", duration: "60分钟", form: "线上视频",
     budget: "6000-12000", timeReq: "", outline: "", forbidden: "",
@@ -30,9 +31,9 @@ function RequestContent() {
     })
     const data = await res.json()
     setLoading(false)
+    if (data.orderNo) setOrderNo(data.orderNo)
     if (data.sensitiveWords?.length > 0) {
       setSensitiveFound(data.sensitiveWords)
-      // 仍然继续，但提示用户
     }
     setStep(1)
   }
@@ -132,7 +133,7 @@ function RequestContent() {
               <br/>这些问题将在人工复审后被剔除或要求修改。
             </div>
           )}
-          <div style={{ fontSize: 13, color: "#5F5E5A", marginBottom: 16 }}>调研需求已提交，订单号：<strong>ORD-2026-XXXX</strong></div>
+          <div style={{ fontSize: 13, color: "#5F5E5A", marginBottom: 16 }}>调研需求已提交，订单号：<strong>{orderNo || "生成中..."}</strong></div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setStep(0)} style={{ padding: "8px 16px", border: "0.5px solid #e0dfd8", borderRadius: 8, background: "#fff", cursor: "pointer", fontSize: 13 }}>返回修改</button>
             <button onClick={() => router.push("/orders")} style={{ padding: "8px 16px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>查看我的订单 →</button>

@@ -55,7 +55,9 @@ export default function Nav() {
         </Link>
       ))}
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
-        <span style={{ color: "#888" }}>{session.user?.name || session.user?.email}</span>
+        <Link href="/profile" style={{ color: "#185FA5", textDecoration: "none", fontSize: 13 }}>
+          {session.user?.name || session.user?.email}
+        </Link>
         <span style={{
           background: role === "ADMIN" ? "#FCEBEB" : role === "EXPERT" ? "#E1F5EE" : "#E6F1FB",
           color: role === "ADMIN" ? "#A32D2D" : role === "EXPERT" ? "#0F6E56" : "#185FA5",
