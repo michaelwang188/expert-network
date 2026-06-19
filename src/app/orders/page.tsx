@@ -71,6 +71,12 @@ function OrdersContent() {
 
       {error && <div style={{ padding: 12, background: "#FCEBEB", color: "#A32D2D", borderRadius: 8, fontSize: 13, marginBottom: 12 }}>{error}</div>}
 
+      {/* 费用说明 */}
+      <div style={{ background: "#f8f7f4", borderRadius: 8, padding: 10, fontSize: 12, color: "#888", marginBottom: 12, lineHeight: 1.6 }}>
+        💰 <strong>费用结构</strong>：总价 = 专家酬劳（80%）+ 平台服务费（20%）。平台不参与调研结论，仅提供撮合与合规保障。
+        ⚠️ 禁止私下联系专家绕开平台交易，一经发现永久封号。
+      </div>
+
       {loading ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>加载中...</div> :
         filtered.length === 0 ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>{error ? "请刷新重试" : "暂无订单"}</div> :
         <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, overflow: "hidden" }}>
@@ -81,6 +87,7 @@ function OrdersContent() {
                 <th style={{ padding: 10, textAlign: "left", fontSize: 12, color: "#888", fontWeight: 500 }}>调研主题</th>
                 <th style={{ padding: 10, textAlign: "left", fontSize: 12, color: "#888", fontWeight: 500 }}>专家</th>
                 <th style={{ padding: 10, textAlign: "left", fontSize: 12, color: "#888", fontWeight: 500 }}>金额</th>
+                <th style={{ padding: 10, textAlign: "left", fontSize: 12, color: "#888", fontWeight: 500 }}>明细</th>
                 <th style={{ padding: 10, textAlign: "left", fontSize: 12, color: "#888", fontWeight: 500 }}>状态</th>
                 <th style={{ padding: 10, textAlign: "left", fontSize: 12, color: "#888", fontWeight: 500 }}>操作</th>
               </tr>
@@ -92,6 +99,9 @@ function OrdersContent() {
                   <td style={{ padding: 10, fontWeight: 500 }}>{o.request?.title || o.orderNo || o.id}</td>
                   <td style={{ padding: 10, fontSize: 12, color: "#888" }}>{o.expert?.title || "-"}</td>
                   <td style={{ padding: 10, fontWeight: 500 }}>¥{((o.amount || 0) / 100).toLocaleString()}</td>
+                  <td style={{ padding: 10, fontSize: 11, color: "#888" }}>
+                    专家 ¥{((o.expertFee || 0) / 100).toLocaleString()}<br/>平台 ¥{((o.platformFee || 0) / 100).toLocaleString()}
+                  </td>
                   <td style={{ padding: 10 }}>
                     <span style={{
                       background: (STATUS_MAP[o.status]?.color || "#888") + "18",

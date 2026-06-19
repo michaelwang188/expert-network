@@ -134,6 +134,9 @@ function RequestContent() {
             </div>
           )}
           <div style={{ fontSize: 13, color: "#5F5E5A", marginBottom: 16 }}>调研需求已提交，订单号：<strong>{orderNo || "生成中..."}</strong></div>
+          <div style={{ background: "#FFF8E7", border: "0.5px solid #E6B422", borderRadius: 8, padding: 10, fontSize: 12, color: "#7A5E00", marginBottom: 16, lineHeight: 1.6 }}>
+            ⚠️ <strong>合规提醒</strong>：平台禁止私下联系专家绕开交易。所有沟通通过平台进行，违规将永久封号并冻结结算。
+          </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setStep(0)} style={{ padding: "8px 16px", border: "0.5px solid #e0dfd8", borderRadius: 8, background: "#fff", cursor: "pointer", fontSize: 13 }}>返回修改</button>
             <button onClick={() => router.push("/orders")} style={{ padding: "8px 16px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer", fontSize: 13 }}>查看我的订单 →</button>

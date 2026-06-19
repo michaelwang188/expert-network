@@ -54,6 +54,12 @@ export default async function ExpertDetailPage({ params }: { params: Promise<{ i
           ✓ 已签署内幕信息禁止承诺函 · 竞业限制承诺书 · 调研内容合规协议
         </div>
 
+        {/* 反私下交易警告 */}
+        <div style={{background:"#FFF8E7", border:"0.5px solid #E6B422", borderRadius:8, padding:10, fontSize:12, color:"#7A5E00", marginBottom:12, lineHeight:1.6}}>
+          ⚠️ <strong>合规提醒</strong>：平台禁止私下交易。专家联系方式仅在订单确认后通过平台提供，私自交换联系方式将被永久拉黑并冻结结算。<br/>
+          🔒 联系方式：<strong>已加密 | 订单确认后可见</strong>
+        </div>
+
         {(session.user as any).role === "RESEARCHER" && (
           <Link href={`/request?expertId=${expert.id}`} style={{
             display:"inline-block", background:"#185FA5", color:"#fff", textDecoration:"none",
