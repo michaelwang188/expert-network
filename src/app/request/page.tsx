@@ -118,8 +118,8 @@ function RequestContent() {
               style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", resize: "vertical" }} />
           </div>
           {form.outline && checkSensitive(form.outline).length > 0 && (
-            <div style={{ background: "#FCEBEB", color: "#A32D2D", padding: 10, borderRadius: 8, fontSize: 13 }}>
-              ⚠️ 检测到敏感词：{checkSensitive(form.outline).join("、")} — 提交后需人工复审
+            <div style={{ background: "#FEE2E2", border: "1px solid #dc2626", color: "#991b1b", padding: 12, borderRadius: 8, fontSize: 13 }}>
+              🚫 <strong>提交已被阻止</strong>：检测到敏感词 — {checkSensitive(form.outline).join("、")}。请删除或替换后重新提交。
             </div>
           )}
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>

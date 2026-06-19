@@ -30,7 +30,7 @@ export default async function ProfilePage() {
         prisma.order.count({ where: { expertId: expert.id } }),
         prisma.order.count({ where: { expertId: expert.id, status: "DONE" } }),
       ])
-      stats = { totalOrders, completedOrders, rating: expert.rating, rateHour: expert.rateHour }
+      stats = { totalOrders, completedOrders, rating: expert.rating, ratePoints: expert.ratePoints }
     }
   }
 
@@ -74,7 +74,7 @@ export default async function ProfilePage() {
             <StatBox label="总订单" value={stats.totalOrders || 0} />
             <StatBox label="已完成" value={stats.completedOrders || 0} />
             <StatBox label="评分" value={stats.rating || "-"} />
-            <StatBox label="时薪" value={"¥" + ((stats.rateHour || 0) / 100).toLocaleString()} />
+            <StatBox label="费率" value={stats.ratePoints?.toLocaleString() + " 积分/h"} />
           </div>
         )}
       </div>
@@ -129,7 +129,7 @@ async function RecentOrders({ userId, role }: { userId: string; role: string }) 
               <div style={{ fontWeight: 500 }}>{o.request?.title || o.orderNo}</div>
               <div style={{ fontSize: 12, color: "#888" }}>{o.orderNo} · {role === "RESEARCHER" ? `专家：${o.expert?.title || "未指派"}` : `研究员：${o.researcher?.name || o.researcher?.email}`}</div>
             </div>
-            <div style={{ fontWeight: 500 }}>¥{((o.amount || 0) / 100).toLocaleString()}</div>
+            <div style={{ fontWeight: 500 }}>{(o.amount || 0).toLocaleString()} 积分</div>
             <span style={{ background: (STATUS_MAP[o.status]?.color || "#888") + "18", color: STATUS_MAP[o.status]?.color || "#888", padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500 }}>
               {STATUS_MAP[o.status]?.label || o.status}
             </span>
