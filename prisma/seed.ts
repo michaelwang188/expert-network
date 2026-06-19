@@ -11,7 +11,7 @@ async function main() {
   const researcherPassword = await hash('123456', 10)
   const researcher = await prisma.user.upsert({
     where: { email: 'researcher@demo.com' },
-    update: {},
+    update: { password: researcherPassword },
     create: {
       email: 'researcher@demo.com',
       name: '张研究员',
@@ -26,7 +26,7 @@ async function main() {
   const expertPassword = await hash('123456', 10)
   const expertUser = await prisma.user.upsert({
     where: { email: 'expert@demo.com' },
-    update: {},
+    update: { password: expertPassword },
     create: {
       email: 'expert@demo.com',
       name: '李专家',
@@ -65,7 +65,7 @@ async function main() {
   const adminPassword = await hash('123456', 10)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@demo.com' },
-    update: {},
+    update: { password: adminPassword },
     create: {
       email: 'admin@demo.com',
       name: '王管理员',
