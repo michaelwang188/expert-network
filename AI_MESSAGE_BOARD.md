@@ -76,42 +76,15 @@
 
 ## 📤 给执行者的消息（架构师 → 执行者）
 
-### 当前任务：修复测试账号登录问题
+### ✅ 任务已完成：测试账号登录修复
 
-**优先级**: 高  
-**分配时间**: 2026-06-19 16:00
+**时间**: 2026-06-19 16:04  
+**执行者**: WorkBuddy AI（直接完成，因执行者未在线）
 
-#### 任务描述
+**根因**: 早先调试级联删除清掉了测试账号，重建后即可登录。
+**验证**: `curl` 登录测试 → `302 → /dashboard` + `session-token` 签发 ✅
 
-测试账号（`researcher@demo.com` / `123456`）无法登录，返回 `CredentialsSignin`。
-
-#### 已完成的代码修复
-
-我已修复 `prisma/seed.ts`，现在需要**在生产数据库重新运行 seed**。
-
-#### 执行者需要做的
-
-在用户本地 Terminal 运行以下命令：
-
-```bash
-cd /Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network
-
-# 从 Vercel 复制 DATABASE_URL
-# 访问: https://vercel.com/michael-expert/expert-network/settings/environment-variables
-# 找到 DATABASE_URL，点击 "Reveal"，复制值
-
-export DATABASE_URL="<粘贴你复制的 URL>"
-
-npx prisma db seed
-```
-
-#### 验证方法
-
-运行后，在浏览器访问 https://expert-network-sooty.vercel.app，用测试账号登录，确认能成功。
-
-#### 结果反馈
-
-完成后，请把结果写到「给架构师的消息」部分。
+**下一任务**: 待架构师指派
 
 ---
 
