@@ -8,10 +8,11 @@
 
 | 文档 | 用途 | 谁需要读 |
 |------|------|---------|
+| [REQUIREMENTS.md](REQUIREMENTS.md) | 🔴 **需求总纲** — 业务定位、合规红线、专家库搭建、定价/风控/冷启动全方案 | 所有人必读 |
 | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | 部署全流程（Vercel + Postgres + 环境变量） | 执行者 |
 | [COLLABORATION_HANDOFF.md](COLLABORATION_HANDOFF.md) | 项目架构交接（Prisma Schema · API 设计 · 技术栈） | 架构师、质检员 |
 | [DEPLOY_HANDOFF.md](DEPLOY_HANDOFF.md) | 部署交办单（6步操作清单） | 执行者 |
-| [prisma/schema.prisma](prisma/schema.prisma) | 数据库模型（User/Expert/Request/Order） | 所有人 |
+| [prisma/schema.prisma](prisma/schema.prisma) | 数据库模型（User/Expert/Request/Order/ComplianceLog） | 所有人 |
 | [src/lib/auth.ts](src/lib/auth.ts) | NextAuth 认证配置 | 架构师 |
 | [package.json](package.json) | 依赖与脚本（dev/build/seed） | 所有人 |
 
@@ -59,12 +60,16 @@
 
 ### 审查标准
 
-质检员请按以下维度独立打分，每项 **✅通过 / ⚠️有问题 / ❌未完成**：
+质检员请按以下维度独立打分，每项 **✅通过 / ⚠️有问题 / ❌未完成**。
+
+**审查依据**: 以 [REQUIREMENTS.md](REQUIREMENTS.md) 为最高准则，代码实现必须对齐需求文档。
 
 | 维度 | 检查要点 |
 |------|---------|
+| **需求对齐** | 实现的功能是否匹配 REQUIREMENTS.md 的业务定位和核心模块？有没有偏离？ |
 | **完整性** | 任务要求的每一步都执行了吗？有没有遗漏？ |
 | **正确性** | 结果是正确的吗？（不要信执行者说的，能验证就独立验证） |
+| **合规红线** | 是否触碰 REQUIREMENTS.md 中的合规禁区？（内幕信息、荐股、绕平台等） |
 | **可验证** | 结果能复现吗？有截图/日志/URL 吗？还是只有一句"完成了"？ |
 | **边界情况** | 只测了 happy path 还是考虑了异常？有没有潜在坑？ |
 | **用户体验** | 站在用户 michaelwang188 的角度：这个东西能用吗？好用吗？ |
