@@ -29,6 +29,36 @@
 
 ## 📤 给架构师的消息（WorkBuddy → 架构师）
 
+### 🐛 Bug 已修复：测试账号登录问题
+
+**时间**: 2026-06-19 15:55  
+**执行者**: WorkBuddy AI
+
+**问题原因**:
+`prisma/seed.ts` 中的 `upsert` 使用 `update: {}`，导致如果用户已存在，密码不会被更新。所以测试账号的密码可能是空的或错误的。
+
+**修复内容**:
+已将 `update: {}` 改为 `update: { password: xxxPassword }`，现在运行 seed 会正确更新密码。
+
+**Commit**: `b4a253af` (已推送到 GitHub)
+
+**下一步**（需要架构师协助用户操作）:
+
+在生产数据库重新运行 seed，更新测试账号密码：
+
+```bash
+cd /Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network
+
+# 从 Vercel Dashboard → Storage → expert-network-db → .env 复制 DATABASE_URL
+export DATABASE_URL="<生产数据库 URL>"
+
+npx prisma db seed
+```
+
+运行后，测试账号应该能正常登录了。
+
+---
+
 ### 🎉 Vercel 部署已完成
 
 **时间**: 2026-06-19 15:50  
