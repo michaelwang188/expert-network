@@ -3,11 +3,12 @@
 import { useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import AuthGuard from "@/components/AuthGuard"
 
 const STEPS = ["填写需求", "提纲审核", "匹配专家", "预约确认", "访谈结算"]
 const SENSITIVE = ["定增","并购","内幕","未公告","股价","收购价格","控股计划","涉密","定增价格","并购标的","未公开业绩"]
 
-export default function RequestPage() {
+function RequestContent() {
   const { data: session } = useSession()
   const router = useRouter()
   const [step, setStep] = useState(0)
@@ -85,6 +86,22 @@ export default function RequestPage() {
                 style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none" }} />
             </div>
           </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>预算范围（元）</label>
+              <select value={form.budget} onChange={e => setForm(f => ({...f, budget: e.target.value}))}
+                style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", background: "#fff" }}>
+                <option>3000-6000</option><option>6000-12000</option><option>12000-24000</option><option>24000+</option>
+              </select>
+            </div>
+            <div>
+              <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>预期时长</label>
+              <select value={form.duration} onChange={e => setForm(f => ({...f, duration: e.target.value}))}
+                style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", background: "#fff" }}>
+                <option>30分钟</option><option>60分钟</option><option>90分钟</option><option>120分钟</option>
+              </select>
+            </div>
+          </div>
           <div>
             <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>访谈提纲（每行一个问题）</label>
             <textarea value={form.outline} onChange={e => setForm(f => ({...f, outline: e.target.value}))} rows={6}
@@ -123,5 +140,13 @@ export default function RequestPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function RequestPage() {
+  return (
+    <AuthGuard roles={["RESEARCHER"]}>
+      <RequestContent />
+    </AuthGuard>
   )
 }

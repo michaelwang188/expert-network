@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import AuthGuard from "@/components/AuthGuard"
 
 const INDUSTRIES = ["", "AI算力", "新能源", "半导体", "MLCC", "创新药", "消费电子"]
 const ROLE_TYPES = ["", "研发", "供应链", "渠道", "管理", "政策"]
@@ -13,7 +14,7 @@ type Expert = {
   forms: string; completedOrders: number; rating: number; status: string;
 }
 
-export default function ExpertsPage() {
+function ExpertsContent() {
   const [experts, setExperts] = useState<Expert[]>([])
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -110,5 +111,13 @@ export default function ExpertsPage() {
         </div>
       }
     </div>
+  )
+}
+
+export default function ExpertsPage() {
+  return (
+    <AuthGuard>
+      <ExpertsContent />
+    </AuthGuard>
   )
 }

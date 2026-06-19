@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 const navItems = [
   { href: "/dashboard", label: "数据看板", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/experts", label: "专家库", roles: ["RESEARCHER", "ADMIN"] },
+  { href: "/experts/edit", label: "我的资料", roles: ["EXPERT"] },
   { href: "/request", label: "发起调研", roles: ["RESEARCHER"] },
   { href: "/orders", label: "订单管理", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/compliance", label: "合规中心", roles: ["ADMIN"] },

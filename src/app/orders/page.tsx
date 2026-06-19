@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import AuthGuard from "@/components/AuthGuard"
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING:   { label: "待确认", color: "#BA7517" },
@@ -12,18 +12,31 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
   CANCELLED: { label: "已取消", color: "#A32D2D" },
 }
 
-export default function OrdersPage() {
+function OrdersContent() {
   const { data: session } = useSession()
-  const router = useRouter()
   const [orders, setOrders] = useState<any[]>([])
   const [filter, setFilter] = useState("")
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
   const fetchOrders = async () => {
     setLoading(true)
-    const res = await fetch("/api/orders")
-    const data = await res.json()
-    setOrders(data)
+    setError("")
+    try {
+      const res = await fetch("/api/orders")
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        setOrders(data)
+      } else if (data.error) {
+        setError(data.error)
+        setOrders([])
+      } else {
+        setOrders([])
+      }
+    } catch {
+      setError("加载失败，请刷新重试")
+      setOrders([])
+    }
     setLoading(false)
   }
 
@@ -38,7 +51,11 @@ export default function OrdersPage() {
     fetchOrders()
   }
 
-  const filtered = filter ? orders.filter(o => o.status === filter) : orders
+  const filtered = Array.isArray(orders) && filter
+    ? orders.filter(o => o.status === filter)
+    : orders
+
+  const role = (session?.user as any)?.role
 
   return (
     <div>
@@ -52,8 +69,10 @@ export default function OrdersPage() {
         <span style={{ fontSize: 13, color: "#888", marginLeft: "auto" }}>共 {filtered.length} 笔订单</span>
       </div>
 
+      {error && <div style={{ padding: 12, background: "#FCEBEB", color: "#A32D2D", borderRadius: 8, fontSize: 13, marginBottom: 12 }}>{error}</div>}
+
       {loading ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>加载中...</div> :
-        filtered.length === 0 ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>暂无订单</div> :
+        filtered.length === 0 ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>{error ? "请刷新重试" : "暂无订单"}</div> :
         <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
@@ -69,25 +88,25 @@ export default function OrdersPage() {
             <tbody>
               {filtered.map(o => (
                 <tr key={o.id} style={{ borderTop: "0.5px solid #f1efe8" }}>
-                  <td style={{ padding: 10, fontFamily: "monospace", fontSize: 12, color: "#888" }}>{o.orderNo}</td>
-                  <td style={{ padding: 10, fontWeight: 500 }}>{o.request?.title || o.orderNo}</td>
+                  <td style={{ padding: 10, fontFamily: "monospace", fontSize: 12, color: "#888" }}>{o.orderNo || o.id}</td>
+                  <td style={{ padding: 10, fontWeight: 500 }}>{o.request?.title || o.orderNo || o.id}</td>
                   <td style={{ padding: 10, fontSize: 12, color: "#888" }}>{o.expert?.title || "-"}</td>
-                  <td style={{ padding: 10, fontWeight: 500 }}>¥{(o.amount / 100).toLocaleString()}</td>
+                  <td style={{ padding: 10, fontWeight: 500 }}>¥{((o.amount || 0) / 100).toLocaleString()}</td>
                   <td style={{ padding: 10 }}>
                     <span style={{
-                      background: STATUS_MAP[o.status]?.color + "18" || "#f1efe8",
+                      background: (STATUS_MAP[o.status]?.color || "#888") + "18",
                       color: STATUS_MAP[o.status]?.color || "#888",
                       padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500,
                     }}>{STATUS_MAP[o.status]?.label || o.status}</span>
                   </td>
                   <td style={{ padding: 10 }}>
-                    {o.status === "PENDING" && (session?.user as any)?.role === "EXPERT" && (
+                    {o.status === "PENDING" && role === "EXPERT" && (
                       <button onClick={() => handleAction(o.id, "ACTIVE")} style={{ padding: "4px 10px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>确认接单</button>
                     )}
                     {o.status === "ACTIVE" && (
                       <button onClick={() => handleAction(o.id, "DONE")} style={{ padding: "4px 10px", background: "#0F6E56", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>标记完成</button>
                     )}
-                    {o.status === "DONE" && (session?.user as any)?.role === "ADMIN" && (
+                    {o.status === "DONE" && role === "ADMIN" && (
                       <button onClick={() => handleAction(o.id, "PAID")} style={{ padding: "4px 10px", background: "#BA7517", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>确认结算</button>
                     )}
                     {["PENDING","ACTIVE"].includes(o.status) && (
@@ -101,5 +120,13 @@ export default function OrdersPage() {
         </div>
       }
     </div>
+  )
+}
+
+export default function OrdersPage() {
+  return (
+    <AuthGuard>
+      <OrdersContent />
+    </AuthGuard>
   )
 }
