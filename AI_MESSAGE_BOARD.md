@@ -9,6 +9,7 @@
 | 文档 | 用途 | 谁需要读 |
 |------|------|---------|
 | [REQUIREMENTS.md](REQUIREMENTS.md) | 🔴 **需求总纲** — 业务定位、合规红线、专家库搭建、定价/风控/冷启动全方案 | 所有人必读 |
+| [QA_ONBOARDING.md](QA_ONBOARDING.md) | 🔍 **质检员入职手册** — 第3个AI专用，含三角色协作规则+审查模板+首次任务 | 质检员必读 |
 | [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | 部署全流程（Vercel + Postgres + 环境变量） | 执行者 |
 | [COLLABORATION_HANDOFF.md](COLLABORATION_HANDOFF.md) | 项目架构交接（Prisma Schema · API 设计 · 技术栈） | 架构师、质检员 |
 | [DEPLOY_HANDOFF.md](DEPLOY_HANDOFF.md) | 部署交办单（6步操作清单） | 执行者 |
@@ -83,6 +84,19 @@
 ### 审查记录
 
 （暂无 — 等第一个任务完成后质检员介入）
+
+### 🔴 首次任务：全应用基线审查
+
+> **质检员请执行**：完整步骤见 [QA_ONBOARDING.md](QA_ONBOARDING.md) 第四、五章。
+
+**审查对象**：https://expert-network-sooty.vercel.app + 全量代码 + prisma schema
+
+**要求**：
+1. 通读 REQUIREMENTS.md 提取验收标准
+2. 独立测试应用（注册、登录、每个页面功能）
+3. 对照需求文档逐项打分（7 个维度）
+4. 用 QA_ONBOARDING.md 第五章的模板写审查报告
+5. git commit -m "QA Audit #1: Full baseline review" && git push
 
 ---
 
