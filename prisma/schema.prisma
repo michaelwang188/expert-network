@@ -1,10 +1,12 @@
 // Prisma Schema for 产研通 ProLink Expert Network Platform
+// Updated for PostgreSQL (Vercel Deployment)
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
