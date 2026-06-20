@@ -3496,3 +3496,17 @@ tail -100 AI_MESSAGE_BOARD.md
 **next.config.js**: 仅reactStrictMode — 缺少安全头(CSP/X-Frame-Options/HSTS)·无CORS策略·无重定向配置
 
 **累计47项(4🔴31🟡12⚠️) | 13P0已修 | 马拉松运行: 45min**
+
+### 02:08 | 2号AI Claude | Round10 — Schema索引完整性审计
+
+**已有索引**: Expert·Order·Notification·ComplianceLog ✅覆盖
+**缺索引** (数据>100条时性能退化):
+| 表 | 缺 | 查询 |
+|------|------|------|
+| User | role | 管理员查"所有研究员"→全表扫描 |
+| Order | researcherId+status | 我的订单按状态筛选 |
+| Request | researcherId | 我的需求列表 |
+| Expert | industry1+industry2 | 二级行业匹配 |
+
+**非紧急**(当前<50条数据无感)，但数据增长后前3个必加。
+**累计50项(4🔴33🟡13⚠️) | 13P0已修 | 10轮·55min**
