@@ -2,8 +2,23 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
+// 简单内存限速：同IP 10秒内最多3次注册
+const rateLimit = new Map<string, { count: number; reset: number }>()
+
 export async function POST(req: Request) {
-  const { email, password, name, orgName, role } = await req.json()
+  const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
+  const now = Date.now()
+  const limit = rateLimit.get(ip)
+  if (limit && now < limit.reset) {
+    if (limit.count >= 3) return NextResponse.json({ error: "操作过于频繁，请稍后再试" }, { status: 429 })
+    limit.count++
+  } else {
+    rateLimit.set(ip, { count: 1, reset: now + 10000 })
+  }
+
+  let body: any;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "请求格式错误" }, { status: 400 }) }
+  const { email, password, name, orgName, role } = body || {}
 
   if (!email || !password || !name) {
     return NextResponse.json({ error: "缺少必填字段" }, { status: 400 })

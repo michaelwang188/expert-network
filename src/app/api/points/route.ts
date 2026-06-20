@@ -3,16 +3,12 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
-// GET — 积分余额 + 排行榜
+// GET — 积分余额 + 排行榜（排行榜公开，余额需登录）
 export async function GET(req: Request) {
-  const session = await getServerSession(authOptions)
-  if (!session) return NextResponse.json({ error: "未登录" }, { status: 401 })
-
   const { searchParams } = new URL(req.url)
-  const type = searchParams.get("type") // "me" | "leaderboard" | "transactions"
+  const type = searchParams.get("type")
 
-  const userId = (session.user as any).id
-
+  // 排行榜公开——无需登录
   if (type === "leaderboard") {
     const users = await prisma.user.findMany({
       select: { id: true, name: true, role: true, orgName: true, points: true },
@@ -22,6 +18,11 @@ export async function GET(req: Request) {
     })
     return NextResponse.json({ leaderboard: users })
   }
+
+  // 以下需要登录
+  const session = await getServerSession(authOptions)
+  if (!session) return NextResponse.json({ error: "未登录" }, { status: 401 })
+  const userId = (session.user as any).id
 
   if (type === "transactions") {
     const txs = await prisma.pointsTransaction.findMany({
