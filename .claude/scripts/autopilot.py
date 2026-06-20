@@ -72,10 +72,17 @@ def bash(cmd, timeout=60):
     except: return "", "timeout", 124
 
 def read_file(path):
+    """安全读项目文件，自动修复 DeepSeek 幻觉路径"""
     full = (PROJECT_DIR / path).resolve()
-    if not str(full).startswith(str(PROJECT_DIR.resolve())): return None
-    try: return full.read_text()
-    except: return None
+    if str(full).startswith(str(PROJECT_DIR.resolve())):
+        try: return full.read_text()
+        except: pass
+    # 幻觉路径修复：按文件名搜索项目目录
+    name = Path(path).name
+    for f in PROJECT_DIR.rglob(name):
+        try: return f.read_text()
+        except: pass
+    return None
 
 def write_file(path, content):
     full = (PROJECT_DIR / path).resolve()
