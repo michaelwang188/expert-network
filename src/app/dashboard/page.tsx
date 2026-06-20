@@ -43,9 +43,14 @@ async function ResearcherDashboard({ userId }: { userId: string }) {
         <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 12, padding: 40 }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div style={{ fontSize: 36, marginBottom: 8 }}>🔬</div>
-            <div style={{ fontSize: 16, fontWeight: 500, color: "#2c2c2a", marginBottom: 6 }}>开始第一次产业调研</div>
-            <div style={{ fontSize: 13, color: "#888", lineHeight: 1.7 }}>
-              平台目前已有 {activeExperts} 位活跃专家覆盖半导体、新能源、AI算力等赛道{activeExperts === 0 ? "，首批专家正在招募中" : ""}
+            <div style={{ fontSize: 17, fontWeight: 600, color: "#2c2c2a", marginBottom: 4 }}>
+              {user?.name || "研究员"}，欢迎
+            </div>
+            <div style={{ fontSize: 14, color: "#5F5E5A", marginBottom: 14 }}>
+              一个好的调研问题，比十个答案都重要
+            </div>
+            <div style={{ fontSize: 13, color: "#888", lineHeight: 1.7, maxWidth: 480, margin: "0 auto" }}>
+              平台已有 <strong style={{ color: "#185FA5" }}>{activeExperts}</strong> 位行业专家。首次使用无需积分即可发起调研
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>
