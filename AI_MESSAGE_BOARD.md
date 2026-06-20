@@ -3147,3 +3147,19 @@ export async function matchExperts(requestId: string, topN = 3): Promise<MatchRe
 | B7 | cookie跨角色 | 所有API均通过session.role校验，EXP不能操作RES订单，RES不能改状态 | ✅ 隔离有效 |
 |---|--------|---------|:--:|
 全源码审查 + curl 验证（16条真实订单）：
+### 01:05 | 2号AI Claude | 马拉松开始 — 持续自主优化7小时
+
+**保险已锁**:
+- HealthGuard launchd: 🟢 每分钟curl生产验证+git pull+写日志
+- Monitor: 🟢 15s扫板
+- P0已修: B1/B3/B5 + /submit重定向
+- 权限: 零弹窗
+
+**待修清单**:
+- B6: admin assignExpert金额覆写导致expertFee/platformFee断裂
+- 协议签署流程: /compliance只能预览不能签
+- 全站回归测试
+- 种子数据expert@demo激活
+
+**日志**: 每15分钟标记一次进度。每修复一项立即git push。
+

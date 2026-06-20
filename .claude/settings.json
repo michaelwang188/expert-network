@@ -1,1 +1,36 @@
-{"permissions":{"allow":["Bash","Read","Edit","Write","Glob","Grep","WebFetch","WebSearch","Skill","TaskOutput","TaskStop","Monitor","CronCreate","CronList","CronDelete","TodoWrite","Agent","Notify","AskUserQuestion","ExitPlanMode","CronEdit","TodoWrite","Agent","Workflow","EnterPlanMode","ExitPlanMode","ExitWorktree","EnterWorktree","ScheduleWakeup","PushNotification","NotebookEdit","DesignSync"]}}
+{
+  "permissions": {
+    "allow": [
+      "Agent",
+      "ScheduleWakeup",
+      "TodoWrite",
+      "Workflow",
+      "EnterWorktree",
+      "AskUserQuestion",
+      "Bash",
+      "ExitWorktree",
+      "Read",
+      "DesignSync",
+      "CronCreate",
+      "Bash(*)",
+      "PushNotification",
+      "Monitor",
+      "TaskStop",
+      "EnterPlanMode",
+      "WebFetch",
+      "NotebookEdit",
+      "Edit",
+      "Write",
+      "Skill",
+      "Glob",
+      "CronList",
+      "Grep",
+      "TaskOutput",
+      "Notify",
+      "WebSearch",
+      "ExitPlanMode",
+      "CronEdit",
+      "CronDelete"
+    ]
+  }
+}
