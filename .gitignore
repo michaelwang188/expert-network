@@ -37,3 +37,12 @@ push-to-github-fixed.sh
 
 # launchd plists (contain API keys)
 *.plist
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
+# Local runtime state
+.workbuddy/*.log
+.workbuddy/*.json
+
+# Old backup directories (keep local, dont push)
