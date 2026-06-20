@@ -66,6 +66,7 @@ export default function RegisterPage() {
             <option value="RESEARCHER">研究员（公募/私募/券商/PEVC）</option>
             <option value="EXPERT">专家（产业从业者）</option>
           </select>
+          <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>管理员账号由平台分配，如需开通请联系客服</div>
         </div>
         {error && <div style={{ color: "#A32D2D", fontSize: 13, background: "#FCEBEB", padding: 8, borderRadius: 8 }}>{error}</div>}
         <button type="submit" disabled={loading} style={{

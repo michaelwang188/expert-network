@@ -8,6 +8,9 @@ export async function POST(req: Request) {
   if (!email || !password || !name) {
     return NextResponse.json({ error: "缺少必填字段" }, { status: 400 })
   }
+  if (name.length > 100 || (orgName || "").length > 200) {
+    return NextResponse.json({ error: "姓名或机构名称过长" }, { status: 400 })
+  }
   if (password.length < 6) {
     return NextResponse.json({ error: "密码至少6位" }, { status: 400 })
   }
