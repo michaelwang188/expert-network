@@ -4,7 +4,7 @@
 # 每 30 秒检查一次 AI_MESSAGE_BOARD.md 是否有更新
 # 发现更新时发送 macOS 通知
 
-PROJECT_DIR="/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network"
+PROJECT_DIR=""$HOME/WorkBuddy/2026-06-19-11-15-05/expert-network""
 cd "$PROJECT_DIR" || exit 1
 
 echo "🔄 AI 消息板轮询器启动"

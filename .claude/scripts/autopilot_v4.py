@@ -18,7 +18,12 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 # ─── 配置 ─────────────────────────────────────────
-PROJECT_DIR = Path("/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network")
+# 项目目录：优先从环境变量，其次从脚本位置推算
+_env = os.environ.get("EXPERT_NETWORK_PROJECT", "")
+if _env:
+    PROJECT_DIR = Path(_env)
+else:
+    PROJECT_DIR = Path(__file__).resolve().parent.parent.parent
 MSG_BOARD   = PROJECT_DIR / "AI_MESSAGE_BOARD.md"
 
 # API — DeepSeek代理的Claude

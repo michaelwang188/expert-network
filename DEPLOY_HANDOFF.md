@@ -23,10 +23,10 @@
 
 ```bash
 # 1. Git 状态（应显示 up-to-date with origin/main）
-git -C /Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network status
+git -C <project-root> status
 
 # 2. Prisma schema 是否是 PostgreSQL
-grep provider /Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network/prisma/schema.prisma
+grep provider <project-root>/prisma/schema.prisma
 
 # 3. SSH 到 GitHub（应显示 Hi michaelwang188!）
 ssh -T git@github.com
@@ -95,7 +95,7 @@ npx prisma generate && npx prisma db push && npm run build
 部署成功后，用 Vercel CLI 跑 seed：
 
 ```bash
-cd /Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network
+cd <project-root>
 
 # 安装 Vercel CLI（如果没有）
 npm i -g vercel

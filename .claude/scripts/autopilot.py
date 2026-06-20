@@ -12,18 +12,25 @@
 """
 
 import os, sys, json, time, re, hashlib, subprocess, urllib.request, traceback
+
+# 项目目录：优先环境变量，其次脚本位置推算
+_env_proj = os.environ.get("EXPERT_NETWORK_PROJECT", "")
+if _env_proj:
+    _PROJECT_DIR = Path(_env_proj)
+else:
+    _PROJECT_DIR = Path(__file__).resolve().parent.parent.parent
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 # ═══════════════════════════════════════════════════
 # 配置
 # ═══════════════════════════════════════════════════
-PROJECT_DIR = Path("/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network")
-MSG_BOARD   = PROJECT_DIR / "AI_MESSAGE_BOARD.md"
-IRON_RULES  = PROJECT_DIR / "IRON_RULES.md"
-REQUIREMENTS= PROJECT_DIR / "REQUIREMENTS.md"
-PITFALLS    = PROJECT_DIR / "PITFALLS.md"
-STATE_FILE  = PROJECT_DIR / ".workbuddy" / "autopilot_state.json"
+_PROJECT_DIR
+MSG_BOARD   = _PROJECT_DIR / "AI_MESSAGE_BOARD.md"
+IRON_RULES  = _PROJECT_DIR / "IRON_RULES.md"
+REQUIREMENTS= _PROJECT_DIR / "REQUIREMENTS.md"
+PITFALLS    = _PROJECT_DIR / "PITFALLS.md"
+STATE_FILE  = _PROJECT_DIR / ".workbuddy" / "autopilot_state.json"
 STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 # API Key: 先从环境变量，再从 .env.local，最后尝试 bash 环境
@@ -66,27 +73,27 @@ def log(msg): print(f"[{datetime.now(TZ).strftime('%H:%M:%S')}] {msg}", flush=Tr
 
 def bash(cmd, timeout=60):
     try:
-        r = subprocess.run(["bash","-c",cmd], cwd=PROJECT_DIR,
+        r = subprocess.run(["bash","-c",cmd], cwd=_PROJECT_DIR,
                            capture_output=True,text=True,timeout=timeout)
         return r.stdout.strip(), r.stderr.strip(), r.returncode
     except: return "", "timeout", 124
 
 def read_file(path):
     """安全读项目文件，自动修复 DeepSeek 幻觉路径"""
-    full = (PROJECT_DIR / path).resolve()
-    if str(full).startswith(str(PROJECT_DIR.resolve())):
+    full = (_PROJECT_DIR / path).resolve()
+    if str(full).startswith(str(_PROJECT_DIR.resolve())):
         try: return full.read_text()
         except: pass
     # 幻觉路径修复：按文件名搜索项目目录
     name = Path(path).name
-    for f in PROJECT_DIR.rglob(name):
+    for f in _PROJECT_DIR.rglob(name):
         try: return f.read_text()
         except: pass
     return None
 
 def write_file(path, content):
-    full = (PROJECT_DIR / path).resolve()
-    if not str(full).startswith(str(PROJECT_DIR.resolve())): return False
+    full = (_PROJECT_DIR / path).resolve()
+    if not str(full).startswith(str(_PROJECT_DIR.resolve())): return False
     try:
         full.parent.mkdir(parents=True, exist_ok=True)
         full.write_text(content); return True

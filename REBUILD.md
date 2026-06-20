@@ -13,7 +13,7 @@
 | 名称 | 产研通 ProLink（产业专家对接平台） |
 | GitHub | `git@github.com:michaelwang188/expert-network.git` |
 | Branch | `main` |
-| 本地路径 | `/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network/` |
+| 本地路径 | `<project-root>/` |
 
 ---
 
@@ -126,9 +126,9 @@ npm run dev
 
 ```bash
 # 备份目录
-BAK=/Users/michaelwang188/.claude/expert-network-backup-2026-06-19
+BAK=<claude-root>/expert-network-backup-2026-06-19
 # 或
-BAK=/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network/.backups/2026-06-19-final
+BAK=<project-root>/.backups/2026-06-19-final
 
 # 恢复
 mkdir expert-network && cd expert-network

@@ -3,7 +3,7 @@
 # Usage: bash .claude/scripts/deploy.sh
 set -e
 
-PROJ="/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network"
+PROJ=""$HOME/WorkBuddy/2026-06-19-11-15-05/expert-network""
 TOKEN="${VERCEL_TOKEN}"
 
 echo "=== Step 1/4: TypeScript check ==="

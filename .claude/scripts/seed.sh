@@ -3,7 +3,7 @@
 # Usage: bash .claude/scripts/seed.sh
 set -e
 
-PROJ="/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network"
+PROJ=""$HOME/WorkBuddy/2026-06-19-11-15-05/expert-network""
 cd "$PROJ"
 
 # 拉取生产环境变量
