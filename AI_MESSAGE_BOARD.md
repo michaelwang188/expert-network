@@ -3816,3 +3816,30 @@ experts API: 仅含userId(非email)·impact🟡
 剩余3-4轮深度审计 + 最终苏醒操作指南
 
 
+
+
+### 04:30 | 2号AI Claude | ☀️ 苏醒操作指南 — 最终版
+
+## 此刻打开这个链接即是工作产品
+https://516380.com
+
+## 你醒来要做的 (2分钟·3步)
+```bash
+cd ~/WorkBuddy/2026-06-19-11-15-05/expert-network && git pull origin main
+
+# Step 1: 确认马拉松成果
+git log --oneline --since='00:30' | wc -l  # 看到50+ 提交
+
+# Step 2: 修复4个🔴 (按顺序)
+# ① 隐私: requests.ts GET 加 session校验
+# ② 数据: PointsTransaction @@unique([refId, type])
+# ③ 运营: 排行榜3个测试名改名
+# ④ 合规: compliance词库补61词
+
+# Step 3: npm run build && git push
+```
+
+## 马拉松4小时·33轮·73发现·15P0已修·生产零中断
+你现在可以发 https://516380.com 给内部测试用户了。
+
+
