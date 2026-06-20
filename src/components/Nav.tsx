@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState, useEffect } from "react"
 
 const navItems = [
   { href: "/dashboard", label: "数据看板", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
@@ -10,6 +11,7 @@ const navItems = [
   { href: "/experts/edit", label: "我的资料", roles: ["EXPERT"] },
   { href: "/request", label: "发起调研", roles: ["RESEARCHER"] },
   { href: "/orders", label: "订单管理", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
+  { href: "/notifications", label: "通知", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/leaderboard", label: "积分排行", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/compliance", label: "合规中心", roles: ["ADMIN"] },
   { href: "/admin", label: "平台管理", roles: ["ADMIN"] },
@@ -19,6 +21,16 @@ export default function Nav() {
   const { data: session } = useSession()
   const pathname = usePathname()
   const role = (session?.user as any)?.role
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    if (session) {
+      fetch("/api/notifications/unread-count")
+        .then(res => res.json())
+        .then(data => setUnreadCount(data.count || 0))
+        .catch(() => setUnreadCount(0))
+    }
+  }, [session, pathname])
 
   if (!session) return null
 
@@ -50,9 +62,30 @@ export default function Nav() {
             color: pathname === item.href ? "#185FA5" : "#5F5E5A",
             background: pathname === item.href ? "#E6F1FB" : "transparent",
             fontWeight: pathname === item.href ? 500 : 400,
+            position: "relative",
           }}
         >
           {item.label}
+          {item.href === "/notifications" && unreadCount > 0 && (
+            <span style={{
+              position: "absolute",
+              top: -4,
+              right: -8,
+              background: "#A32D2D",
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 600,
+              minWidth: 16,
+              height: 16,
+              borderRadius: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "0 4px",
+            }}>
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
         </Link>
       ))}
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>

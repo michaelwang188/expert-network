@@ -44,6 +44,20 @@ export default async function AdminPage() {
     if (order) {
       await prisma.request.update({ where: { id: order.requestId }, data: { status: "MATCHING" } })
     }
+    // 🔔 创建通知：通知专家有新的订单
+    const expert = await prisma.expert.findUnique({ where: { id: expertId } })
+    if (expert) {
+      const request = await prisma.request.findUnique({ where: { id: order?.requestId } })
+      await prisma.notification.create({
+        data: {
+          userId: expert.userId,
+          type: "ORDER_ASSIGNED",
+          title: "新的访谈订单",
+          message: `您有新的访谈订单待确认：${request?.title || order?.orderNo}`,
+          refId: orderId,
+        },
+      })
+    }
     revalidatePath("/admin")
   }
   async function confirmOrder(formData: FormData) {

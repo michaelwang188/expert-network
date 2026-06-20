@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   return NextResponse.json(orders)
 }
 
-// 更新订单状态（权限校验：只能操作自己的订单）
+// 更新订单状态（权限校验 + PAID 时自动创建 PointsTransaction）
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: "未登录" }, { status: 401 })
@@ -36,8 +36,13 @@ export async function PATCH(req: Request) {
   const role = (session.user as any).role
   const userId = (session.user as any).id
 
-  // 先查订单，判断权限
-  const existing = await prisma.order.findUnique({ where: { id: orderId } })
+  // 查订单 + 关联的专家用户（结算需要 expert.userId）
+  const existing = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      expert: { include: { user: true } },
+    },
+  })
   if (!existing) return NextResponse.json({ error: "订单不存在" }, { status: 404 })
 
   // 权限规则：
@@ -60,13 +65,100 @@ export async function PATCH(req: Request) {
   }
   // ADMIN 不受限制
 
+  // 🔴 PAID 结算：原子操作 — 更新订单 + 积分变动 + 流水记录
+  if (status === "PAID") {
+    // 双重防重复：已 PAID 不重复结算
+    if (existing.status === "PAID") {
+      return NextResponse.json({ error: "订单已结算，不可重复操作" }, { status: 409 })
+    }
+
+    const researcherId = existing.researcherId
+    const expertUserId = existing.expert?.user?.id
+    const amount = existing.amount  // 总金额（积分）
+    const expertFee = existing.expertFee  // 专家费（积分）
+    const orderNo = (await prisma.request.findUnique({
+      where: { id: existing.requestId },
+      select: { orderNo: true },
+    }))?.orderNo || existing.requestId
+
+    if (!expertUserId) {
+      return NextResponse.json({ error: "订单未指派专家，无法结算" }, { status: 400 })
+    }
+
+    // 研究员积分不足检查
+    const researcher = await prisma.user.findUnique({
+      where: { id: researcherId },
+      select: { points: true },
+    })
+    if (!researcher || researcher.points < amount) {
+      return NextResponse.json({ error: "研究员积分余额不足" }, { status: 400 })
+    }
+
+    const now = new Date()
+
+    // 原子事务：订单→PAID + 研究员扣分 + 专家加分 + 双流水
+    const order = await prisma.$transaction(async (tx) => {
+      // 1. 更新订单状态
+      const updatedOrder = await tx.order.update({
+        where: { id: orderId },
+        data: { status: "PAID", paidAt: now },
+      })
+
+      // 2. 研究员扣减积分
+      await tx.user.update({
+        where: { id: researcherId },
+        data: { points: { decrement: amount } },
+      })
+
+      // 3. 专家增加积分
+      await tx.user.update({
+        where: { id: expertUserId },
+        data: { points: { increment: expertFee } },
+      })
+
+      // 4. 读最新积分余额用于流水记录
+      const [researcherNew, expertNew] = await Promise.all([
+        tx.user.findUnique({ where: { id: researcherId }, select: { points: true } }),
+        tx.user.findUnique({ where: { id: expertUserId }, select: { points: true } }),
+      ])
+
+      // 5. 流水：研究员支出
+      await tx.pointsTransaction.create({
+        data: {
+          userId: researcherId,
+          amount: -amount,
+          type: "SPEND_ORDER",
+          description: `支付专家访谈费用：${orderNo}`,
+          refId: orderId,
+          balance: researcherNew?.points ?? 0,
+        },
+      })
+
+      // 6. 流水：专家获得劳动积分
+      await tx.pointsTransaction.create({
+        data: {
+          userId: expertUserId,
+          amount: expertFee,
+          type: "EARN_LABOR",
+          description: `完成专家访谈：${orderNo}`,
+          refId: orderId,
+          balance: expertNew?.points ?? 0,
+        },
+      })
+
+      return updatedOrder
+    })
+
+    return NextResponse.json(order)
+  }
+
+  // 非 PAID 的普通状态变更
   const order = await prisma.order.update({
     where: { id: orderId },
     data: {
       status: status as any,
       confirmedAt: status === "ACTIVE" ? new Date() : undefined,
       completedAt: status === "DONE" ? new Date() : undefined,
-      paidAt: status === "PAID" ? new Date() : undefined,
     },
   })
   return NextResponse.json(order)
