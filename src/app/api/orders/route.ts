@@ -143,10 +143,9 @@ export async function PATCH(req: Request) {
       if (debitResult.count === 0) return "INSUFFICIENT"
 
       // 1. 更新订单状态
-      const updatedOrder = await tx.order.update({
-        where: { id: orderId },
-        data: { status: "PAID", paidAt: now },
-      })
+      const orderResult = await tx.order.updateMany({ where: { id: orderId, status: "DONE" }, data: { status: "PAID", paidAt: now } });
+      if (orderResult.count === 0) return "CONCURRENT";
+      const updatedOrder = await tx.order.findUnique({ where: { id: orderId } });
 
       // 2. 专家增加积分
       await tx.user.update({
