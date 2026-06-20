@@ -351,7 +351,7 @@ def role_executor():
                         results.append({"role":"tool","tool_call_id":rid,"content":"Reported"})
 
                 # 不追加 "tool_calls": null 的 assistant 消息
-                msgs_to_add = [{"role":"assistant","content":None,"tool_calls":msg["tool_calls"]}]
+                msgs_to_add = [{"role":"assistant","content":"","tool_calls":msg["tool_calls"]}]
                 msgs_to_add.extend(results)
                 messages.extend(msgs_to_add)
 
@@ -465,15 +465,20 @@ def main():
     STATE_FILE.write_text(json.dumps({"pid":str(os.getpid()),"started":datetime.now(TZ).isoformat()}))
 
     last_board_md5 = md5(MSG_BOARD)
-    last_check = time.time()
-    last_plan = time.time()
-    last_qa = time.time()
+    last_check = 0    # 立刻触发首次扫描
+    last_plan = 0     # 立刻触发首次规划
+    last_qa = 0       # 立刻触发首次质检
 
     bash("git pull origin main")
 
+    iteration = 0
     while True:
         try:
+            iteration += 1
             now = time.time()
+            if iteration % 20 == 0:  # 每10分钟
+                log(f"💓 心跳 #{iteration} | ⬜{len(scan_unclaimed())}")
+
             bash("git pull origin main 2>/dev/null")
 
             # 🔧 2号AI: 快扫 (每30s)
