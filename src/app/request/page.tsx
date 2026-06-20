@@ -111,7 +111,7 @@ function RequestContent() {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             <div>
-              <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>预算范围（元）</label>
+              <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>预算范围（积分）</label>
               <select value={form.budget} onChange={e => setForm(f => ({...f, budget: e.target.value}))}
                 style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", background: "#fff" }}>
                 <option>3000-6000</option><option>6000-12000</option><option>12000-24000</option><option>24000+</option>
