@@ -96,11 +96,19 @@ export async function POST(req: Request) {
     }
   }
 
+  const researcherId = (session.user as any).id
+
+  // 🎉 C3: 首单优惠 — 新研究员第一条需求免费
+  const myRequestCount = await prisma.request.count({ where: { researcherId } })
+  const isFirstOrder = myRequestCount === 0
+  const finalAmount = isFirstOrder ? 0 : estimatedAmount
+  const finalStatus = isFirstOrder ? "PROMO" : "PENDING"
+
   const request = await prisma.request.create({
     data: {
       orderNo, title, industry, subField, duration, form, budget, timeReq, outline, forbidden,
-      status: "COMPLIANCE_OK", // 已通过服务端拦截，不含敏感词
-      researcherId: (session.user as any).id,
+      status: "COMPLIANCE_OK",
+      researcherId,
     }
   })
 
@@ -109,11 +117,11 @@ export async function POST(req: Request) {
     data: {
       orderNo,
       requestId: request.id,
-      researcherId: (session.user as any).id,
-      amount: estimatedAmount,
-      expertFee: Math.round(estimatedAmount * 0.8),   // 积分：80% 给专家
-      platformFee: Math.round(estimatedAmount * 0.2),  // 积分：20% 平台服务费
-      status: "PENDING",
+      researcherId,
+      amount: finalAmount,
+      expertFee: finalAmount > 0 ? Math.round(finalAmount * 0.8) : 0,
+      platformFee: finalAmount > 0 ? Math.round(finalAmount * 0.2) : 0,
+      status: finalStatus as any,
     }
   })
 
