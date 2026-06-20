@@ -26,12 +26,17 @@ export async function POST(req: Request) {
 
   let body: any;
   try { body = await req.json(); } catch { return NextResponse.json({ error: "请求格式错误" }, { status: 400 }) }
-  const { email, password, name, orgName, role } = body || {}
+  const email = String(body.email || "").trim()
+  const password = String(body.password || "")
+  // XSS过滤：去除HTML标签防止存储型XSS
+  const name = String(body.name || "").replace(/<[^>]*>/g, "").slice(0, 100)
+  const orgName = String(body.orgName || "").replace(/<[^>]*>/g, "").slice(0, 200)
+  const role = body.role
 
   if (!email || !password || !name) {
     return NextResponse.json({ error: "缺少必填字段" }, { status: 400 })
   }
-  if (name.length > 100 || (orgName || "").length > 200) {
+  if (name.length > 100 || orgName.length > 200) {
     return NextResponse.json({ error: "姓名或机构名称过长" }, { status: 400 })
   }
   if (password.length < 6) {
