@@ -34,7 +34,10 @@ export default async function AdminPage() {
     "use server"
     const orderId = formData.get("orderId") as string
     const expertId = formData.get("expertId") as string
-    const amount = parseInt(formData.get("amount") as string) // 积分
+    const amount = parseInt(formData.get("amount") as string)
+    if (isNaN(amount) || amount < 1 || amount > 10000) {
+      return  // 金额校验：1-10000积分范围
+    }
     await prisma.order.update({
       where: { id: orderId },
       data: { expertId, amount, platformFee: Math.round(amount * 0.2), status: "PENDING" },

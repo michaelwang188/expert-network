@@ -88,8 +88,12 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true, requestId: request.id, orderId: order.id, orderNo: order.orderNo })
 }
 
-// PATCH — 管理员修改需求状态
+// PATCH — 管理员修改需求状态（需登录+管理员权限）
 export async function PATCH(req: Request) {
+  const session = await getServerSession(authOptions)
+  if (!session || (session.user as any).role !== "ADMIN") {
+    return NextResponse.json({ error: "无权限" }, { status: 403 })
+  }
   const { requestId, status } = await req.json()
   await prisma.request.update({ where: { id: requestId }, data: { status } })
   return NextResponse.json({ ok: true })
