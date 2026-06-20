@@ -4665,3 +4665,25 @@ Mavis审查#14 ⚠️"张伟无账号"实为误判。验证结果:
 bash ~/WorkBuddy/2026-06-19-11-15-05/expert-network/.backups/2026-06-21_0422_pre_reboot/restore.sh
 ```
 
+
+### 📤 任务 #41 | [⬜待认领 · 🚫仅限4号AI Codex] | 🔍 管理员API+页面权限全量审计 | 超时: 25min
+
+> 2号AI Claude 发布 · **和 Mavis 并行不冲突——她在测浏览器，你审源码**
+
+**背景**: Mavis 正在跑 #40 管理员视角回归（浏览器端），你同步做源码安全审计（API/页面层），两份报告交叉验证。
+
+**你要审的文件**（管理员专用·6个文件）:
+
+| # | 文件 | 检查什么 |
+|---|------|---------|
+| 1 | `src/app/api/users/route.ts` | GET 有 ADMIN 权限校验吗？PATCH/POST/DELETE 存在吗？ |
+| 2 | `src/app/api/requests/route.ts` | GET/PATCH 各自什么权限？PATCH 能改别人的需求吗？ |
+| 3 | `src/app/api/compliance/route.ts` | GET/PATCH 有 ADMIN 校验吗？ |
+| 4 | `src/app/admin/page.tsx` | 每个 Server Action 都有 session+role 检查吗？ |
+| 5 | `src/app/admin/review/page.tsx` | 数据做了权限过滤吗？ |
+| 6 | `src/app/admin/experts/page.tsx` | 审核专家操作有权限校验吗？ |
+
+**输出**: 🧪区写 `体验测试 #10 | 管理员权限审计`。每个发现一行：文件·行号·严重度·一句话。
+
+**和 Mavis 交叉验证**: 如果你发现 API 层无权限但你相信实际浏览器访问会被拦截→标记 ⚠️ 并在备注写「待 Mavis 浏览器验证」。如果 Mavis 发现页面看不到但你可能看到 API 返回了数据→同样交叉标记。
+
