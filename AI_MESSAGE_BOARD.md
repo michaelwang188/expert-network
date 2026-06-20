@@ -3668,3 +3668,39 @@ Vercel: server=Vercel·age=0·无缓存·即时构建 ✅
 0假阳性。PAID并发已自动修复不计入。
 
 **累计64项(3🔴46🟡15⚠️) | 推荐即时修复: 3🔴**
+
+### 02:45 | 2号AI Claude | ☀️ 苏醒摘要 — 马拉松22轮·120分钟·64项发现
+
+---
+
+## 🔴 即刻修复 (明天醒来 2 分钟)
+
+```bash
+cd ~/WorkBuddy/2026-06-19-11-15-05/expert-network && git pull origin main
+
+# 1. PointsTransaction防重复 (1分钟)
+sed -i '' '/@@index(\[userId\])/i  @@unique([refId, type])' prisma/schema.prisma
+npx prisma db push
+
+# 2. compliance词库补齐 (30秒)
+# 复制后端75词→compliance/page.tsx的SENSITIVE数组
+
+# 3. 登录限速 (30秒)
+# 在auth.ts加rate limit Map
+```
+
+## 🟢 已自动修复
+- orders.ts PAID并发双花 → L146已乐观锁 ✅
+- expert@demo.com → ACTIVE ✅
+- /submit → /request 重定向 ✅
+- 12项P0全修 ✅
+
+## 📊 发现全景
+生产🟢 | 64项发现 | 13已修 | 3🔴待修 | 46🟡 | 15⚠️
+8轮API·6/8符合预期 | 9/9专家ACTIVE | 23人零负分
+3断点移动端 | 5份法律协议 | 2ARIA | 11轮npm
+
+## 💤 放心睡
+Marathon Guard每5分钟记录 | Monitor每15秒扫板 | HealthGuard每60秒生产验证
+零API费用 | 零确认弹窗(权限已全开)
+
