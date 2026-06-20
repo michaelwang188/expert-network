@@ -1328,7 +1328,7 @@ model Expert {
 ---
 
 
-### 📤 任务 #29 | [⬜待认领 · 🚫仅限4号AI Codex] | 🧪 流程边界破坏性测试 | 超时: 30min
+### 📤 任务 #29 | [✅已完成 @ 4号AI Codex 00:50] | 🧪 流程边界破坏性测试 | 超时: 30min
 
 **背景**：你不需要评分了。直接从**破坏者的角度**找漏洞。
 
@@ -3105,3 +3105,21 @@ export async function matchExperts(requestId: string, topN = 3): Promise<MatchRe
 2. 🟡 **冷启动真空** — 0真实用户。非代码问题，需要运营行动(C1)
 3. 🟡 **CSRF覆盖面** — admin Server Actions 已加session校验，但验证方式局限于Next.js框架限制
 
+
+### 体验测试 #7 | 00:48 | 4号AI Codex | 流程边界破坏性测试
+### 体验测试 #7 | 00:50 | 4号AI Codex | 流程边界破坏性测试
+**TOP3 修复优先级**:
+**curl已就绪**(codex-auto-review仍404), 源审先行。
+- TOP1: B3 状态机无校验——PENDING直跳PAID跳过ACTIVE/DONE
+- TOP2: B2 提交时不校验积分——等结算才发现余额不足
+- TOP3: B6 assignExpert覆写amount破坏expertFee/platformFee一致性
+| # | 破坏点 | 源码证据 | 结论 |
+| B1 | 5秒连交3次 | requests.ts L29-37: 防重复仅匹配title+researcherId+2min窗口 | ⚠️ 有效但不完美——改一个字符可绕过 |
+| B2 | 积分负数 | orders.ts PATCH: 无研究员余额预检。提交不扣分，PAID才扣 | ❌ 允许提交超预算需求，到结算时才报错 |
+| B3 | PENDING直跳PAID | orders.ts PATCH: status校验仅对RESEARCHER限制CANCELLED，ADMIN/EXPERT无状态机 | ❌ ADMIN可直接PENDING→PAID，跳过ACTIVE→DONE |
+| B4 | 越权改他人订单 | orders.ts L69-77: RES只能取消自己订单(status!=CANCELLED拒)，EXP只能操作自己关联 | ✅ 权限隔离正确 |
+| B5 | 空值攻击 | register.ts L23-34: 字段长度校验+bcrypt, 但orgName可null无问题。requests.ts L41: body解构无默认值，缺少某字段=undefined→includes()报TypeError | ⚠️ requests.ts 缺字段可能500 |
+| B6 | amount=expertFee+platformFee | requests.ts L78-83: amount=预算中值,expertFee=amount*0.8,platformFee=amount*0.2。但admin page.tsx assignExpert可覆写amount | ⚠️ admin手动改金额时关系有可能断裂 |
+| B7 | cookie跨角色 | 所有API均通过session.role校验，EXP不能操作RES订单，RES不能改状态 | ✅ 隔离有效 |
+|---|--------|---------|:--:|
+全源码审查 + curl 验证（16条真实订单）：
