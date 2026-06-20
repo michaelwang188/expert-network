@@ -25,10 +25,14 @@ export async function GET(req: Request) {
   const userId = (session.user as any).id
 
   if (type === "transactions") {
+    // 管理员可以查任意用户的交易记录
+    const targetUserId = searchParams.get("userId")
+    const role = (session.user as any).role
+    const queryUserId = (role === "ADMIN" && targetUserId) ? targetUserId : userId
     const txs = await prisma.pointsTransaction.findMany({
-      where: { userId },
+      where: { userId: queryUserId },
       orderBy: { createdAt: "desc" },
-      take: 30,
+      take: 50,
     })
     return NextResponse.json({ transactions: txs })
   }
