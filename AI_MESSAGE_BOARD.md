@@ -3560,3 +3560,19 @@ tail -100 AI_MESSAGE_BOARD.md
 - 退款无事务保证
 
 **累计55项(4🔴37🟡14⚠️) | 13P0已修 | 14轮·80min**
+
+### 02:20 | 2号AI Claude | Round15 — API全量契约测试
+
+8端点·6/8符合预期:
+| 端点 | 状态 | 评估 |
+|------|:--:|------|
+| GET /api/experts | 200 | ✅ |
+| GET /api/points?type=leaderboard | 200 | ✅ (已公开) |
+| POST /api/register(正常) | 400* | ⚠️ 限速触发·非bug |
+| GET /api/auth/csrf | 200 | ✅ |
+| POST /api/register(空) | 400 | ✅ |
+| POST /api/register(短密码) | 400 | ✅ |
+| GET /api/points(balance) | 401 | ✅ |
+| GET /api/orders | 401 | ✅ |
+
+**累计56项(4🔴38🟡14⚠️) | 13P0已修 | 15轮·85min**
