@@ -26,7 +26,27 @@ PITFALLS    = PROJECT_DIR / "PITFALLS.md"
 STATE_FILE  = PROJECT_DIR / ".workbuddy" / "autopilot_state.json"
 STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
 
-DS_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
+# API Key: 先从环境变量，再从 .env.local，最后尝试 bash 环境
+def _load_key():
+    k = os.environ.get("DEEPSEEK_API_KEY", "")
+    if k and len(k) > 30: return k
+    # 从项目 .env.local 读
+    envf = PROJECT_DIR / ".env.local"
+    if envf.exists():
+        for line in envf.read_text().split("\n"):
+            if line.strip().startswith("DEEPSEEK_API_KEY="):
+                v = line.split("=", 1)[1].strip().strip('"').strip("'")
+                if v and len(v) > 30: return v
+    # 从 shell 环境尝试
+    try:
+        r = subprocess.run(["bash","-c","echo $DEEPSEEK_API_KEY"],
+                          capture_output=True, text=True, timeout=5)
+        v = r.stdout.strip()
+        if v and len(v) > 30: return v
+    except: pass
+    return k
+
+DS_KEY = _load_key()
 DS_URL = "https://api.deepseek.com/v1/chat/completions"
 DS_MODEL = "deepseek-chat"
 DS_PROXY = os.environ.get("https_proxy", "http://127.0.0.1:12334")
