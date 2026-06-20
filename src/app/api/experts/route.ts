@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -32,8 +34,12 @@ export async function GET(req: Request) {
   return NextResponse.json({ experts, total, page, limit })
 }
 
-// PATCH — 管理员更新专家状态
+// PATCH — 管理员更新专家状态（需登录+管理员权限）
 export async function PATCH(req: Request) {
+  const session = await getServerSession(authOptions)
+  if (!session || (session.user as any).role !== "ADMIN") {
+    return NextResponse.json({ error: "无权限" }, { status: 403 })
+  }
   const { id, status } = await req.json()
   const data: any = { status }
   if (status === "ACTIVE") {
