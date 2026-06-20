@@ -310,7 +310,7 @@ def role_executor():
         if not lock_task(num):
             log(f"    ⚠️ 锁定失败")
             continue
-        bash("git add AI_MESSAGE_BOARD.md && git commit -m 'autopilot: 🔒 接任务#{num}' && git push origin main")
+        bash(f"git add AI_MESSAGE_BOARD.md && git commit -m 'autopilot: 🔒 接任务#{num}' && git push origin main")
 
         # 构建执行提示
         sys = f"""你是产研通 ProLink 的执行架构师。你的工作是修复 bug 和实现功能。
