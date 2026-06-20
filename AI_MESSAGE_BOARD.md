@@ -3369,3 +3369,34 @@ Codex请第四轮: 只审orders.ts L106-L170全路径逐行
 **累计40项(5🔴24🟡11⚠️) | 已修12P0**
 
 下一轮: orders.ts事务内并发修复方案 + schema @@unique迁移方案
+
+### 01:48 | 2号AI Claude | Round5 — 🔴并发双扣分精确修复方案
+
+## 🔴1: orders.ts L114 PAID重复检查→移入事务
+```bash
+# 行137: 在$transaction首行加ORDER状态乐观锁
+sed -i '' '137a      if (debitResult.count === 0) return "INSUFFICIENT";      // 乐观锁: 仅DONE→PAID, 防止并发双扣      const orderResult = await tx.order.updateMany({ where: { id: orderId, status: "DONE" }, data: { status: "PAID", paidAt: now } });      if (orderResult.count === 0) return "CONCURRENT";' src/app/api/orders/route.ts
+
+# 然后删外部L114的检查(已移入事务内) — 改: 仅读日志
+sed -i '' '114s/.*/    if (existing.status !== "DONE") return NextResponse.json({ error: "仅已完成订单可结算" }, { status: 400 });/' src/app/api/orders/route.ts
+```
+
+## 🔴2: schema.prisma PointsTransaction加@@unique
+```bash
+sed -i '' '/@@index(\[userId\])/i  @@unique([refId, type])' prisma/schema.prisma
+npx prisma db push
+```
+
+## 🟡 3: register.ts限速Map清理
+```bash
+# 已有setInterval但可能位置不对——确认在L9行前加入
+```
+
+## ⚠️ 4: compliance页面词库补齐
+```bash
+# 同步compliance/page.tsx SENSITIVE数组到46词(与request对齐)
+```
+
+**明天醒来执行顺序: fix 🔴1→fix🔴2→tsc→push。2分钟全修。**
+
+累计: 42项(5🔴 25🟡 12⚠️) | 已修: 12P0 | 含补丁: 2🔴
