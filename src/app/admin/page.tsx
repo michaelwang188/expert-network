@@ -24,9 +24,13 @@ export default async function AdminPage() {
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
     const approved = await prisma.expert.update({ where: { id }, data: { status: "ACTIVE", idVerified: true, empVerified: true, complianceSig: true } })
-    // 通知专家审核通过 + 首单优惠积分
-    await prisma.notification.create({ data: { userId: approved.userId, type: "EXPERT_APPROVED", title: "审核已通过", message: "您的专家申请已通过审核！现在可以接收访谈订单了。作为首单福利，已为您添加500积分。", refId: id } })
-    await prisma.user.update({ where: { id: approved.userId }, data: { points: { increment: 500 } } })
+    // 通知 + 积分奖励(审计流水记录)
+    const bonusAmount = 500
+    await prisma.$transaction(async (tx) => {
+      await tx.notification.create({ data: { userId: approved.userId, type: "EXPERT_APPROVED", title: "审核已通过", message: `您的专家申请已通过审核！现在可以接收访谈订单了。作为首单福利，已为您添加${bonusAmount}积分。`, refId: id } })
+      const after = await tx.user.update({ where: { id: approved.userId }, data: { points: { increment: bonusAmount } }, select: { points: true } })
+      await tx.pointsTransaction.create({ data: { userId: approved.userId, amount: bonusAmount, type: "ADMIN_ADJUST", description: "专家审核通过·首单福利积分", refId: id, balance: after.points } })
+    })
     revalidatePath("/admin")
   }
   async function rejectExpert(formData: FormData) {

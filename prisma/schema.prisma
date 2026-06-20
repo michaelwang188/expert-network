@@ -163,6 +163,7 @@ model Order {
 
 enum OrderStatus {
   PENDING
+  PROMO     // 🆕 C3: 新研究员首单0积分
   ACTIVE
   DONE
   PAID
