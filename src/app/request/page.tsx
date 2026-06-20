@@ -54,6 +54,8 @@ function RequestContent() {
         setOrderNo(data.orderNo)
       }
       setStep(1)
+      // 2秒后自动跳转到订单页
+      setTimeout(() => router.push("/orders"), 2000)
     } catch {
       setSubmitted(false)
     }
@@ -85,6 +87,18 @@ function RequestContent() {
           </div>
         ))}
       </div>
+
+      {step === 1 && (
+        <div style={{ background: "#EAF3DE", border: "0.5px solid #97C459", borderRadius: 12, padding: 32, textAlign: "center" }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>📬</div>
+          <div style={{ fontSize: 16, fontWeight: 500, color: "#3B6D11", marginBottom: 8 }}>需求已提交</div>
+          <div style={{ fontSize: 14, color: "#3B6D11", marginBottom: 4, fontFamily: "monospace" }}>{orderNo}</div>
+          <div style={{ fontSize: 13, color: "#5F5E5A", marginBottom: 20 }}>管理员预计在 2 小时内为您匹配合适的专家</div>
+          <a href="/orders" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, background: "#0F6E56", color: "#fff", fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
+            查看订单 →
+          </a>
+        </div>
+      )}
 
       {step === 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>

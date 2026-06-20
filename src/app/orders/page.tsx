@@ -18,6 +18,9 @@ function OrdersContent() {
   const [filter, setFilter] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [toast, setToast] = useState("")
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(""), 2500) }
 
   const fetchOrders = async () => {
     setLoading(true)
@@ -42,13 +45,22 @@ function OrdersContent() {
 
   useEffect(() => { fetchOrders() }, [])
 
+  const actionLabels: Record<string, string> = {
+    ACTIVE: "已接单", DONE: "标记完成", PAID: "已结算", CANCELLED: "已取消",
+  }
   const handleAction = async (orderId: string, status: string) => {
-    await fetch("/api/orders", {
+    const res = await fetch("/api/orders", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderId, status }),
     })
-    fetchOrders()
+    if (res.ok) {
+      showToast(actionLabels[status] || "操作成功")
+      fetchOrders()
+    } else {
+      const d = await res.json().catch(() => ({}))
+      setError(d.error || "操作失败")
+    }
   }
 
   const filtered = Array.isArray(orders) && filter
@@ -69,7 +81,8 @@ function OrdersContent() {
         <span style={{ fontSize: 13, color: "#888", marginLeft: "auto" }}>共 {filtered.length} 笔订单</span>
       </div>
 
-      {error && <div style={{ padding: 12, background: "#FCEBEB", color: "#A32D2D", borderRadius: 8, fontSize: 13, marginBottom: 12 }}>{error}</div>}
+      {error && <div style={{ padding: 12, background: "#FCEBEB", color: "#A32D2D", borderRadius: 8, fontSize: 13, marginBottom: 12 }}>{error} <span onClick={() => setError("")} style={{ cursor: "pointer" }}>✕</span></div>}
+      {toast && <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "#3B6D11", color: "#fff", padding: "10px 24px", borderRadius: 10, fontSize: 14, fontWeight: 500, zIndex: 100 }}>{toast}</div>}
 
       {/* 费用说明 */}
       <div style={{ background: "#f8f7f4", borderRadius: 8, padding: 10, fontSize: 12, color: "#888", marginBottom: 12, lineHeight: 1.6 }}>

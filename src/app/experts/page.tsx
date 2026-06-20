@@ -38,8 +38,7 @@ function ExpertsContent() {
   }
 
   useEffect(() => { fetchExperts() }, [industry, roleType, form])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { const t = setTimeout(() => fetchExperts(), 400); return () => clearTimeout(t) }, [search])
+  useEffect(() => { const t = setTimeout(() => fetchExperts(), 500); return () => clearTimeout(t) }, [search])
 
   const initials = (name: string) => name?.[0] || "专"
   const tagList = (tags: string) => tags?.split(",").map(t => t.trim()).filter(Boolean) || []
