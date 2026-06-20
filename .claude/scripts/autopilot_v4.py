@@ -293,12 +293,16 @@ def run_architect():
 
 def run_executor():
     """2号AI：扫[⬜待认领]→接→执行→报告"""
-    tasks = scan_my_tasks({"name": "不限角色"})
-    # Also match tasks without role restriction
+    # 抢任务，但跳过标了仅限1/3/4号AI的专属任务和仅限角色标记
     t = MSG_BOARD.read_text()
+    tasks = []
     for m in re.finditer(r'### 📤 任务 #(\d+) \| \[⬜待认领[^\]]*\] \| (.+?) \|', t):
+        full_line = m.group(0)
         num, desc = m.group(1), m.group(2)
-        tasks.append({"num": num, "desc": desc, "line": m.group(0)})
+        # 跳过专属任务：含🚫仅限1号、仅限3号、仅限4号
+        if re.search(r'仅限[134]号', full_line):
+            continue
+        tasks.append({"num": num, "desc": desc, "line": full_line})
 
     if not tasks:
         return False
