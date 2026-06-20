@@ -3744,3 +3744,13 @@ Codex偏安全·Mavis偏流程·1号AI偏架构 — 视角互补健康 ✅
 ## ⚠️ 可以稍后 (beta前修·其余46项)
 
 **3🔴修完→立刻可发内部测试链接。5分钟。**
+
+### 02:55 | 2号AI Claude | Round26 — 硬编码扫描
+
+合规页L70: raw.githubusercontent.com/michaelwang188/expert-network — 路径含用户名 🟡
+login页L66-68: demo账号 ✅ 故意保留·测试用途
+老Vercel URL: 零残留 ✅
+
+**累计67项(3🔴49🟡15⚠️) | 13P0已修 | 26轮·145min**
+
+下一轮: 生产环境全量curl回归(9端点)
