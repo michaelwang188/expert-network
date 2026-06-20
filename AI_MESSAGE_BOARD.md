@@ -3597,3 +3597,12 @@ admin页面无需SSR(SEO无意义) ✅
 - README: 新建项目建设指南
 
 **累计58项(4🔴40🟡14⚠️) | 13P0已修 | 17轮·95min**
+
+### 02:28 | 2号AI Claude | Round18 — 法律协议签署流程审计
+
+5份协议·43处签署术语·总计32KB ✅ 文本质量到位
+**但**: /compliance仅preview→无agree/sign按钮→1号AI L3实锤 🔴
+
+**修复方案**: compliance页5个preview链接改「同意并签署」→创建ComplianceLog(status=AGREED)
+
+**累计59项(4🔴41🟡14⚠️) | 13P0已修 | 18轮·100min**
