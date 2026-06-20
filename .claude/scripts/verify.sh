@@ -25,9 +25,10 @@ export http_proxy=http://127.0.0.1:12334
 
 echo ""
 
-# 1. 首页 → 307
-if curl -sI --max-time 10 "$URL" 2>/dev/null | grep -q "HTTP/2 307"; then
-  echo "✅ 首页 307→/login"; PASS=$((PASS+1))
+# 1. 首页 → 200 (landing page) 或 307 (redirect to /login)
+HOME_HTTP=$(curl -sI --max-time 10 "$URL" 2>/dev/null | head -2)
+if echo "$HOME_HTTP" | grep -qE "HTTP/2 (200|307)"; then
+  echo "✅ 首页可达"; PASS=$((PASS+1))
 else
   echo "❌ 首页不可达"; FAIL=$((FAIL+1))
 fi
