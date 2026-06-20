@@ -27,10 +27,25 @@ export async function GET(req: Request) {
   return NextResponse.json(orders)
 }
 
-// 更新订单状态（权限校验 + PAID 时自动创建 PointsTransaction）
+// 更新订单状态（权限校验 + 速率限制 + PAID 时自动创建 PointsTransaction）
+// 简单内存限速: 同IP 10秒内最多5次 PATCH
+const patchRateLimit = new Map<string, { count: number; reset: number }>()
+setInterval(() => { const now = Date.now(); for (const [ip, e] of patchRateLimit) { if (now >= e.reset) patchRateLimit.delete(ip) } }, 60000)
+
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions)
   if (!session) return NextResponse.json({ error: "未登录" }, { status: 401 })
+
+  // 限速
+  const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
+  const now = Date.now()
+  const limit = patchRateLimit.get(ip)
+  if (limit && now < limit.reset) {
+    if (limit.count >= 5) return NextResponse.json({ error: "操作过于频繁" }, { status: 429 })
+    limit.count++
+  } else {
+    patchRateLimit.set(ip, { count: 1, reset: now + 10000 })
+  }
 
   const { orderId, status } = await req.json()
   const role = (session.user as any).role
@@ -83,6 +98,9 @@ export async function PATCH(req: Request) {
 
     if (!expertUserId) {
       return NextResponse.json({ error: "订单未指派专家，无法结算" }, { status: 400 })
+    }
+    if (expertFee <= 0 || amount <= 0) {
+      return NextResponse.json({ error: "金额不能为零或负数" }, { status: 400 })
     }
 
     const now = new Date()
