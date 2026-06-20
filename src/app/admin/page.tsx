@@ -17,27 +17,34 @@ export default async function AdminPage() {
     prisma.complianceLog.findMany({ orderBy: { createdAt: "desc" }, take: 20 }),
   ])
 
-  // Server Actions
+  // Server Actions — 均含管理员权限二次校验（防CSRF）
   async function approveExpert(formData: FormData) {
     "use server"
+    const s = await getServerSession(authOptions)
+    if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
     await prisma.expert.update({ where: { id }, data: { status: "ACTIVE", idVerified: true, empVerified: true, complianceSig: true } })
     revalidatePath("/admin")
   }
   async function rejectExpert(formData: FormData) {
     "use server"
+    const s = await getServerSession(authOptions)
+    if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
     await prisma.expert.update({ where: { id }, data: { status: "INACTIVE" } })
     revalidatePath("/admin")
   }
   async function assignExpert(formData: FormData) {
     "use server"
+    const s = await getServerSession(authOptions)
+    if (!s || (s.user as any).role !== "ADMIN") return
     const orderId = formData.get("orderId") as string
     const expertId = formData.get("expertId") as string
     const amount = parseInt(formData.get("amount") as string)
-    if (isNaN(amount) || amount < 1 || amount > 10000) {
-      return  // 金额校验：1-10000积分范围
-    }
+    if (isNaN(amount) || amount < 1 || amount > 10000) return
+    // 验证专家状态为ACTIVE
+    const expert = await prisma.expert.findUnique({ where: { id: expertId }, select: { status: true, userId: true } })
+    if (!expert || expert.status !== "ACTIVE") return
     await prisma.order.update({
       where: { id: orderId },
       data: { expertId, amount, platformFee: Math.round(amount * 0.2), status: "PENDING" },
@@ -48,29 +55,30 @@ export default async function AdminPage() {
       await prisma.request.update({ where: { id: order.requestId }, data: { status: "MATCHING" } })
     }
     // 🔔 创建通知：通知专家有新的订单
-    const expert = await prisma.expert.findUnique({ where: { id: expertId } })
-    if (expert) {
-      const request = await prisma.request.findUnique({ where: { id: order?.requestId } })
-      await prisma.notification.create({
-        data: {
-          userId: expert.userId,
-          type: "ORDER_ASSIGNED",
-          title: "新的访谈订单",
-          message: `您有新的访谈订单待确认：${request?.title || order?.orderNo}`,
-          refId: orderId,
-        },
-      })
-    }
+    const request = await prisma.request.findUnique({ where: { id: order?.requestId } })
+    await prisma.notification.create({
+      data: {
+        userId: expert.userId,
+        type: "ORDER_ASSIGNED",
+        title: "新的访谈订单",
+        message: `您有新的访谈订单待确认：${request?.title || order?.orderNo}`,
+        refId: orderId,
+      },
+    })
     revalidatePath("/admin")
   }
   async function confirmOrder(formData: FormData) {
     "use server"
+    const s = await getServerSession(authOptions)
+    if (!s || (s.user as any).role !== "ADMIN") return
     const orderId = formData.get("orderId") as string
     await prisma.order.update({ where: { id: orderId }, data: { status: "ACTIVE", confirmedAt: new Date() } })
     revalidatePath("/admin")
   }
   async function handleCompliance(formData: FormData) {
     "use server"
+    const s = await getServerSession(authOptions)
+    if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
     await prisma.complianceLog.update({ where: { id }, data: { handled: true } })
     revalidatePath("/admin")
