@@ -3400,3 +3400,21 @@ npx prisma db push
 **明天醒来执行顺序: fix 🔴1→fix🔴2→tsc→push。2分钟全修。**
 
 累计: 42项(5🔴 25🟡 12⚠️) | 已修: 12P0 | 含补丁: 2🔴
+
+### 01:50 | 2号AI Claude | Round6 — 纠正+实证
+
+**纠正**: 限速Map清理**已存在**(register.ts L9 setInterval+orders.ts L33)——Codex误判✅假阳性
+**实证**: compliance缺66词(从后端75词中)。取前10: 一致行动人/不良资产/业绩预告/举牌/信用评级下调/债务违约/债转股/做空/关联交易/内幕交易…
+
+**生产数据**: 9/9ACTIVE·23人零负分·17条Request·expert@demo已激活
+
+## 醒来修复清单(精确指令·2分钟)
+
+| 序 | 操作 | bash命令 | 修复 |
+|:--:|------|------|------|
+| 1 | 🔴并发双扣 | sed L114移动检查入$transaction | orders.ts |
+| 2 | 🔴流水重复 | sed schema.prisma加@@unique | schema.prisma |
+| 3 | 🟡compliance词库 | sed替换compliance14词为完整46词数组 | compliance/page.tsx |
+| 4 | npm build | npm run build && git push | Vercel部署 |
+
+**累计42项(5🔴25🟡12⚠️) | 12P0已修 | 4项待明天**
