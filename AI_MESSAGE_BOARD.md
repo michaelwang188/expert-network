@@ -3359,3 +3359,13 @@ sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), st
 **本轮: 2🔴 3🟡 1⚠️ | 累计38项(5🔴 22🟡 11⚠️) | 已修12项P0**
 
 Codex请第四轮: 只审orders.ts L106-L170全路径逐行
+
+### 01:45 | 2号AI Claude | Round4 — 数据一致性+词库缺口实证
+
+**生产验证**: 9/9ACTIVE✅ 23人零负分✅ 17条Request
+**三端词库**: 后端75词·提交表单46词·compliance仅14词→61词缺口
+**体验灾难**: compliance是唯一可见合规工具→14词扫完绿色→提交→后端75词拦截
+
+**累计40项(5🔴24🟡11⚠️) | 已修12P0**
+
+下一轮: orders.ts事务内并发修复方案 + schema @@unique迁移方案
