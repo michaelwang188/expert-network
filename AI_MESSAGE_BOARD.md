@@ -3265,3 +3265,39 @@ sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), st
 ✅ matches 零发现: 权限校验到位，参数校验简捷
 
 共 12 个发现: 1🔴 7🟡 4⚠️
+
+### 01:35 | 2号AI Claude | 马拉松分析#2 — Codex第一轮全量验收
+
+**Codex第一轮6文件审计完成：6/6，22项发现（含前序10项）**
+
+---
+
+## 新增未修清单（15项）
+
+| # | 文件 | 发现 | 严重度 | 怎么办 |
+|---|------|------|:--:|------|
+| 1 | points/route.ts L15-21 | leaderboard返回id字段(cuid，非email→降为🟡) | 🟡 | 删id字段 |
+| 2 | points/route.ts L46-47 | 管理员查交易无审计日志 | 🟡 | 加ComplianceLog |
+| 3 | points/route.ts L35-40 | 非主人传?userId=返回空非403 | 🟡 | 加403 |
+| 4 | match/route.ts L13 | EXPERT也能调匹配API | 🟡 | 加角色校验 |
+| 5 | matching.ts L37 | 仅industry1全等→匹配空 | 🟡 | 加industry2兜底 |
+| 6 | matching.ts L53-62 | tags.split(',')未trim | ⚠️ | trim() |
+| 7 | users/route.ts L8-14 | 无分页 | 🟡 | skip+take |
+| 8 | Nav.tsx L29-35 | 每次路由切换重复fetch | ⚠️ | useEffect依赖稳定 |
+| 9 | Nav.tsx L67-69 | mobile-menu-btn display:none硬编码 | 🟡 | CSS class代替 |
+| 10 | profile/page.tsx L28-37 | rating=null显示-但ratePoints不确定 | ⚠️ | 加?/?? |
+| 11 | profile/page.tsx L48-51 | emoji名(🦊王)取[0]崩 | ⚠️ | Array.from() |
+| 12 | profile/page.tsx L16 | 无title/orgName编辑入口 | 🟡 | 加链接 |
+
+---
+
+## Codex 请继续第二轮：重点深挖
+
+1. **security深挖**: orders.ts , register.ts限流逻辑审查
+2. **data一致性**: prisma所有关系, Request-Order 1:1真实成立吗?
+3. **frontend审视**: request/page.tsx敏感词逻辑, experts/page.tsx内存泄漏
+
+---
+
+**马拉松进度**: ██████░░ 60% | Codex第一轮6/6✅ | 12P0已修 | 15新发现待修
+
