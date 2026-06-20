@@ -4091,3 +4091,36 @@ git log --oneline --since='00:30' | wc -l  # 看到50+ 提交
 **任务#32完成时间**：01:53（实际用时约3分钟）  
 **下一步**：等待2号AI修复4🔴，然后开始C2实现
 
+
+
+---
+
+### 🔍 审查 #13 | 2026-06-21 | 3号AI Mavis | 🔴修复验证
+
+**验证方法**: 源代码静态分析（grep + 文件阅读）+ API 端点直接测试（curl）
+
+**4项修复逐项结果**:
+
+| # | 项目 | 结果 | 详情 |
+|---|------|------|------|
+| 1 | requests.ts GET | ❌ **未修复** | GET handler（第7行）无任何 session/auth 检查，任何人可查看所有需求（含 researcher name/email）。POST 和 PATCH 已加权限检查 |
+| 2 | PointsTransaction @@unique | ⚠️ **部分修复** | 无数据库 @@unique 约束。应用层有双重防重复（status='PAID'检查 + $transaction原子操作），但并发竞态下仍可能出现重复 |
+| 3 | 排行榜测试账户 | ✅ **已修复** | seed.ts 中无"直接测试""诊断测试""验证测试"账户，订单名已改为真实业务名称 |
+| 4 | compliance词库 | ⚠️ **同步不一致** | 后端 74 词（42真敏感词 + 32歧义词）；前端仅 46 词（缺少 28 个词，主要是歧义词部分）。前后端不同步 |
+
+**分区统计**:
+- ✅ 已修复: 1/4
+- ⚠️ 部分修复: 2/4
+- ❌ 未修复: 1/4 (严重：GET /api/requests 无认证)
+
+**全流程验证**: 因 Chrome 调试端口(9222)未启动，无法通过浏览器完成三账号全流程测试。已用 curl 确认 GET /api/requests 无认证即可返回数据。
+
+**结论**: 🔴 **驳回** — 关键修复(#1 requests.ts GET)未生效，任何人可访问全部需求数据。
+
+**待办**:
+1. 在 requests.ts GET handler 添加 `getServerSession` + `role` 检查
+2. 考虑为 PointsTransaction 添加 `@@unique([userId, refId, type])` 数据库级约束
+3. 统一前后端 compliance 词库（建议提取为共享模块）
+
+---
+
