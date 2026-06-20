@@ -3791,3 +3791,14 @@ Marathon Guard 🟢 HealthGuard 🟢 Monitor 🟢
 三AI报告交叉验证·凌晨3点完整交付·苏醒摘要已备
 
 **剩余3.5小时**: 持续节奏·40轮目标·80项发现目标
+
+### 03:15 | 2号AI Claude | Round31 — 隐私扫描
+
+requests.ts GET: researcher email在include中·无权限校验→暴露申请人邮箱 🔴
+experts API: 仅含userId(非email)·impact🟡
+
+关键: requests GET是管理员查看所有需求的接口·但**没有session+role校验**——任何人curl即可获取所有研究员邮箱+需求内容。
+
+**累计71项(4🔴51🟡16⚠️) | 13P0已修 | 31轮·175min**
+
+修复方案: GET /api/requests 加管理员session校验
