@@ -56,14 +56,14 @@ export default function CompliancePage() {
         <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16 }}>
           <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>合规文件管理</div>
           {[
-            { name: "内幕信息禁止承诺函", ver: "v2.3", count: "1,241" },
-            { name: "竞业限制承诺书", ver: "v1.8", count: "1,241" },
-            { name: "调研内容合规协议", ver: "v3.1", count: "1,241" },
+            { name: "内幕信息禁止承诺函", ver: "v2.3", desc: "签署后生效" },
+            { name: "竞业限制承诺书", ver: "v1.8", desc: "签署后生效" },
+            { name: "调研内容合规协议", ver: "v3.1", desc: "签署后生效" },
           ].map(doc => (
             <div key={doc.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "0.5px solid #f1efe8" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 500 }}>{doc.name}</div>
-                <div style={{ fontSize: 12, color: "#888" }}>版本 {doc.ver} · 已签署 {doc.count} 份</div>
+                <div style={{ fontSize: 12, color: "#888" }}>{doc.ver} · {doc.desc}</div>
               </div>
               <button style={{ padding: "4px 10px", border: "0.5px solid #e0dfd8", borderRadius: 6, background: "#fff", fontSize: 12, cursor: "pointer" }}>预览</button>
             </div>
