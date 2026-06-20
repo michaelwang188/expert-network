@@ -126,8 +126,9 @@ def board_write(text): MSG_BOARD.write_text(text)
 def scan_unclaimed():
     """扫描 📤区 [⬜待认领]"""
     tasks = []
-    for m in re.finditer(r'^### 📤 任务 #(\d+) \| \[⬜待认领\] \| (.+?) \| 超时: (\d+)',
-                         board_text(), re.MULTILINE):
+    # 灵活匹配，不要求行首，容忍空格差异
+    for m in re.finditer(r'### 📤 任务 #(\d+)\s*\|\s*\[⬜待认领\]\s*\|\s*(.+?)\s*\|\s*超时:\s*(\d+)',
+                         board_text()):
         num, desc, timeout = m.group(1), m.group(2), m.group(3)
         start = m.end()
         end = board_text().find("\n###", start)
@@ -258,11 +259,12 @@ def role_architect():
 4. 如果没有需要做的 → no_action
 
 任务创建原则：
-- 一次最多创建 2 个任务
+- 一次最多创建2个任务
 - 每个任务有清晰的验收标准
-- 任务应该是原子化的（30分钟以内能完成）
-- 优先级：P0(致命bug) > P1(核心功能缺失) > P2(体验优化)
-- 禁止重复创建已有任务
+- 原子化（30分钟以内）
+- 优先级：P0 > P1 > P2
+- 禁止重复已有任务
+- 🔴 num必须用数字字符串如"7"，desc一行中文，timeout用"5"，body用Markdown分点
 
 现在开始分析。"""
 
