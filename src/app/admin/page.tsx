@@ -179,7 +179,7 @@ function AssignPanel({ order, experts, assignExpert }: any) {
             {display.map((e: any) => <option key={e.id} value={e.id}>{e.title}（{e.org}）· {e.ratePoints || e.rateHour || 500}积分/h</option>)}
           </select>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input name="amount" type="number" placeholder="金额(积分)" required defaultValue={order.amount || 800} style={{ width: 90, padding: 5, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13 }} />
+            <input name="amount" type="number" placeholder="金额(积分)" required min="1" defaultValue={order.amount || 800} style={{ width: 90, padding: 5, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13 }} />
             <span style={{ fontSize: 12, color: "#888" }}>积分</span>
             <button type="submit" style={{ padding: "5px 12px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>派单</button>
           </div>

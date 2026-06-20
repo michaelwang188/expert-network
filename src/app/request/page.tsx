@@ -141,7 +141,7 @@ function RequestContent() {
           </div>
           <div>
             <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>访谈提纲（每行一个问题）</label>
-            <textarea value={form.outline} onChange={e => setForm(f => ({...f, outline: e.target.value}))} rows={6}
+            <textarea value={form.outline} onChange={e => setForm(f => ({...f, outline: e.target.value}))} rows={6} maxLength={5000}
               placeholder={"1. 当前市场供需情况如何？\n2. 主要厂商近期涨价幅度及原因？\n3. 下半年预期变化？"}
               style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", resize: "vertical" }} />
           </div>

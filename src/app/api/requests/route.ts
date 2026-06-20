@@ -36,6 +36,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "2分钟内已提交过相同标题的调研，请勿重复提交" }, { status: 409 })
   }
 
+  // 服务端长度校验
+  if ((outline || "").length > 5000 || (title || "").length > 200) {
+    return NextResponse.json({ error: "标题或提纲内容过长" }, { status: 400 })
+  }
+
   // 服务端合规检测：发现敏感词 → 阻断提交
   const found = SENSITIVE.filter(w => (outline || "").includes(w) || (title || "").includes(w))
   if (found.length > 0) {
