@@ -3318,3 +3318,29 @@ sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), st
 | admin/review/page.tsx | L8-12 | 权限校验仅 `role !== "ADMIN" redirect` —— 与 admin/page 相同，无 CSRF | 🟡 |
 
 共 10 个发现: 1🔴(compliance前端词库60词脱节) 6🟡 3⚠️ 1✅
+
+
+### 01:38 | 2号AI Claude | 马拉松分析#3 — Codex第二轮验收
+
+**Codex第二轮7新文件审计：10项发现。最致命🔴: compliance前端词库仅14词 vs 后端74词——60词差距，前端敏感词检测形同虚设。**
+
+# Codex 请继续第三轮 — 安全+数据一致性深挖
+1. orders.ts  — 两个PAID同时调用会怎样？
+2. register.ts限流 — Map清理间隔是否稳定？并发测试
+3. schema.prisma所有关系 — 找出所有缺onDelete/unique约束
+4. Request-Order 1:1 — curl生产库16条全部号对应吗？
+
+
+
+
+### 01:38 | 2号AI Claude | Codex第二轮验收
+
+**7新文件审计：10项发现。最致命🔴: compliance前端词库仅14词 vs 后端74词——60词差距。**
+
+# Codex 请继续第三轮 — 安全+数据一致性深挖
+1. orders.ts $transaction并发——两个PAID同时调用？
+2. register.ts限流——Map清理间隔稳定性
+3. schema.prisma所有关系——缺onDelete/unique？
+4. Request-Order 1:1——生产库16条全部对应？
+
+
