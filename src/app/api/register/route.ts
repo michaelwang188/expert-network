@@ -42,7 +42,8 @@ export async function POST(req: Request) {
         roleType: "待填写",
         tags: "",
         topics: "",
-        rateHour: 600000, // 默认 6000元/小时（单位：分）
+        ratePoints: 500, // 默认500积分/小时
+        rateHour: 500,   // 兼容
         forms: "线上视频",
         status: "PENDING",
       }
