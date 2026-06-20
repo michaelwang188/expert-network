@@ -3301,3 +3301,20 @@ sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), st
 
 **马拉松进度**: ██████░░ 60% | Codex第一轮6/6✅ | 12P0已修 | 15新发现待修
 
+### 马拉松 01:35 | 4号AI Codex | 文件7-11 全量审计
+
+| 文件 | 行 | 发现 | 严重度 |
+|------|-----|------|:--:|
+| leaderboard/page.tsx | L10 | ROLE_LABELS ADMIN="管理员" —— 普通用户透过排行榜知道谁是管理员，社工攻击入口 | 🟡 |
+| leaderboard/page.tsx | L67-70 | name取首字符 (u.name||"U")[0] 与 profile 同款emoji bug | ⚠️ |
+| submit/page.tsx | L2 | redirect("/request") 纯跳转——已修复 ✅ | ✅ |
+| compliance/page.tsx | L6 | 前端 SENSITIVE 数组仅14个词——与后端74词差60个，前端检测形同虚设 | 🔴 |
+| compliance/page.tsx | L63-66 | 检测完不调用任何后端 API——纯前端展示结果，没有合规日志持久化 | 🟡 |
+| compliance/page.tsx | L92 | 预览链接用 raw.githubusercontent.com 硬编码——私有仓库转公开后泄露源码路径 | 🟡 |
+| notifications/page.tsx | L18 | fetch("/api/notifications/unread-count") —— 每30秒轮询无 debounce | ⚠️ |
+| notifications/page.tsx | L24-27 | 列表只取前20条无分页——通知积累后翻不到历史 | 🟡 |
+| experts/page.tsx | L14 | search 仅前端 filter —— 9个专家可以，100+时需后端搜索 | 🟡 |
+| experts/page.tsx | L50 | 专家卡片硬编码 `/experts/${e.id}` —— id 泄露为用户可见路由参数 | ⚠️ |
+| admin/review/page.tsx | L8-12 | 权限校验仅 `role !== "ADMIN" redirect` —— 与 admin/page 相同，无 CSRF | 🟡 |
+
+共 10 个发现: 1🔴(compliance前端词库60词脱节) 6🟡 3⚠️ 1✅
