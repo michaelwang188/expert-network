@@ -78,7 +78,35 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "无权限执行此操作" }, { status: 403 })
     }
   }
-  // ADMIN 不受限制
+  // ADMIN 不受角色限制，但需遵守状态机
+  if (role !== "ADMIN") {
+    // 非管理员：状态机保护
+    const allowedTransitions: Record<string, string[]> = {
+      PENDING: ["ACTIVE", "CANCELLED"],
+      ACTIVE: ["DONE", "CANCELLED"],
+      DONE: [],
+      PAID: [],
+      CANCELLED: [],
+    }
+    const allowed = allowedTransitions[existing.status] || []
+    if (!allowed.includes(status)) {
+      return NextResponse.json({
+        error: `不允许从 ${existing.status} 直接变更为 ${status}`
+      }, { status: 400 })
+    }
+  }
+
+  // 管理员状态机：防止非法跳转
+  if (role === "ADMIN") {
+    const terminalStates = ["PAID", "CANCELLED"]
+    if (terminalStates.includes(existing.status)) {
+      return NextResponse.json({ error: "已终结订单不可变更" }, { status: 400 })
+    }
+    // PAID 只能从 DONE 来
+    if (status === "PAID" && existing.status !== "DONE") {
+      return NextResponse.json({ error: "仅已完成订单可结算" }, { status: 400 })
+    }
+  }
 
   // 🔴 PAID 结算：原子操作 — 更新订单 + 积分变动 + 流水记录
   if (status === "PAID") {

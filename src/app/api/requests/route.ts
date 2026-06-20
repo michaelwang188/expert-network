@@ -44,16 +44,18 @@ export async function POST(req: Request) {
 
   const { title, industry, subField, duration, form, budget, timeReq, outline, forbidden } = await req.json()
 
-  // 防重复提交：同研究员同标题+提纲2分钟内视为重复
+  // 防重复提交：同研究员+同标题+提纲前50字指纹，3分钟内视为重复
+  const outlineFingerprint = (outline || "").slice(0, 50).trim()
   const recentDup = await prisma.request.findFirst({
     where: {
       researcherId: (session.user as any).id,
       title,
-      createdAt: { gte: new Date(Date.now() - 2 * 60 * 1000) },
+      outline: { startsWith: outlineFingerprint },
+      createdAt: { gte: new Date(Date.now() - 3 * 60 * 1000) },
     },
   })
   if (recentDup) {
-    return NextResponse.json({ error: "2分钟内已提交过相同标题的调研，请勿重复提交" }, { status: 409 })
+    return NextResponse.json({ error: "3分钟内已提交过相同调研，请勿重复提交" }, { status: 409 })
   }
 
   // 服务端长度校验
@@ -73,7 +75,13 @@ export async function POST(req: Request) {
 
   const orderNo = "ORD-" + new Date().getFullYear() + "-" + String(Math.floor(1000 + Math.random() * 9000))
 
-  // 解析预算：取第一个数字，若含范围则取中间值
+  // 解析预算：取第一个数字，若含范围则取中间值。防空值
+  const safeOutline = outline || ""
+  const safeSubField = subField || ""
+  const safeDuration = duration || "60分钟"
+  const safeForm = form || "线上视频"
+  const safeTimeReq = timeReq || ""
+  const safeForbidden = forbidden || ""
   let estimatedAmount = 800
   if (budget) {
     const nums = budget.match(/(\d+)/g)
