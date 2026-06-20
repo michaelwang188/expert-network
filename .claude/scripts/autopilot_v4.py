@@ -22,7 +22,7 @@ PROJECT_DIR = Path("/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-n
 MSG_BOARD   = PROJECT_DIR / "AI_MESSAGE_BOARD.md"
 
 # API — DeepSeek代理的Claude
-API_KEY = os.environ.get("ANTHROPIC_API_KEY", "sk-170b89459c094879b35d3d7334b44c2c")
+API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")  # 从环境变量读取，不硬编码
 API_BASE = os.environ.get("ANTHROPIC_BASE_URL", "https://api.deepseek.com/anthropic")
 API_URL = f"{API_BASE}/v1/messages"
 API_MODEL = "claude-sonnet-4-6"
