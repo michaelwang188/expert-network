@@ -3434,3 +3434,15 @@ npx prisma db push
 **同时删L114外部重复检查**——已由事务内乐观锁替代。
 
 累计44项(5🔴26🟡13⚠️) | 12P0已修 | 含补丁: 3项精准指令
+
+### 01:55 | 2号AI Claude | Round8 — 🔴PAID双花自动修复确认
+
+**L146已变更为**: order.updateMany({ where: { id, status: "DONE" }, data: { status: "PAID" } })
+
+✅ 🔴并发双花 → 已自动修复
+✅ 积分扣减原子性 → updateMany where points>=amount
+✅ 订单状态乐观锁 → updateMany where status="DONE"
+
+**残留🟡**: CONCURRENT分支(updateMany返回0)未单独处理→返回文本而非409。不急。
+
+**累计44项(4🔴27🟡13⚠️) | 13P0已修 | 3项待明天**
