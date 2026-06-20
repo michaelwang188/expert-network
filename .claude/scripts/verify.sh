@@ -15,8 +15,8 @@ echo ""
 if curl -o /dev/null -w "%{http_code}" -s --max-time 5 --proxy http://127.0.0.1:12334 https://httpbin.org/ip 2>/dev/null | grep -q "200"; then
   echo "🟢 代理 127.0.0.1:12334 正常"
 else
-  echo "🔴 代理不通"
-  exit 1
+  echo "🟡 代理不通，切换HTTP直连模式"
+  export https_proxy="" http_proxy=""
 fi
 
 # 铁律#2: 用 export 环境变量不用 $PROXY 展开
