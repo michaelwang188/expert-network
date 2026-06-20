@@ -45,7 +45,7 @@ async function ResearcherDashboard({ userId }: { userId: string }) {
             <div style={{ fontSize: 36, marginBottom: 8 }}>🔬</div>
             <div style={{ fontSize: 16, fontWeight: 500, color: "#2c2c2a", marginBottom: 6 }}>开始第一次产业调研</div>
             <div style={{ fontSize: 13, color: "#888", lineHeight: 1.7 }}>
-              平台目前已有 {activeExperts} 位活跃专家覆盖半导体、新能源、AI算力等赛道
+              平台目前已有 {activeExperts} 位活跃专家覆盖半导体、新能源、AI算力等赛道{activeExperts === 0 ? "，首批专家正在招募中" : ""}
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>

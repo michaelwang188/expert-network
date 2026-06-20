@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
   const { title, industry, subField, duration, form, budget, timeReq, outline, forbidden } = await req.json()
 
-  // 防重复提交：同一研究员 2 分钟内相同标题的请求视为重复
+  // 防重复提交：同研究员同标题+提纲2分钟内视为重复
   const recentDup = await prisma.request.findFirst({
     where: {
       researcherId: (session.user as any).id,
@@ -53,14 +53,14 @@ export async function POST(req: Request) {
 
   const orderNo = "ORD-" + new Date().getFullYear() + "-" + String(Math.floor(1000 + Math.random() * 9000))
 
-  // 解析预算范围，取中间值作为预估金额（单位：分）
-  let estimatedAmount = 800 // 默认 800 积分
+  // 解析预算：取第一个数字，若含范围则取中间值
+  let estimatedAmount = 800
   if (budget) {
-    const match = budget.match(/(\d+)/g)
-    if (match && match.length >= 2) {
-      const low = parseInt(match[0])
-      const high = parseInt(match[1])
-      estimatedAmount = Math.round((low + high) / 2)
+    const nums = budget.match(/(\d+)/g)
+    if (nums) {
+      const values = nums.map(Number)
+      estimatedAmount = values.length >= 2 ? Math.round((values[0] + values[1]) / 2) : values[0]
+      if (estimatedAmount < 100) estimatedAmount = 800 // 下限保护
     }
   }
 
