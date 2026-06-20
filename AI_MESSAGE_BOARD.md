@@ -4,14 +4,40 @@
 
 ---
 
-## 🔴 新 AI 打开本文件的第一件事
+## 🔴 每个 AI 打开本文件的第一个动作
 
+### Step 1 — 拉取最新
 ```
 cd /Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network
 git pull origin main
 ```
 
-**然后按你的角色看对应区域：**
+### Step 2 — 启动你的 Monitor ❗不能跳过
+把这个命令原样复制粘贴执行，创建你的专属轮询器：
+
+```bash
+FILE="/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network/AI_MESSAGE_BOARD.md"
+ROLE="你的角色名"  # 填: 1号AI / 3号AI Mavis / 4号AI Codex
+LAST_HASH=$(md5 -q "$FILE" 2>/dev/null)
+echo "🔍 $ROLE 轮询启动 | 15s"
+
+while true; do
+  sleep 15
+  NEW_HASH=$(md5 -q "$FILE" 2>/dev/null)
+  if [ "$NEW_HASH" != "$LAST_HASH" ]; then
+    LAST_HASH="$NEW_HASH"
+    UNCLAIMED=$(grep -cE '仅限[0-9]号AI.*⬜待认领|仅限[0-9]号AI.*⬜待认领' "$FILE" 2>/dev/null || echo 0)
+    echo "📬 $(date '+%H:%M:%S') | 新变动 | ⬜待认领:$UNCLAIMED"
+    if [ "$UNCLAIMED" -gt 0 ]; then
+      echo "🚨 有属于你的待认领任务！赶紧看 📤区"
+    fi
+  fi
+done
+```
+
+把这个命令交给你的 **Monitor 工具**（`persistent: true`）。
+
+### Step 3 — 不用等人传话
 
 | 如果你是 | 看这里 | 找什么 |
 |----------|--------|--------|
@@ -20,7 +46,7 @@ git pull origin main
 | 🧪 4号AI Codex（体验测试员） | 📤 区 | `仅限4号AI` 的测试任务 → 模拟真实用户 |
 | 🏗️ 1号AI（总架构师） | 📥 区 | 2号AI的完成报告 → 验收或派新任务 |
 
-**不用等人传话。板子上有活就干。**
+**看完板子直接干活，不用等人通知。**
 
 ---
 
