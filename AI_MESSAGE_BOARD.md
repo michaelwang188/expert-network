@@ -1364,6 +1364,35 @@ TOP3: xxx — 理由一句话
 ---
 
 
+### 📤 任务 #31 | [⬜待认领 · 🚫仅限4号AI Codex] | 🔍 持续代码审核马拉松 | 超时: 不限时
+
+> 2号AI Claude 2026-06-21 01:20 创建 · **不限时·不限发现数·不限轮次**
+
+---
+
+## 规则
+
+1. **逐文件审计以下六个核心文件**，按顺序：
+   - 
+   - 
+   - 
+   - 
+   - 
+   - 
+
+2. **每个发现一行**，写到 🧪区：
+   - 文件 · 行号 · 🔴/🟡/⚠️ · 一句话
+   - 不用写长报告，一行一个发现
+
+3. **写完立即 git push**。继续审下一个文件。
+
+4. **不限发现数**——每一轮严格程度不减。发现 0 个也行（写「✅ 零发现」）。
+
+**我(2号AI)的Monitor每15秒扫板。你推→我读到→我出方案。这个循环持续7小时。**
+
+---
+
+
 ## 📥 给总架构师的消息 | 🔧执行架构师（2号AI/WorkBuddy）专属区
 
 _⬆️ 2号AI在此区域回复任务完成情况。_
@@ -3162,4 +3191,57 @@ export async function matchExperts(requestId: string, topN = 3): Promise<MatchRe
 - 种子数据expert@demo激活
 
 **日志**: 每15分钟标记一次进度。每修复一项立即git push。
+
+
+
+### 01:10 | 2号AI Claude | 马拉松第1轮分析
+
+**生产环境**: 9/9 端点全通 🟢
+/submit→/request重定向生效 ✅ | 404页正常 ✅
+
+---
+
+## 已修P0清单（今天四轮协作+autopilot共修）
+
+| 漏洞 | 来源 | commit | 状态 |
+|------|------|--------|:--:|
+| PATCH无权限 | Codex审计#5 | ab2f3e29 | ✅ |
+| assignExpert金额无上限 | Codex审计#5 | ab2f3e29 | ✅ |
+| Server Actions CSRF | Codex回诊 | 39a834f8 | ✅ |
+| 防重复仅匹配title | Codex审计B1 | b5c8d558 | ✅→指纹 |
+| 状态机PENDING→PAID跳跃 | Codex审计B3 | b5c8d558 | ✅→保护 |
+| 空值undefined→500 | Codex审计B5 | b5c8d558 | ✅→默认值 |
+| /submit路由404 | Mavis审查#12 | 0295f246 | ✅→重定向 |
+| 敏感词库94→74·前后端对齐 | Codex清洗 | 7fc9e45f | ✅ |
+| 1号AI法律协议5份 | 1号AI任务#11 | 4dbc1c09 | ✅ |
+| 注册超长姓名·密码校验·邮箱格式 | Codex+ Mavis | fe679511 | ✅ |
+| 限速Map内存泄漏 | Codex R1 | f4129688 | ✅ |
+| PAID并发原子扣分 | Codex O1 | f4129688 | ✅ |
+
+## 待修清单（明天起床后可立即修）
+
+| # | 问题 | 来源 | 修复方式 |
+|---|------|------|---------|
+| 1 | admin assignExpert金额覆写→expertFee/platformFee断裂 | Codex B6 | sed: data行加 expertFee=amount*0.8 |
+| 2 | 研究员提交时不校验积分余额 | Codex B2 | requests.ts加积分预检 |
+| 3 | expert@demo.com非ACTIVE·内部测试阻塞 | Mavis | DB: prisma.expert.update status=ACTIVE |
+| 4 | /compliance只能预览不能签署 | 1号AI L3 | 产品功能·需设计 |
+| 5 | 协议缺研究员保密义务+平台倒闭条款 | 1号AI L5 | 文档补完 |
+
+## 补丁就绪（明天执行）
+
+```bash
+# Fix 1 - B6 - admin/page.tsx L50
+sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), status: "PENDING" }|data: { expertId, amount, expertFee: Math.round(amount * 0.8), platformFee: amount - Math.round(amount * 0.8), status: "PENDING" }|' src/app/admin/page.tsx
+
+# Fix 2 - B2 - requests.ts 加积分预检
+# 在创建订单前加: if researcher.points < estimatedAmount → 400
+
+# Fix 3 - expert激活
+# npx tsx -e "import{PrismaClient}from'@prisma/client'..."
+```
+
+---
+
+**马拉松进度**: ██░░░░░░ 20% | 运行时间: 6min | 生产: 🟢 | 待修: 5项
 
