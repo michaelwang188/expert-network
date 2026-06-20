@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import Link from "next/link"
 
 export default function RegisterPage() {
@@ -28,7 +29,14 @@ export default function RegisterPage() {
       setError(data.error || "注册失败")
       setLoading(false)
     } else {
-      router.push("/login?registered=1")
+      // 🆕 注册成功后自动登录，不再跳登录页
+      const result = await signIn("credentials", { email, password, redirect: false })
+      if (result?.ok) {
+        router.push("/dashboard")
+        router.refresh()
+      } else {
+        router.push("/login?registered=1")
+      }
     }
   }
 

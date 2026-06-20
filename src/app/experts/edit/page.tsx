@@ -156,7 +156,10 @@ function ExpertEditContent() {
         {/* 报价与档期 */}
         <SectionTitle title="报价与档期" />
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <Field label="小时费率（积分/小时）" value={form.ratePoints.toString()} onChange={v => update("ratePoints", parseInt(v) || 0)} type="number" />
+          <div>
+            <Field label="小时费率（积分/小时）" value={form.ratePoints.toString()} onChange={v => update("ratePoints", parseInt(v) || 0)} type="number" />
+            <div style={{ fontSize: 11, color: "#888", marginTop: -4, marginBottom: 8 }}>根据您的行业经验自定价。参考范围：初级500-1000，资深1000-3000，顶级3000+</div>
+          </div>
           <Field label="可接待时段" value={form.availableTime} onChange={v => update("availableTime", v)} placeholder="例：工作日14:00-18:00" />
         </div>
         <div>
