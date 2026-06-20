@@ -11,8 +11,8 @@ export default async function AdminPage() {
   const [pendingExperts, allExperts, pendingOrders, allOrders, complianceLogs] = await Promise.all([
     prisma.expert.findMany({ where: { status: "PENDING" }, orderBy: { createdAt: "desc" } }),
     prisma.expert.findMany({ orderBy: { createdAt: "desc" } }),
-    // 待派单：有订单但还未指派专家的
-    prisma.order.findMany({ where: { expertId: "" }, orderBy: { createdAt: "desc" }, include: { researcher: true, request: true } }),
+    // 待派单：订单expertId为null（未指派专家）
+    prisma.order.findMany({ where: { expertId: null }, orderBy: { createdAt: "desc" }, include: { researcher: true, request: true } }),
     prisma.order.findMany({ orderBy: { createdAt: "desc" }, include: { researcher: true, expert: true, request: true } }),
     prisma.complianceLog.findMany({ orderBy: { createdAt: "desc" }, take: 20 }),
   ])
@@ -34,7 +34,7 @@ export default async function AdminPage() {
     "use server"
     const orderId = formData.get("orderId") as string
     const expertId = formData.get("expertId") as string
-    const amount = parseInt(formData.get("amount") as string) * 100 // 元转分
+    const amount = parseInt(formData.get("amount") as string) // 积分
     await prisma.order.update({
       where: { id: orderId },
       data: { expertId, amount, platformFee: Math.round(amount * 0.2), status: "PENDING" },
@@ -150,8 +150,15 @@ function AssignPanel({ order, experts, assignExpert }: any) {
   const matched = experts.filter((e: any) => {
     const tags = (e.tags || "").toLowerCase()
     const industry = (req?.industry || "").toLowerCase()
-    return tags.includes(industry) || e.org?.includes(req?.subField || "") || Math.random() > 0.3
-  }).slice(0, 5)
+    const subField = (req?.subField || "").toLowerCase()
+    // 优先：标签匹配行业或子领域，其次：机构名匹配
+    if (industry && tags.includes(industry)) return true
+    if (subField && (tags.includes(subField) || (e.org || "").toLowerCase().includes(subField))) return true
+    return false
+  })
+  // 无匹配时展示全部活跃专家供手动选择
+  const candidates = matched.length > 0 ? matched : experts
+  const display = candidates.slice(0, 8)
 
   return (
     <div style={{ padding: 14, borderBottom: "0.5px solid #f1efe8" }}>
@@ -169,11 +176,11 @@ function AssignPanel({ order, experts, assignExpert }: any) {
           <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>匹配专家</div>
           <select name="expertId" required style={{ width: "100%", padding: 6, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13, marginBottom: 6 }}>
             <option value="">请选择专家...</option>
-            {matched.map((e: any) => <option key={e.id} value={e.id}>{e.title}（{e.org}）· {(e.rateHour || 600000) / 10000}积分/小时</option>)}
+            {display.map((e: any) => <option key={e.id} value={e.id}>{e.title}（{e.org}）· {e.ratePoints || e.rateHour || 500}积分/h</option>)}
           </select>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <input name="amount" type="number" placeholder="金额(积分)" required defaultValue={Math.round((order.amount || 800000) / 100)} style={{ width: 90, padding: 5, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13 }} />
-            <span style={{ fontSize: 12, color: "#888" }}>元</span>
+            <input name="amount" type="number" placeholder="金额(积分)" required defaultValue={order.amount || 800} style={{ width: 90, padding: 5, border: "0.5px solid #e0dfd8", borderRadius: 6, fontSize: 13 }} />
+            <span style={{ fontSize: 12, color: "#888" }}>积分</span>
             <button type="submit" style={{ padding: "5px 12px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>派单</button>
           </div>
         </form>
@@ -199,7 +206,7 @@ function OrderRow({ o, experts, confirmOrder }: any) {
         <div style={{ fontWeight: 500 }}>{o.request?.title || o.orderNo}</div>
         <div style={{ fontSize: 12, color: "#888" }}>专家：{o.expert?.title || "未指派"} · 研究员：{o.researcher?.name}</div>
       </div>
-      <div style={{ fontWeight: 500, minWidth: 80 }}>¥{(o.amount / 100).toLocaleString()}</div>
+      <div style={{ fontWeight: 500, minWidth: 80 }}>{o.amount}积分</div>
       <span style={{ background: s.color + "18", color: s.color, padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500, minWidth: 80, textAlign: "center" }}>{s.label}</span>
       {o.status === "PENDING" && o.expertId && (
         <form action={confirmOrder}><input type="hidden" name="orderId" value={o.id} /><button type="submit" style={{ padding: "4px 10px", background: "#0F6E56", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>确认开始</button></form>
