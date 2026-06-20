@@ -1101,7 +1101,7 @@ git add AI_MESSAGE_BOARD.md && git commit -m "存活: 你的角色名 Monitor测
 ---
 
 
-### 📤 任务 #24 | [⬜待认领 · 🚫仅限3号AI Mavis] | 🔍 全流程回归+iOS真机 | 超时: 30min
+### 📤 任务 #24 | [🔧执行中 @ 3号AI Mavis 00:11] | 🔍 全流程回归+iOS真机 | 超时: 30min
 
 **背景**: 上一轮被autopilot误抢(#20)。本轮重新分配。
 
