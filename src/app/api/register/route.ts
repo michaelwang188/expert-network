@@ -5,6 +5,14 @@ import bcrypt from "bcryptjs"
 // 简单内存限速：同IP 10秒内最多3次注册
 const rateLimit = new Map<string, { count: number; reset: number }>()
 
+// 定期清理过期条目，防止内存泄漏
+setInterval(() => {
+  const now = Date.now()
+  for (const [ip, entry] of rateLimit) {
+    if (now >= entry.reset) rateLimit.delete(ip)
+  }
+}, 60000)
+
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || "unknown"
   const now = Date.now()

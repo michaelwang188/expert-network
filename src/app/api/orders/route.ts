@@ -85,44 +85,36 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "订单未指派专家，无法结算" }, { status: 400 })
     }
 
-    // 研究员积分不足检查
-    const researcher = await prisma.user.findUnique({
-      where: { id: researcherId },
-      select: { points: true },
-    })
-    if (!researcher || researcher.points < amount) {
-      return NextResponse.json({ error: "研究员积分余额不足" }, { status: 400 })
-    }
-
     const now = new Date()
 
-    // 原子事务：订单→PAID + 研究员扣分 + 专家加分 + 双流水
+    // 原子事务：订单→PAID + 研究员扣分(并发安全) + 专家加分 + 双流水
     const order = await prisma.$transaction(async (tx) => {
+      // 0. 并发安全：用 updateMany where points >= amount 原子扣分
+      const debitResult = await tx.user.updateMany({
+        where: { id: researcherId, points: { gte: amount } },
+        data: { points: { decrement: amount } },
+      })
+      if (debitResult.count === 0) return "INSUFFICIENT"
+
       // 1. 更新订单状态
       const updatedOrder = await tx.order.update({
         where: { id: orderId },
         data: { status: "PAID", paidAt: now },
       })
 
-      // 2. 研究员扣减积分
-      await tx.user.update({
-        where: { id: researcherId },
-        data: { points: { decrement: amount } },
-      })
-
-      // 3. 专家增加积分
+      // 2. 专家增加积分
       await tx.user.update({
         where: { id: expertUserId },
         data: { points: { increment: expertFee } },
       })
 
-      // 4. 读最新积分余额用于流水记录
+      // 3. 读最新积分余额用于流水记录
       const [researcherNew, expertNew] = await Promise.all([
         tx.user.findUnique({ where: { id: researcherId }, select: { points: true } }),
         tx.user.findUnique({ where: { id: expertUserId }, select: { points: true } }),
       ])
 
-      // 5. 流水：研究员支出
+      // 4. 流水：研究员支出
       await tx.pointsTransaction.create({
         data: {
           userId: researcherId,
@@ -134,7 +126,7 @@ export async function PATCH(req: Request) {
         },
       })
 
-      // 6. 流水：专家获得劳动积分
+      // 5. 流水：专家获得劳动积分
       await tx.pointsTransaction.create({
         data: {
           userId: expertUserId,
@@ -149,7 +141,10 @@ export async function PATCH(req: Request) {
       return updatedOrder
     })
 
-    return NextResponse.json(order)
+    if (order === "INSUFFICIENT") {
+      return NextResponse.json({ error: "研究员积分余额不足" }, { status: 400 })
+    }
+    return NextResponse.json(order as any)
   }
 
   // 非 PAID 的普通状态变更
