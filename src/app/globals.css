@@ -28,3 +28,95 @@ body {
   color: #2c2c2a;
   margin: 0;
 }
+
+/* ─── 移动端基础适配 (iPhone 375px) ──────────────── */
+@media (max-width: 640px) {
+  /* Landing page hero */
+  h1, [style*="font-size: 36"] {
+    font-size: 24px !important;
+  }
+
+  /* 三列/四列 → 单列 */
+  [style*="grid-template-columns: repeat(3, 1fr)"],
+  [style*="grid-template-columns: repeat(4, 1fr)"],
+  [style*="grid-template-columns: repeat(5, 1fr)"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 双列 → 单列 */
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 主容器 padding */
+  main, [style*="max-width: 1200"] {
+    padding: 16px 12px !important;
+  }
+
+  /* 表格横向滚动 */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Nav 导航 */
+  nav, [style*="justify-content: space-between"][style*="padding"] {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* 按钮不重叠 */
+  button + button {
+    margin-left: 0 !important;
+    margin-top: 6px;
+  }
+
+  /* Hero区域 */
+  [style*="margin: 80px auto"] {
+    margin: 40px auto 0 !important;
+  }
+
+  /* 侧边栏隐藏，改用顶部tab */
+  aside, [style*="width: 200"] {
+    display: none;
+  }
+
+  /* 管理员表单宽度 */
+  select, input[type="number"], input[type="text"] {
+    max-width: 100%;
+  }
+
+  /* 桌面padding */
+  [style*="padding: 40"],
+  [style*="padding: 48"] {
+    padding: 24px 16px !important;
+  }
+
+  [style*="padding: 28"] {
+    padding: 20px 16px !important;
+  }
+}
+
+/* ─── 平板 (640-1024px) ─────────────────────────── */
+@media (min-width: 641px) and (max-width: 1024px) {
+  [style*="grid-template-columns: repeat(4, 1fr)"],
+  [style*="grid-template-columns: repeat(5, 1fr)"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ─── 移动端导航 ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .desktop-nav { display: none !important; }
+  .mobile-menu-btn { display: block !important; }
+  .mobile-menu { display: flex !important; }
+}
+
+/* ─── 加载态 ─────────────────────────────────────── */
+[data-loading="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
