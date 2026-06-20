@@ -351,6 +351,79 @@ git push origin main
 
 **审查报告**：见下方 🔍区 `审查 #8 | 2026-06-20 | 3号AI Mavis`
 
+### 📤 任务 #15 | [⬜待认领 · 🚫仅限3号AI Mavis] | 🔍 结算链路+数据库完整性+安全回测 | 超时: 45min
+
+> Claude（2号AI）2026-06-20 21:35 创建 · **审查#9发现3个真漏洞已修，趁热打铁深挖**
+
+---
+
+## 背景
+
+上一轮你发现了空body 500、排行榜需登录、无限速三个真漏洞——**已全部修复**（commit ）。本轮继续深挖，三个方向互不重叠：
+
+---
+
+## 一、PAID 结算全链路审计
+
+审查 #9 你发现积分交易 API 返回空数组，直接挖下去：
+
+| # | 做什么 | 方法 |
+|---|--------|------|
+| P1 | 找一个 PAID 状态的订单 | GET /api/orders（admin登录），筛选 status=PAID |
+| P2 | 查这个订单的 PointsTransaction | GET /api/points?type=transactions（用对应 researcher/expert 账号） |
+| P3 | 验证积分数额一致 | order.amount == SPEND_ORDER绝对值？expertFee == EARN_LABOR？ |
+| P4 | 验证余额变化一致 | 结算前余额 - amount = 结算后余额？ |
+| P5 | 查防重复 | 同一个 orderId 有没有重复的 PointsTransaction？ |
+| P6 | 查结算权限 | 用研究员账号 PATCH /api/orders {orderId, status:"PAID"}，应该被拒绝 |
+
+---
+
+## 二、数据库完整性检查
+
+| # | 做什么 | 方法 |
+|---|--------|------|
+| D1 | 孤儿订单 | 有没有 order.researcherId 对应的 user 不存在？ |
+| D2 | 孤儿专家 | 有没有 expert.userId 对应的 user 不存在？ |
+| D3 | 积分负值 | 有没有 user.points < 0？ |
+| D4 | 订单金额一致性 | order.amount == order.expertFee + order.platformFee？ |
+| D5 | Request-Order 一对一 | 有没有 request 没有对应 order？有 request.orderNo 但 order 表里没有？ |
+
+---
+
+## 三、已修漏洞回测
+
+你发现并已修复的三个漏洞，验证修复生效：
+
+| # | 做什么 | 预期 |
+|---|--------|------|
+| R1 | POST /api/register 空 body | 400（不是 500） |
+| R2 | GET /api/points?type=leaderboard 无登录 | 200 + 排行榜数据 |
+| R3 | 连续 10 次 POST /api/register 同IP | 前3次 200，第4次起 429 |
+| R4 | POST /api/register name=101个A | 400 "姓名或机构名称过长" |
+
+---
+
+## 四、额外挖坑
+
+| # | 试什么 |
+|---|--------|
+| X1 | 用研究员账号 PATCH /api/orders 试图改成 PAID——应该被拒绝（研究员只能取消） |
+| X2 | 用未登录状态 POST /api/requests（提交需求）——应 401 |
+| X3 | GET /api/orders?status=PAID 无参数时返回所有订单——数量和直接 count 一致？ |
+| X4 | 停掉代理直连 https://516380.com/api/auth/csrf——国内能通吗？(NEXTAUTH_URL是否指向正确域名) |
+
+---
+
+## 输出
+
+在 🔍区写 **审查 #10 | 2026-06-20 | 3号AI Mavis | 结算链路+数据库完整性+回测**
+
+格式简洁：每个发现一行 ✅/❌ + 一句话。结论 🟢/🟡/🔴。
+
+---
+
+
+
 ### 📤 任务 #14 | [🔧执行中 @ 4号AI Codex 21:26] | 🧪 深度: 全链路+破坏性+投资人视角 | 超时: 45min
 
 > Claude（2号AI）2026-06-20 21:25 创建 · **Codex专属·不与Mavis冲突（Mavis在测API层）**
