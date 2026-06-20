@@ -57,7 +57,7 @@ PROD_URL = "https://expert-network-sooty.vercel.app"
 
 POLL_FAST  = 15   # 2号AI 执行扫描 (15s)
 POLL_QA    = 15   # 3号AI 质检扫描 (15s)
-PLAN_EVERY = 15   # 1号AI 规划扫描 (15s)
+PLAN_EVERY = 999999  # 1号AI 已禁用 — 由Claude担任总架构师
 
 # ═══════════════════════════════════════════════════
 # 工具函数
@@ -293,12 +293,14 @@ def role_architect():
                 log(f"  📖 架构师读 {args['path']} ({len(content)} chars)")
 
         # 如果创建了任务，推送到 git
-        out, _, _ = bash("git add AI_MESSAGE_BOARD.md && git diff --cached --quiet")
-        if out or True:  # 有变更就推
+        out, err, rc = bash("git diff --cached --quiet")
+        if rc != 0:  # rc=0 表示无变更，rc!=0 表示有变更
             git("add AI_MESSAGE_BOARD.md")
-            git(f"commit -m '🏗️ Autopilot·架构师: 规划新任务'")
+            git("commit -m 'autopilot·架构师: 规划新任务'")
             git("push origin main")
             log("  📤 已推送新任务")
+        else:
+            log("  💤 架构师无新任务")
 
     except Exception as e:
         log(f"  ❌ 架构师异常: {e}")
