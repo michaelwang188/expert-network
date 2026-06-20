@@ -57,7 +57,7 @@ export default async function ProfilePage() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 13 }}>
           <div><span style={{ color: "#888" }}>机构：</span>{user?.orgName || "未填写"}</div>
           <div><span style={{ color: "#888" }}>职务：</span>{user?.title || "未填写"}</div>
-          <div><span style={{ color: "#888" }}>公益积分：</span><strong style={{ color: "#185FA5", fontSize: 16 }}>{user?.points?.toLocaleString() || 0}</strong></div>
+          <div><span style={{ color: "#888" }}>账户积分：</span><strong style={{ color: "#185FA5", fontSize: 16 }}>{user?.points?.toLocaleString() || 0}</strong></div>
           <div><span style={{ color: "#888" }}>注册时间：</span>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}</div>
         </div>
 

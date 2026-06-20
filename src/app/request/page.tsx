@@ -19,7 +19,7 @@ function RequestContent() {
   const orderNoRef = useRef("")
   const [form, setForm] = useState({
     title: "", industry: "MLCC", subField: "", duration: "60分钟", form: "线上视频",
-    budget: "6000-12000", timeReq: "", outline: "", forbidden: "",
+    budget: "6000-12000 积分", timeReq: "", outline: "", forbidden: "",
   })
 
   const checkSensitive = (text: string) => SENSITIVE.filter(w => text.includes(w))
@@ -128,7 +128,7 @@ function RequestContent() {
               <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>预算范围（积分）</label>
               <select value={form.budget} onChange={e => setForm(f => ({...f, budget: e.target.value}))}
                 style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", background: "#fff" }}>
-                <option>3000-6000</option><option>6000-12000</option><option>12000-24000</option><option>24000+</option>
+                <option value="3000-6000">3000-6000 积分</option><option value="6000-12000">6000-12000 积分</option><option value="12000-24000">12000-24000 积分</option><option value="24000+">24000+ 积分</option><option value="custom">自定义</option>
               </select>
             </div>
             <div>

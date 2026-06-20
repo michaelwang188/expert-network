@@ -33,7 +33,7 @@ async function ResearcherDashboard({ userId }: { userId: string }) {
       <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>我的工作台</h2>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
-        <StatCard label="公益积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
+        <StatCard label="账户积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
         <StatCard label="我的调研需求" value={myRequests.toString()} sub="条已提交" />
         <StatCard label="我的订单" value={myOrders.toString()} sub="笔" />
         <StatCard label="可预约专家" value={activeExperts.toString()} sub="位活跃" />
@@ -91,7 +91,7 @@ async function ExpertDashboard({ userId }: { userId: string }) {
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
-        <StatCard label="公益积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
+        <StatCard label="账户积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
         <StatCard label="待接订单" value={pendingOrders.toString()} sub="笔" />
         <StatCard label="进行中订单" value={activeOrders.toString()} sub="笔" />
         <StatCard label="累计完成" value={expert.completedOrders.toString()} sub="笔" />
