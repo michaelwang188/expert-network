@@ -77,6 +77,13 @@ export default async function AdminPage() {
     <div>
       <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>平台管理</h2>
 
+      {/* 专家邀请 */}
+      <div style={{ background: "#E6F1FB", border: "0.5px solid #b8d4f4", borderRadius: 10, padding: 12, marginBottom: 16, display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
+        <span>🔗 专家注册邀请链接：</span>
+        <code style={{ background: "#fff", padding: "4px 10px", borderRadius: 6, fontSize: 12, flex: 1 }}>https://516380.com/register</code>
+        <span style={{ fontSize: 12, color: "#185FA5" }}>（让专家选择「专家」身份注册，注册后在下方审核）</span>
+      </div>
+
       {/* 统计卡片 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 20 }}>
         <StatCard label="待审核专家" value={pendingExperts.length.toString()} color="#BA7517" />

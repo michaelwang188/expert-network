@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     },
   })
 
-  // 如果注册的是专家，自动创建一条待审核的专家档案
+  // 如果注册的是专家，自动创建待审核档案 + 通知所有管理员
   if (safeRole === "EXPERT") {
     await prisma.expert.create({
       data: {
@@ -79,12 +79,25 @@ export async function POST(req: Request) {
         roleType: "待填写",
         tags: "",
         topics: "",
-        ratePoints: 500, // 默认500积分/小时
-        rateHour: 500,   // 兼容
+        ratePoints: 500,
+        rateHour: 500,
         forms: "线上视频",
         status: "PENDING",
       }
     })
+    // 通知所有管理员：有新专家待审核
+    const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } })
+    for (const admin of admins) {
+      await prisma.notification.create({
+        data: {
+          userId: admin.id,
+          type: "EXPERT_PENDING",
+          title: "新专家待审核",
+          message: `${name}（${orgName || "未填机构"}）已注册为专家，待审核`,
+          refId: user.id,
+        }
+      })
+    }
   }
 
   return NextResponse.json({ ok: true, userId: user.id })
