@@ -78,7 +78,8 @@ function OrdersContent() {
       </div>
 
       {loading ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>加载中...</div> :
-        filtered.length === 0 ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>{error ? "请刷新重试" : "暂无订单"}</div> :
+        filtered.length === 0 ?
+        <EmptyState role={role} error={!!error} /> :
         <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
             <thead>
@@ -129,6 +130,38 @@ function OrdersContent() {
           </table>
         </div>
       }
+    </div>
+  )
+}
+
+function EmptyState({ role, error }: { role: string; error: boolean }) {
+  if (error) {
+    return <div style={{ padding: 40, textAlign: "center", background: "#FCEBEB", borderRadius: 10, color: "#A32D2D", fontSize: 14 }}>加载失败，请刷新页面重试</div>
+  }
+  const msg: Record<string, { emoji: string; title: string; desc: string; action?: { label: string; href: string } }> = {
+    RESEARCHER: {
+      emoji: "🔬", title: "暂无订单", desc: "提交调研需求后，管理员会为您匹配合适的行业专家，订单将显示在这里。",
+      action: { label: "提交调研需求", href: "/request" },
+    },
+    EXPERT: {
+      emoji: "🧠", title: "暂无订单", desc: "管理员匹配到合适的需求后会将订单分配给您。届时您可以在此页面确认接单并查看订单详情。",
+    },
+    ADMIN: {
+      emoji: "📋", title: "暂无订单", desc: "尚无研究员提交调研需求。当有新需求时，您可以在管理后台进行派单操作。",
+      action: { label: "前往管理后台", href: "/admin" },
+    },
+  }
+  const m = msg[role] || msg.RESEARCHER
+  return (
+    <div style={{ textAlign: "center", padding: 48, background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 12 }}>
+      <div style={{ fontSize: 40, marginBottom: 12 }}>{m.emoji}</div>
+      <div style={{ fontSize: 15, fontWeight: 500, color: "#2c2c2a", marginBottom: 8 }}>{m.title}</div>
+      <div style={{ fontSize: 13, color: "#888", marginBottom: 20, lineHeight: 1.7, maxWidth: 400, margin: "0 auto 20px" }}>{m.desc}</div>
+      {m.action && (
+        <a href={m.action.href} style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, background: "#185FA5", color: "#fff", fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
+          {m.action.label}
+        </a>
+      )}
     </div>
   )
 }

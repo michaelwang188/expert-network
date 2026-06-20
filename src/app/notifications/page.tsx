@@ -6,10 +6,12 @@ import { revalidatePath } from "next/cache"
 
 export default async function NotificationsPage() {
   const session = await getServerSession(authOptions)
-  if (!session) redirect("/login")
+  if (!session?.user) redirect("/login")
+  const userId = (session.user as any).id as string
+  if (!userId) redirect("/login")
 
   const notifications = await prisma.notification.findMany({
-    where: { userId: (session.user as any).id },
+    where: { userId },
     orderBy: { createdAt: "desc" },
   })
 
@@ -27,7 +29,7 @@ export default async function NotificationsPage() {
   async function markAllAsRead() {
     "use server"
     await prisma.notification.updateMany({
-      where: { userId: (session.user as any).id, read: false },
+      where: { userId, read: false },
       data: { read: true },
     })
     revalidatePath("/notifications")

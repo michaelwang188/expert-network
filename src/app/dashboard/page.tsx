@@ -4,122 +4,188 @@ import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 
-// 热门赛道统计
-const TRACK_LABELS = ["AI算力","新能源","半导体","MLCC","创新药","消费电子"]
-
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session) redirect("/login")
-
-  // 并行查数据
-  const [expertCount, pendingExperts, monthOrders, recentOrders, complianceLogs] = await Promise.all([
-    prisma.expert.count({ where: { status: "ACTIVE" } }),
-    prisma.expert.count({ where: { status: "PENDING" } }),
-    prisma.order.findMany({
-      where: { createdAt: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) } },
-      include: { researcher: true, expert: true },
-      orderBy: { createdAt: "desc" },
-      take: 20,
-    }),
-    prisma.order.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      include: { researcher: true, expert: true },
-    }),
-    prisma.complianceLog.findMany({ where: { handled: false }, orderBy: { createdAt: "desc" }, take: 10 }),
-  ])
-
-  const monthGMV = monthOrders.reduce((s, o) => s + o.amount, 0) / 100  // 分→元，再÷100? wait: amount is in 分, so /100 = 元
-  const monthOrderCount = monthOrders.length
-
-  // 赛道分布（简化统计 —— 实际应从 Request.industry 关联，这里用 Order 近似）
-  const trackCounts: Record<string, number> = {}
-  TRACK_LABELS.forEach(l => trackCounts[l] = 0)
-  // 用 mock 数据展示，真实场景从 Request 表统计
-  trackCounts["AI算力"] = 247; trackCounts["新能源"] = 204; trackCounts["半导体"] = 183
-  trackCounts["MLCC"] = 136; trackCounts["创新药"] = 115; trackCounts["消费电子"] = 88
-  const maxTrack = Math.max(...Object.values(trackCounts))
-
-  const statusMap: Record<string, { label: string; color: string }> = {
-    PENDING: { label: "待确认", color: "#BA7517" },
-    ACTIVE: { label: "进行中", color: "#185FA5" },
-    DONE: { label: "已完成", color: "#3B6D11" },
-    PAID: { label: "已结算", color: "#0F6E56" },
-    CANCELLED: { label: "已取消", color: "#A32D2D" },
-  }
+  const role = (session.user as any).role
+  const userId = (session.user as any).id
 
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>数据看板</h2>
+      {role === "RESEARCHER" && <ResearcherDashboard userId={userId} />}
+      {role === "EXPERT" && <ExpertDashboard userId={userId} />}
+      {role === "ADMIN" && <AdminDashboard />}
+    </div>
+  )
+}
 
-      {/* 指标卡 */}
+// ─── 研究员 Dashboard ────────────────────────────
+async function ResearcherDashboard({ userId }: { userId: string }) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { points: true, name: true } })
+  const [myRequests, myOrders] = await Promise.all([
+    prisma.request.count({ where: { researcherId: userId } }),
+    prisma.order.count({ where: { researcherId: userId } }),
+  ])
+  const activeExperts = await prisma.expert.count({ where: { status: "ACTIVE" } })
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>我的工作台</h2>
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
-        <StatCard label="在库活跃专家" value={expertCount.toLocaleString()} sub="可接单状态" />
-        <StatCard label="本月订单" value={monthOrderCount.toString()} sub="笔" up />
-        <StatCard label="本月 GMV（积分）" value={monthGMV.toLocaleString()} sub="平台总积分" up />
-        <StatCard label="待处理事项" value={pendingExperts.toString()} sub="专家审核 + 合规" warn={pendingExperts > 0} />
+        <StatCard label="公益积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
+        <StatCard label="我的调研需求" value={myRequests.toString()} sub="条已提交" />
+        <StatCard label="我的订单" value={myOrders.toString()} sub="笔" />
+        <StatCard label="可预约专家" value={activeExperts.toString()} sub="位活跃" />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
-        {/* 热门赛道 */}
-        <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>热门赛道分布</div>
-          {TRACK_LABELS.map(t => (
-            <div key={t} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-              <div style={{ width: 72, fontSize: 12, color: "#888", textAlign: "right", flexShrink: 0 }}>{t}</div>
-              <div style={{ flex: 1, height: 16, background: "#f1efe8", borderRadius: 4, overflow: "hidden" }}>
-                <div style={{ width: `${maxTrack ? trackCounts[t] / maxTrack * 100 : 0}%`, height: "100%", borderRadius: 4, background: t === "AI算力" ? "#378ADD" : t === "新能源" ? "#1D9E75" : t === "半导体" ? "#534AB7" : t === "MLCC" ? "#BA7517" : t === "创新药" ? "#D4537E" : "#888780" }} />
-              </div>
-              <div style={{ width: 36, fontSize: 12, color: "#888", flexShrink: 0 }}>{trackCounts[t]}</div>
-            </div>
-          ))}
+      {myRequests === 0 ? (
+        <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 12, padding: 40, textAlign: "center" }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>🔬</div>
+          <div style={{ fontSize: 15, fontWeight: 500, color: "#2c2c2a", marginBottom: 8 }}>开始第一次产业调研</div>
+          <div style={{ fontSize: 13, color: "#888", marginBottom: 20, lineHeight: 1.7 }}>
+            描述你的调研主题、行业方向和预算，平台会为你匹配合适的行业专家
+          </div>
+          <Link href="/request" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, background: "#185FA5", color: "#fff", fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
+            发起调研需求
+          </Link>
         </div>
-
-        {/* 近期订单 */}
-        <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 12 }}>近期订单</div>
-          {recentOrders.length === 0 && <div style={{ fontSize: 13, color: "#888" }}>暂无订单，<Link href="/request" style={{ color: "#185FA5" }}>去发起调研</Link></div>}
-          {recentOrders.map(o => (
-            <div key={o.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0", borderBottom: "0.5px solid #f1efe8", fontSize: 13 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.id}</div>
-                <div style={{ fontSize: 12, color: "#888" }}>{o.researcher.name || o.researcher.email} → {o.expert?.title || "待指派专家"}</div>
-              </div>
-              <div style={{ fontWeight: 500, color: "#2c2c2a", whiteSpace: "nowrap" }}>{(o.amount).toLocaleString()} 积分</div>
-              <div style={{
-                background: statusMap[o.status] ? statusMap[o.status].color + "18" : "#f1efe8",
-                color: statusMap[o.status]?.color || "#888",
-                padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500, whiteSpace: "nowrap",
-              }}>
-                {statusMap[o.status]?.label || o.status}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* 合规预警 */}
-      {complianceLogs.length > 0 && (
-        <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16 }}>
-          <div style={{ fontSize: 14, fontWeight: 500, marginBottom: 12, color: "#A32D2D" }}>合规预警（{complianceLogs.length} 项待处理）</div>
-          {complianceLogs.map(log => (
-            <div key={log.id} style={{ padding: "8px 0", borderBottom: "0.5px solid #f1efe8", fontSize: 13, display: "flex", gap: 8 }}>
-              <span style={{ background: "#FCEBEB", color: "#A32D2D", padding: "1px 6px", borderRadius: 4, fontSize: 11, fontWeight: 500, whiteSpace: "nowrap" }}>{log.eventType}</span>
-              <span style={{ color: "#5F5E5A" }}>{log.description || log.targetType + " " + log.targetId}</span>
-              <span style={{ marginLeft: "auto", fontSize: 12, color: "#888" }}>{new Date(log.createdAt).toLocaleDateString()}</span>
-            </div>
-          ))}
-        </div>
+      ) : (
+        <QuickLinks />
       )}
     </div>
   )
 }
 
-function StatCard({ label, value, sub, up, warn }: { label: string; value: string; sub: string; up?: boolean; warn?: boolean }) {
+// ─── 专家 Dashboard ───────────────────────────────
+async function ExpertDashboard({ userId }: { userId: string }) {
+  const expert = await prisma.expert.findUnique({
+    where: { userId },
+    select: { id: true, status: true, completedOrders: true, rating: true, ratePoints: true, realName: true },
+  })
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { points: true } })
+
+  if (!expert) {
+    return (
+      <div style={{ textAlign: "center", padding: 60 }}>
+        <div style={{ fontSize: 36, marginBottom: 12 }}>🧠</div>
+        <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 8 }}>完善专家资料</div>
+        <div style={{ fontSize: 13, color: "#888", marginBottom: 20 }}>创建专家档案后即可接收访谈订单</div>
+        <Link href="/experts/edit" style={{ padding: "10px 28px", borderRadius: 8, background: "#0F6E56", color: "#fff", fontSize: 14, textDecoration: "none" }}>创建专家档案</Link>
+      </div>
+    )
+  }
+
+  const pendingOrders = await prisma.order.count({ where: { expertId: expert.id, status: "PENDING" } })
+  const activeOrders = await prisma.order.count({ where: { expertId: expert.id, status: "ACTIVE" } })
+  const reviewing = expert.status === "PENDING"
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>{expert.realName} 的工作台</h2>
+
+      {reviewing && (
+        <div style={{ background: "#FFF8E1", border: "0.5px solid #f0d77b", borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13, color: "#BA7517" }}>
+          ⏳ 您的专家资料正在审核中，审核通过后即可接收访谈订单。预计 1-2 个工作日内完成。
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
+        <StatCard label="公益积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
+        <StatCard label="待接订单" value={pendingOrders.toString()} sub="笔" />
+        <StatCard label="进行中订单" value={activeOrders.toString()} sub="笔" />
+        <StatCard label="累计完成" value={expert.completedOrders.toString()} sub="笔" />
+      </div>
+
+      {pendingOrders === 0 && activeOrders === 0 && expert.completedOrders === 0 ? (
+        <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 12, padding: 40, textAlign: "center" }}>
+          <div style={{ fontSize: 36, marginBottom: 12 }}>🧠</div>
+          <div style={{ fontSize: 15, fontWeight: 500, color: "#2c2c2a", marginBottom: 8 }}>
+            {reviewing ? "审核通过后将自动分配订单" : "尚无新订单"}
+          </div>
+          <div style={{ fontSize: 13, color: "#888", marginBottom: 20, lineHeight: 1.7 }}>
+            {reviewing ? "管理员审核您的专家档案后，研究员提交的匹配需求将自动推荐给您" : "管理员匹配到合适的需求后会分配订单给您，届时您将在此页面看到"}
+          </div>
+          {!reviewing && (
+            <Link href="/orders" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, border: "0.5px solid #d0cec6", color: "#5F5E5A", fontSize: 14, textDecoration: "none" }}>
+              查看订单
+            </Link>
+          )}
+        </div>
+      ) : (
+        <QuickLinks />
+      )}
+    </div>
+  )
+}
+
+// ─── 管理员 Dashboard ─────────────────────────────
+async function AdminDashboard() {
+  const [pendingExperts, pendingOrders, activeExperts, totalOrders, unhandledLogs] = await Promise.all([
+    prisma.expert.count({ where: { status: "PENDING" } }),
+    prisma.order.count({ where: { expertId: null, status: { not: "CANCELLED" } } }),
+    prisma.expert.count({ where: { status: "ACTIVE" } }),
+    prisma.order.count(),
+    prisma.complianceLog.count({ where: { handled: false } }),
+  ])
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>管理后台概览</h2>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
+        <StatCard label="待派单" value={pendingOrders.toString()} sub="笔" />
+        <StatCard label="待审核专家" value={pendingExperts.toString()} sub="位" />
+        <StatCard label="在库活跃专家" value={activeExperts.toString()} sub="位" />
+        <StatCard label="总订单" value={totalOrders.toString()} sub="笔" />
+        <StatCard label="合规待处理" value={unhandledLogs.toString()} sub="项" warn={unhandledLogs > 0} />
+      </div>
+
+      {pendingOrders > 0 ? (
+        <div style={{ background: "#E6F1FB", border: "0.5px solid #b8d4f4", borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13, color: "#185FA5" }}>
+          📋 有 {pendingOrders} 笔订单待派单，请前往 <Link href="/admin" style={{ fontWeight: 500 }}>管理后台</Link> 匹配合适的专家
+        </div>
+      ) : pendingExperts > 0 ? (
+        <div style={{ background: "#FFF8E1", border: "0.5px solid #f0d77b", borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13, color: "#BA7517" }}>
+          🧠 有 {pendingExperts} 位专家待审核，请前往 <Link href="/admin/experts" style={{ fontWeight: 500 }}>专家审核</Link>
+        </div>
+      ) : (
+        <div style={{ background: "#EAF3DE", border: "0.5px solid #c4ddb2", borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13, color: "#3B6D11" }}>
+          ✅ 所有事项已处理完毕，平台运行正常
+        </div>
+      )}
+
+      <QuickLinks />
+    </div>
+  )
+}
+
+// ─── 通用 ─────────────────────────────────────────
+function QuickLinks() {
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+      <LinkCard href="/experts" label="专家库" desc="浏览行业专家" />
+      <LinkCard href="/orders" label="我的订单" desc="查看订单状态" />
+      <LinkCard href="/leaderboard" label="积分排行" desc="公益积分榜" />
+      <LinkCard href="/profile" label="个人中心" desc="管理账户信息" />
+    </div>
+  )
+}
+
+function LinkCard({ href, label, desc }: { href: string; label: string; desc: string }) {
+  return (
+    <Link href={href} style={{ display: "block", background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16, textDecoration: "none" }}>
+      <div style={{ fontSize: 14, fontWeight: 500, color: "#2c2c2a", marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 12, color: "#888" }}>{desc}</div>
+    </Link>
+  )
+}
+
+function StatCard({ label, value, sub, warn }: { label: string; value: string; sub: string; warn?: boolean }) {
   return (
     <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16 }}>
       <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>{label}</div>
-      <div style={{ fontSize: 22, fontWeight: 500, color: warn ? "#A32D2D" : up ? "#0F6E56" : "#2c2c2a" }}>{value}</div>
+      <div style={{ fontSize: 22, fontWeight: 500, color: warn ? "#A32D2D" : "#2c2c2a" }}>{value}</div>
       <div style={{ fontSize: 11, color: "#888", marginTop: 2 }}>{sub}</div>
     </div>
   )
