@@ -98,7 +98,24 @@ export async function POST(req: Request) {
         }
       })
     }
+    // 通知专家本人：申请已进入审核队列
+    await prisma.notification.create({
+      data: {
+        userId: user.id,
+        type: "EXPERT_REGISTERED",
+        title: "专家申请已提交",
+        message: "您的专家申请已成功提交，管理员将在1-2个工作日内审核。审核通过后即可接收访谈订单。请先完善您的专家资料以便快速通过审核。",
+        refId: user.id,
+      }
+    })
   }
 
-  return NextResponse.json({ ok: true, userId: user.id })
+  const isExpert = safeRole === "EXPERT"
+  return NextResponse.json({
+    ok: true,
+    userId: user.id,
+    message: isExpert
+      ? "专家申请已提交。我们会在1-2个工作日内审核您的资料，审核通过后即可接单。现在您可以先去完善专家资料。"
+      : "注册成功，请登录",
+  })
 }

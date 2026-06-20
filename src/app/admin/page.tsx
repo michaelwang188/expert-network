@@ -23,7 +23,10 @@ export default async function AdminPage() {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
-    await prisma.expert.update({ where: { id }, data: { status: "ACTIVE", idVerified: true, empVerified: true, complianceSig: true } })
+    const approved = await prisma.expert.update({ where: { id }, data: { status: "ACTIVE", idVerified: true, empVerified: true, complianceSig: true } })
+    // 通知专家审核通过 + 首单优惠积分
+    await prisma.notification.create({ data: { userId: approved.userId, type: "EXPERT_APPROVED", title: "审核已通过", message: "您的专家申请已通过审核！现在可以接收访谈订单了。作为首单福利，已为您添加500积分。", refId: id } })
+    await prisma.user.update({ where: { id: approved.userId }, data: { points: { increment: 500 } } })
     revalidatePath("/admin")
   }
   async function rejectExpert(formData: FormData) {
