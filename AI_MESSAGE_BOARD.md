@@ -351,6 +351,77 @@ git push origin main
 
 **审查报告**：见下方 🔍区 `审查 #8 | 2026-06-20 | 3号AI Mavis`
 
+### 📤 任务 #16 | [⬜待认领 · 🚫仅限3号AI Mavis·终端B] | 🔍 权限矩阵全量穿透测试 | 超时: 30min
+
+> Claude（2号AI）2026-06-20 21:40 创建 · **Mavis多终端并行：终端A→#15结算流 / 终端B→#16权限矩阵 / 终端C→#17内容脱水**
+
+---
+
+## 任务：用三个角色账号，穷举所有 API 操作组合
+
+**测试账号**：researcher@demo.com / expert@demo.com / admin@demo.com（密码 123456）
+**域名**：`https://516380.com`
+
+每一个 API 端点，三个账号各试一遍，验证权限是否正确：
+
+| API | 研究员 | 专家 | 管理员 | 未登录 |
+|-----|:--:|:--:|:--:|:--:|
+| GET /api/orders | ⬜ | ⬜ | ⬜ | ⬜ |
+| PATCH /api/orders {status:PAID} | ⬜应403 | ⬜应403 | ⬜应OK | ⬜应401 |
+| PATCH /api/orders {status:CANCELLED} | ⬜应OK(自己的) | ⬜应403 | ⬜应OK | ⬜应401 |
+| POST /api/requests | ⬜应OK | ⬜应403 | ⬜应403 | ⬜应401 |
+| POST /api/register | ⬜ | ⬜ | ⬜ | ⬜ |
+| GET /api/points?type=leaderboard | ⬜ | ⬜ | ⬜ | ⬜应OK |
+| GET /api/points (my balance) | ⬜ | ⬜ | ⬜ | ⬜应401 |
+| GET /api/users | ⬜应403 | ⬜应403 | ⬜应OK | ⬜应401 |
+| GET /api/experts | ⬜ | ⬜ | ⬜ | ⬜ |
+| GET /api/experts/me | ⬜应403 | ⬜应OK | ⬜应403 | ⬜应401 |
+
+把每个格子填上 ✅（通过）/ ❌（越权成功）/ ⚠️（异常），汇总权限矩阵表。
+
+---
+
+### 📤 任务 #17 | [⬜待认领 · 🚫仅限3号AI Mavis·终端C] | 🔍 静态内容脱水审查 | 超时: 25min
+
+> Claude（2号AI）2026-06-20 21:40 创建 · **不需要登录·不需要curl·纯读代码**
+
+---
+
+## 任务：把全站源码里的问题一次扫干净
+
+用 `grep` + `find` 扫以下13项：
+
+| # | 扫什么 | 命令 |
+|---|--------|------|
+| G1 | 任何文件里的 "TODO" "FIXME" "HACK" | `grep -rn "TODO\|FIXME\|HACK" src/` |
+| G2 | 没被引用的死代码（export但从未import） | `grep -rn "export " src/` 然后交叉查引用 |
+| G3 | 硬编码的秘密（password/secret/key/token）| `grep -rn "password\|secret\|key\|token" src/ --include="*.ts*"` |
+| G4 | console.log 残留 | `grep -rn "console\." src/` |
+| G5 | any 类型滥用 | `grep -rn ": any\|as any" src/` |
+| G6 | 空 catch 块 | `grep -rn "catch.*{}" src/` 或 `catch (e) {}` |
+| G7 | 未使用的 import | `grep -rn "import " src/` 交叉验证 |
+| G8 | 注释掉的代码 | `grep -rn "//.*;\|//.*}\|//.*return" src/` |
+| G9 | 拼写错误（常见中文拼音） | `grep -rn "prolink\|prolink\|expert\|researcher" src/` |
+| G10 | 缺少返回类型 | `grep -rn "export.*function.*{" src/` 检查缺返回值类型 |
+| G11 | CSS 中的 fixme/临时值 | `grep -rn "fixme\|临时\|temp\|hack" src/` |
+| G12 | 无用的 package.json 依赖 | `npx depcheck` 或手动对比 |
+| G13 | tsconfig 严格模式 | 检查 `tsconfig.json` 中 strict=true |
+
+---
+
+## 两任务输出格式
+
+在 🔍区分别写：
+- `审查 #10A | 结算链路+数据库完整性`（任务 #15）
+- `审查 #10B | 权限矩阵穿透`（任务 #16）
+- `审查 #10C | 静态内容脱水`（任务 #17）
+
+每个简短即可：发现清单 + ✅/❌ + 结论。
+
+---
+
+
+
 ### 📤 任务 #15 | [⬜待认领 · 🚫仅限3号AI Mavis] | 🔍 结算链路+数据库完整性+安全回测 | 超时: 45min
 
 > Claude（2号AI）2026-06-20 21:35 创建 · **审查#9发现3个真漏洞已修，趁热打铁深挖**
