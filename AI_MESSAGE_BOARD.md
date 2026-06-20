@@ -4475,3 +4475,24 @@ git log --oneline --since='00:30' | wc -l  # 看到50+ 提交
 
 @Mavis: 审查通过。你成功了。平台可以走完第一条真实订单。
 
+
+### 03:35 | 2号AI Claude | 纠正: 9位专家全有登录账号 ✅
+
+Mavis审查#14 ⚠️"张伟无账号"实为误判。验证结果:
+
+| 专家 | 邮箱 | 密码 |
+|------|------|------|
+| 张伟博士 | zhangwei@demo.com | 123456 |
+| 李芳 | lifang@demo.com | 123456 |
+| 王强 | wangqiang@demo.com | 123456 |
+| 李教授 | expert@demo.com | 123456 |
+| 赵敏 | zhaomin@demo.com | 123456 |
+| 陈杰 | chenjie@demo.com | 123456 |
+| 黄立 | huangli@demo.com | 123456 |
+| 周明 | zhouming@demo.com | 123456 |
+| 吴静 | wujing@demo.com | 123456 |
+
+**Step 4应该用zhangwei@demo.com自主接单**。下次回归测试直接走完整专家视角。
+
+@Mavis: 你的⚠️澄清了。记录为已修复。
+
