@@ -4808,7 +4808,7 @@ bash ~/WorkBuddy/2026-06-19-11-15-05/expert-network/.backups/2026-06-21_0422_pre
 
 ---
 
-### 📤 任务 #42 | [⬜待认领 · 🚫仅限4号AI Codex] | 🔥 C2专家入驻流程源码审计 | 超时: 45min
+### 📤 任务 #42 | [✅已完成 @ 4号AI Codex 05:50] | 🔥 C2专家入驻流程源码审计 | 超时: 45min
 
 **背景**: 冷启动C2是当前最高优先级的代码任务。你要审现有register.ts和notification系统的差距。
 
@@ -5000,3 +5000,34 @@ Codex你来审这些环节的源码差距。我同时开始改代码。
 
 **继续P3**: README建设指南 + PITFALLS 新踩坑记录 → 10分钟
 
+### 体验测试 #11 | 05:48 | 4号AI Codex | 🔥 C2+C3专家入驻+首单审计
+
+## C2 专家入驻流程验证
+
+| 环节 | 状态 | 证据 |
+|------|:--:|------|
+| 注册后通知专家「已提交审核」| ✅ | register.ts L101-112: notification.create type=EXPERT_REGISTERED |
+| Admin审核通过→通知专家+500积分 | ✅ | admin/page.tsx L26-29: notification+points.increment(500) |
+| 注册API返回引导文案(专家vs研究员) | ✅ | register.ts L113-120: isExpert分支message |
+| email验证 | ❌ 缺失 | 无验证码/验证链接机制 |
+| 首次登录onboarding引导 | ❌ 缺失 | expert dashboard 无完善资料引导 |
+| Expert模型 verifiedAt/approvedAt | ❌ 缺失 | schema 无时间戳字段 |
+
+## C3 首单0积分验证
+
+| 检查项 | 状态 | 发现 |
+|--------|:--:|------|
+| 首单判断 requestCount===0 | ✅ | requests.ts L101-103 |
+| amount=0·expertFee=0·platformFee=0 | ✅ | requests.ts L113-116 |
+| 状态标记 PROMO | ⚠️ | 代码用了 "PROMO" as any 但 schema.prisma OrderStatus enum 无 PROMO |
+
+## 🔴 发现
+
+| # | 位置 | 问题 | 严重度 |
+|---|------|------|:--:|
+| C2-1 | schema.prisma | OrderStatus enum 无 PROMO——代码 `as any` 绕过类型检查，DB层面PROMO被存为无效值 | 🔴 |
+| C2-2 | register.ts | 通知消息写死「1-2工作日审核」——无SLA保障机制，超时无自动提醒 | 🟡 |
+| C2-3 | admin/page.tsx | approveExpert 给500积分裸写——无审计流水(PointsTransaction) | 🟡 |
+| C2-4 | schema.prisma | Expert 缺 verifiedAt/approvedAt/onboardingCompletedAt 时间戳 | 🟡 |
+
+**一句话**: C2 通知闭环 ✅，C3 逻辑正确但 PROMO 状态没进 schema。P0: 补 PROMO enum + approveExpert 补积分流水。
