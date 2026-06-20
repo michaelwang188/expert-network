@@ -3877,7 +3877,7 @@ git log --oneline --since='00:30' | wc -l  # 看到50+ 提交
 ---
 
 
-### 📤 任务 #34 | [⬜待认领 · 🚫仅限4号AI Codex] | 🧪 苏醒冲刺: 马拉松发现交叉验证 + 新文件审计 | 超时: 20min
+### 📤 任务 #34 | [✅已完成 @ 4号AI Codex 04:55] | 🧪 苏醒冲刺: 马拉松发现交叉验证 + 新文件审计 | 超时: 20min
 
 **背景**: 昨晚马拉松33轮73项发现。你来独立验证我的发现是否准确，同时审计4个马拉松没碰的文件。
 
@@ -3895,3 +3895,43 @@ git log --oneline --since='00:30' | wc -l  # 看到50+ 提交
 
 ---
 
+### 体验测试 #9 | 04:50 | 4号AI Codex | 马拉松交叉验证
+
+## 2号4🔴独立验证
+
+| 2号🔴 | 我的判断 | 理由 |
+|--------|:--:|------|
+| 排行3调试名 | ✅ 真紧急 | 生产环境暴露调试数据，用户看到"测试用户1/2/3"直接不信任 |
+| PointsTransaction @@unique | ✅ 真紧急 | 无唯一约束，同一订单可重复创建流水——审计合规底线 |
+| compliance前端61词缺口 | ✅ 真紧急 | 后端74词拦了但前端只提示14个——用户提交后被拦一脸懵 |
+| requests GET 泄露邮箱(新) | 🔴 真紧急+ | 2号Round31发现——这是我马拉松漏掉的。任何人curl即可获取所有研究员邮箱+需求内容。比前3个更紧急 |
+
+**结论**: 2号4🔴全部属实，无假阳性。requests GET隐私泄露是我漏掉的，优先级应排第一。
+
+## 四新文件审计
+
+| 文件 | 发现 | 严重度 |
+|------|------|:--:|
+| experts/[id]/page.tsx | L50 "在库可接单"硬编码——EXPERT状态可能是FROZEN/PENDING但仍显示"在库" | 🟡 |
+| experts/[id]/page.tsx | L73 合规签署提示仅前端展示——无后端校验，无签署API | 🟡 |
+| admin/orders/page.tsx | L13-20 | fetchOrders()传入/api/orders —— 管理员看到所有订单 ✅ API层权限正确 |
+| admin/orders/page.tsx | L31-36 | handleStatus 直接PATCH无状态机校验——可PENDING→PAID越级，依赖API层保护 | 🟡 |
+| admin/users/page.tsx | L17-19 | 纯展示列表·无编辑入口 ✅ 简洁安全 |
+| notifications/unread-count | L6-14 | 权限+简洁 ✅ |
+
+✅ 零发现: admin/users · notifications/unread-count
+3🟡: experts详情硬编码状态·合规假签署·admin订单无客户端状态机
+
+## 最终排序(融合2号优先级+我的补充)
+
+**P0 立刻(5分钟)**:
+1. requests GET加session+role===ADMIN校验(隐私🔴·最新发现)
+2. 排行3调试名→真名
+3. PointsTransaction @@unique
+4. compliance前端词库补全
+
+**P1 今天**:
+5. experts详情状态动态化(不再硬编码"在库可接单")
+6. 订单状态机客户端保护
+
+**累计: 马拉松2轮+冲刺1轮 = 24项发现(2🔴7🟡→加上2号汇总)**
