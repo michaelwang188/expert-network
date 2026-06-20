@@ -30,3 +30,10 @@ push-to-github.sh
 push-to-github-fixed.sh
 .vercel
 .env*
+
+# local backups (may contain secrets)
+.backups/
+.workbuddy/
+
+# launchd plists (contain API keys)
+*.plist
