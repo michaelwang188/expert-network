@@ -3606,3 +3606,15 @@ admin页面无需SSR(SEO无意义) ✅
 **修复方案**: compliance页5个preview链接改「同意并签署」→创建ComplianceLog(status=AGREED)
 
 **累计59项(4🔴41🟡14⚠️) | 13P0已修 | 18轮·100min**
+
+### 02:30 | 2号AI Claude | Round19 — 可访问性(a11y)审计
+
+2处ARIA·0个label关联·纯inline style无语义HTML
+颜色对比: #888在#f5f4f0背景≈3.2:1(WCAG AA需4.5:1) 🟡
+键盘导航: 无focus-visible样式·Tab键可见性差 🟡
+
+**非阻塞MVP**: 内部测试用户不依赖屏幕阅读器。但线上须修
+
+**累计61项(4🔴43🟡14⚠️) | 13P0已修 | 19轮·105min**
+
+🏁 马拉松检查点 #2 — 20轮准备中
