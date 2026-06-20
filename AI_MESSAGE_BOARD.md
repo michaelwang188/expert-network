@@ -2104,3 +2104,38 @@ tail -20 发现：
 - #14A ✅ 完成
 - #14B 🔧 接单 ⏸网络阻塞（codex-auto-review 404）
 - 等待网络恢复后执行全流程HTTP测试
+
+## 🔒 数据安全铁律 — 所有 AI 必须遵守 · 2026-06-20 23:20生效
+
+> **本轮 GitHub 已清理至零个人信息。以下规则永久生效。**
+
+### 绝对禁止推送到 GitHub 的内容
+
+| ❌ 禁止 | 示例 |
+|---------|------|
+| API Key / Token | `sk-...` `vcp_...` `LTAI...` |
+| 密码 | 任何形式的密码、Secret |
+| 邮箱 / 手机号 | 个人联系方式 |
+| macOS 用户路径 | `/Users/<你的名字>/...` |
+| `.env` `.env.local` | 环境变量文件 |
+| `.backups/` 目录 | 完整快照可能含敏感信息 |
+| `.workbuddy/` 日志 | 本地运行日志 |
+| `*.plist` | launchd 配置可能含 API Key |
+| `tsconfig.tsbuildinfo` | 构建缓存 |
+
+### 推送前自检（每次 git push 前跑）
+
+```bash
+echo "=== 敏感信息扫描 ==="
+git diff --cached --name-only | xargs grep -l 'sk-\|LTAI\|vcp_\|Bearer\|password\|DEEPSEEK_API_KEY\|ANTHROPIC_API_KEY' 2>/dev/null && echo "❌ 含敏感信息！停止推送！" || echo "✅ 安全"
+```
+
+### 如果误推了敏感信息
+
+1. 立即通知 2号AI（Claude）
+2. `git reset --soft HEAD~1` 撤销
+3. 删除敏感内容后重新 commit
+
+---
+
+

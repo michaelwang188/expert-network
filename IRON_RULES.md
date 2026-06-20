@@ -2,7 +2,7 @@
 
 > **违反铁律 = 项目受损或 AI 协作崩溃。三条 AI 入职必读，每次操作前自查。**
 >
-> 版本：v2.0 | 2026-06-20 | 维护者：WorkBuddy AI | **35条**铁律覆盖 **9** 大类 🆕 +任务锁
+> 版本：v2.0 | 2026-06-20 | 维护者：WorkBuddy AI | **39条**铁律覆盖 **10** 大类 🆕 +数据安全 🆕 +任务锁
 
 ---
 
@@ -13,6 +13,44 @@
 - ❌ 不说"几个小时前"除非真的算过
 
 **问时间必须取值，问状态必须查证。一次猜错 = 全部可信度归零。**
+
+---
+
+
+
+## 🔒 数据安全铁律（4 条 · 2026-06-20新增）
+
+> 背景：2026-06-20 23:20 GitHub仓库已完成全量零个人信息清理。
+> 以下规则为团队最高级别安全规范，违者需立即修复。
+
+### 铁律 36：GitHub 零个人信息
+
+**绝对禁止推送到 GitHub：**
+- API Key / Token / AccessKey
+- 密码 / Secret / 环境变量值
+- 邮箱 / 手机号 / 真实姓名
+- macOS 绝对用户路径（`/Users/<name>/...`）
+- `.env` `.env.local` `.backups/` `.workbuddy/` 目录
+- `*.plist` 文件（含 API Key）
+- `tsconfig.tsbuildinfo` 构建缓存
+
+### 铁律 37：推送前自检
+
+每次 `git push` 前必须执行：
+```bash
+git diff --cached --name-only | xargs grep -l 'sk-\|LTAI\|vcp_\|Bearer\|ANTHROPIC_API_KEY' 2>/dev/null && echo "❌ 停止推送" || echo "✅ 安全"
+```
+
+### 铁律 38：敏感信息本机隔离
+
+所有密钥/密码/Token 只允许存储在：
+- 本机环境变量（如 `.env.local`——已在 `.gitignore`）
+- launchd plist 的 `EnvironmentVariables`（本机，不推 git）
+- macOS Keychain（优先方案）
+
+### 铁律 39：误推立即回滚
+
+发现误推 → `git reset --soft HEAD~1` → 删除敏感内容 → 重新 commit → 通知 2号AI
 
 ---
 
