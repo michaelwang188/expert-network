@@ -4,7 +4,7 @@
 # Fixed: export 环境变量替代变量展开 (PITFALLS#2)
 set -e
 
-URL="https://expert-network-sooty.vercel.app"
+URL="${1:-http://516380.com}"  # HTTP: 国内直连, HTTPS: Vercel自动签发中
 PASS=0
 FAIL=0
 

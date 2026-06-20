@@ -53,7 +53,7 @@ DS_PROXY = os.environ.get("https_proxy", "http://127.0.0.1:12334")
 
 TZ = timezone(timedelta(hours=8))
 VERIFY_SCRIPT = ".claude/scripts/verify.sh"
-PROD_URL = "https://expert-network-sooty.vercel.app"
+PROD_URL = "https://516380.com"
 
 POLL_FAST  = 15   # 2号AI 执行扫描 (15s)
 POLL_QA    = 15   # 3号AI 质检扫描 (15s)
