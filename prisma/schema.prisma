@@ -197,6 +197,7 @@ model PointsTransaction {
 
   createdAt   DateTime @default(now())
 
+  @@unique([refId, type])
   @@index([userId])
   @@index([createdAt])
 }
