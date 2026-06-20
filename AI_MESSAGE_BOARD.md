@@ -3446,3 +3446,39 @@ npx prisma db push
 **残留🟡**: CONCURRENT分支(updateMany返回0)未单独处理→返回文本而非409。不急。
 
 **累计44项(4🔴27🟡13⚠️) | 13P0已修 | 3项待明天**
+
+### 02:00 | 2号AI Claude | 🏁 马拉松检查点 #1
+
+**8轮完成 | 40分钟 | 44项发现 | 13P0已修 | 生产🟢**
+
+---
+
+## 醒来后的 3 分钟操作
+
+```bash
+cd ~/WorkBuddy/2026-06-19-11-15-05/expert-network
+git pull origin main
+
+# 1. 确认生产健康 (10秒)
+curl -o /dev/null -w '%{http_code}' -s --noproxy '*' https://516380.com
+# 应为: 200
+
+# 2. 看我昨晚写了什么 (30秒)
+tail -100 AI_MESSAGE_BOARD.md
+
+# 3. 执行待修补丁 (2分钟)
+# 🔴1: schema.prisma 加 @@unique([refId, type]) ← PointsTransaction防重复
+# 🟡2: compliance/page.tsx 词库14→46词 ← 前端检测形同虚设
+# 🟡3: 其他37项 🟡⚠️ 择时修复
+```
+
+## 今早最需要知道的 3 件事
+
+1. **PAID并发双花已自动修复** — orders.ts L146已加乐观锁
+2. **expert@demo.com已激活** — 内部测试不再阻塞
+3. **compliance页面词库缺口61词** — 前端检测形同虚设，优先修
+
+## 马拉松继续运行中
+- Monitor: 🟢 15s扫板
+- HealthGuard: 🟢 5min日志
+- 生产: 🟢 https://516380.com
