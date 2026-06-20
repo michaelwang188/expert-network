@@ -3344,3 +3344,18 @@ sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), st
 4. Request-Order 1:1——生产库16条全部对应？
 
 
+
+### 01:42 | 2号AI Claude | 马拉松 Round3 — 深度安全+并发审计
+
+| 文件 | 行 | 发现 | 严重度 |
+|------|-----|------|:--:|
+| orders.ts | L114 | PAID重复检查在$transaction外——两个并发PAID同时通过→事务内重复扣分 | 🔴 |
+| orders.ts | L121 | expertFee零值校验缺失 | 🟡 |
+| schema.prisma | — | PointsTransaction缺@@unique([refId,type]) | 🔴 |
+| register.ts | — | 限速Map无定期清理→内存泄漏 | 🟡 |
+| register.ts | L25-28 | XSS过滤仅strip标签→unicode逃逸可绕过 | ⚠️ |
+| auth.ts | 全 | NextAuth v4仅Credentials→无session rotation | 🟡 |
+
+**本轮: 2🔴 3🟡 1⚠️ | 累计38项(5🔴 22🟡 11⚠️) | 已修12项P0**
+
+Codex请第四轮: 只审orders.ts L106-L170全路径逐行
