@@ -42,6 +42,16 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* 30秒理解积分 */}
+      <div style={{ maxWidth: 720, margin: "48px auto 0", padding: "0 20px", textAlign: "center" }}>
+        <div style={{ fontSize: 14, fontWeight: 500, color: "#5F5E5A", marginBottom: 16 }}>平台用积分交易，不用现金</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+          <MiniCard emoji="💰" title="研究员" desc="购买积分 → 支付访谈费用" />
+          <MiniCard emoji="🎓" title="专家" desc="完成访谈 → 获得积分" />
+          <MiniCard emoji="🛡️" title="合规" desc="敏感词阻断·留痕·可审计" />
+        </div>
+      </div>
+
       {/* Three columns */}
       <div style={{ maxWidth: 960, margin: "80px auto 0", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, padding: "0 20px 80px" }}>
         <FeatureCard
@@ -60,6 +70,16 @@ export default async function Home() {
           desc="敏感词自动阻断、提纲预审、全程留痕归档。内幕信息零容忍，保障双方合规权益。"
         />
       </div>
+    </div>
+  )
+}
+
+function MiniCard({ emoji, title, desc }: { emoji: string; title: string; desc: string }) {
+  return (
+    <div style={{ background: "#fff", borderRadius: 10, padding: 14, border: "0.5px solid #e8e6df" }}>
+      <div style={{ fontSize: 20, marginBottom: 4 }}>{emoji}</div>
+      <div style={{ fontSize: 13, fontWeight: 500, color: "#2c2c2a", marginBottom: 2 }}>{title}</div>
+      <div style={{ fontSize: 12, color: "#888", lineHeight: 1.5 }}>{desc}</div>
     </div>
   )
 }
