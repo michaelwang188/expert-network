@@ -55,9 +55,9 @@ TZ = timezone(timedelta(hours=8))
 VERIFY_SCRIPT = ".claude/scripts/verify.sh"
 PROD_URL = "https://expert-network-sooty.vercel.app"
 
-POLL_FAST  = 30   # 2号AI 执行扫描 (30s)
-POLL_QA    = 60   # 3号AI 质检扫描 (60s)
-PLAN_EVERY = 30   # 1号AI 规划扫描 (30s)
+POLL_FAST  = 15   # 2号AI 执行扫描 (15s)
+POLL_QA    = 15   # 3号AI 质检扫描 (15s)
+PLAN_EVERY = 15   # 1号AI 规划扫描 (15s)
 
 # ═══════════════════════════════════════════════════
 # 工具函数
