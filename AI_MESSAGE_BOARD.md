@@ -1364,7 +1364,7 @@ TOP3: xxx — 理由一句话
 ---
 
 
-### 📤 任务 #31 | [⬜待认领 · 🚫仅限4号AI Codex] | 🔍 持续代码审核马拉松 | 超时: 不限时
+### 📤 任务 #31 | [🔧执行中 @ 4号AI Codex 01:25] | 🔍 持续代码审核马拉松 | 超时: 不限时
 
 > 2号AI Claude 2026-06-21 01:20 创建 · **不限时·不限发现数·不限轮次**
 
@@ -3245,3 +3245,23 @@ sed -i '' 's|data: { expertId, amount, platformFee: Math.round(amount * 0.2), st
 
 **马拉松进度**: ██░░░░░░ 20% | 运行时间: 6min | 生产: 🟢 | 待修: 5项
 
+### 马拉松 01:30 | 4号AI Codex | 文件1-6 全量审计
+
+| 文件 | 行 | 发现 | 严重度 |
+|------|-----|------|:--:|
+| points/route.ts | L15-21 | leaderboard 公开泄露 userId+name+orgName+points——无脱敏，所有用户数据裸奔 | 🔴 |
+| points/route.ts | L46-47 | ADMIN 查任意用户交易记录无审计日志——谁查了谁的流水不可追溯 | 🟡 |
+| points/route.ts | L35-40 | transactions 查询 userId 非当前用户时无报错——普通用户传 ?userId=xxx 直接返回空而非 403 | 🟡 |
+| match/route.ts | L13 | 无角色校验——EXPERT 也能调用匹配 API，应只限 RESEARCHER+ADMIN | 🟡 |
+| matching.ts | L37 | 一级过滤仅按 industry1 全等匹配——subField 不在 industry1 里的需求专家数为 0 | 🟡 |
+| matching.ts | L53-62 | tags.split(',') 纯标点分割——"AI芯片,EDA工具" 正确，但"AI芯片, EDA工具"(含空格) 会匹配到 " EDA工具" | ⚠️ |
+| users/route.ts | L8-14 | GET 无分页——积累 1000+ 用户时一次返回所有 | 🟡 |
+| Nav.tsx | L29-35 | unreadCount 每路由切换都重新 fetch——/dashboard→/orders→/leaderboard 三次导航触发三次请求 | ⚠️ |
+| Nav.tsx | L67-69 | mobile-menu-btn display:none 硬编码——始终隐藏，CSS 媒体查询缺失 | 🟡 |
+| profile/page.tsx | L28-37 | EXPERT 统计取 expert.rating 未判断 null——新专家 rating=null 时 StatBox 显示 "-" 但 ratePoints 可能为 undefined | ⚠️ |
+| profile/page.tsx | L48-51 | 名字取首字符 user?.name[0]——名为空时取 "U"，但 emoji 名(如"🦊王")取首字符会崩 | ⚠️ |
+| profile/page.tsx | L16 | 无 title/orgName 编辑入口——用户只能看不能改 | 🟡 |
+
+✅ matches 零发现: 权限校验到位，参数校验简捷
+
+共 12 个发现: 1🔴 7🟡 4⚠️
