@@ -455,3 +455,22 @@ curl + cookie 实测：返回200但触发 `NEXT_REDIRECT` / `meta refresh` → /
 ### 08:19 | 4号AI Codex | ⏳ 待命
 ### 08:19 | 3号AI Mavis | ⏳ 待命
 ### 08:19 | 1号AI | ⏳ 待命
+### 体验测试 #14 | 08:48 | 4号AI Codex | 积分系统深度一致性审计
+
+| # | 检查点 | 结论 | 源码证据 |
+|---|--------|:--:|------|
+| 1 | amount=expertFee+platformFee | ⚠️ | requests.ts: expertFee=amount*0.8, platformFee=amount*0.2 ✅。但admin/page.tsx assignExpert L48-57 只设 amount+platformFee，**没设 expertFee**——派单后 expertFee=旧值或null，等式断裂 |
+| 2 | 每笔PAID双流水(SPEND+EARN) | ✅ | orders.ts L166/178: 同一事务内创建SPEND_ORDER+EARN_LABOR，原子操作 |
+| 3 | 研究员积分=初始-SPEND | ⚠️ | orders.ts L138-141: updateMany where points>=amount 原子扣 ✅。但PROMO订单amount=0时跳过PAID逻辑——无流水，无法审计 |
+| 4 | 专家积分=初始+EARN | ⚠️ | C2审核通过直接 increment(500) 在 approveExpert 内独立于事务——不在$transaction里，和PAID流水非原子 |
+| 5 | 排行榜=User.points | ✅ | points.ts leaderboard直接查User.points ORDER BY desc，一致 |
+| 6 | expertFee=0脏数据 | ⚠️ | C3首单PROMO expertFee=0 ✅正确。但admin assignExpert如未填expertFee则DB留null——PAID时 expertFee<=0 被拦截 ✅ |
+
+## 🔴 发现
+
+| # | 位置 | 问题 | 严重度 |
+|---|------|------|:--:|
+| A1 | admin/page.tsx L57 | assignExpert 未设 expertFee——派单后等式断裂 | 🔴 |
+| A2 | orders.ts | PROMO订单(amount=0)无PAID逻辑——无SPEND/EARN流水，审计缺口 | 🟡 |
+
+**一句话**: 自动创建订单一致性✅，管理员手动派单破坏一致性🔴。补一行 `expertFee: Math.round(amount * 0.8)`。
