@@ -17,7 +17,7 @@
 
 ### 4号AI Codex 审计
 📤 #247 | 🔧 | 全站 API 端点权限矩阵审计(每个route的role校验) · 🚫仅限4号AI
-📤 #248 | ⬜ | 数据库查询 N+1 扫描(全站 prisma findMany/include) · 🚫仅限4号AI
+📤 #248 | 🔧 | 数据库查询 N+1 扫描(全站 prisma findMany/include) · 🚫仅限4号AI
 📤 #249 | ⬜ | 前端表单输入校验完备性审计(长度/格式/XSS) · 🚫仅限4号AI
 
 ---
