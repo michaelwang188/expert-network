@@ -42,8 +42,11 @@ export async function POST(req: Request) {
   if (password.length < 6) {
     return NextResponse.json({ error: "密码至少6位" }, { status: 400 })
   }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!/^[^\s@<>\"'&]+@[^\s@<>\"'&]+\.[^\s@<>\"'&]+$/.test(email)) {
     return NextResponse.json({ error: "邮箱格式不正确" }, { status: 400 })
+  }
+  if (email.length > 200) {
+    return NextResponse.json({ error: "邮箱地址过长" }, { status: 400 })
   }
 
   // 安全限制：只允许注册 RESEARCHER 或 EXPERT，禁止注册 ADMIN
