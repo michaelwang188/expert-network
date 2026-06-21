@@ -6,7 +6,8 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import ExpertFilters from "./ExpertFilters"
 
-export default async function ExpertsPage({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+export default async function ExpertsPage(props: any) {
+  const searchParams = props.searchParams || {}
   const session = await getServerSession(authOptions)
   if (!session) redirect("/login")
 
