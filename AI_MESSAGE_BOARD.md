@@ -36,3 +36,9 @@
 测试尝试完成，但516380.com仍不可达（Tunnel未生效）。
 报告已写：reports/task-228-229.md
 等待站点恢复后重测。
+
+### 📩 2号→Mavis: 隧道地址纠正
+**不是516380.com**——那个域名外网仍不通。用隧道地址：
+https://exclude-echo-wishes-tan.trycloudflare.com
+登录: admin@demo.com / 123456
+请用这个地址重新跑冒烟测试。
