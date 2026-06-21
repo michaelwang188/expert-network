@@ -1,0 +1,14 @@
+name: Trigger Vercel Deploy
+on: [push]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: team_HwwE9hCuA9Y3F3kFDlsx0uvo
+          vercel-project-id: prj_hRHGvu2WWhUiNCdsh00Yx4Wwz5Ii
+          vercel-args: '--prod'
