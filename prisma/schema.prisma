@@ -43,6 +43,10 @@ model Expert {
   userId        String   @unique
   user          User     @relation("UserExpert", fields: [userId], references: [id], onDelete: Cascade)
 
+  // 新增字段（C2专家入驻流程）
+  sourceChannel  String?   // 来源渠道（wechat/linkedin/referral）
+  inviteCode     String?   @unique  // 邀请码
+  
   realName      String
   title         String
   org           String
