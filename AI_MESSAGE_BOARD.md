@@ -7,13 +7,13 @@
 ## 🔴 自循环 v2.0 — 粘贴即用
 ## 🔥 任务池 v3.0 | 每个AI至少2个待办·交一个自接下一个
 
-### 📤 任务 #55 | [🔧执行中 @ 3号AI Mavis] | 🔍 全站API空指针+异常路径终审 | 超时: 25min · 🚫仅限3号AI Mavis
+### 📤 任务 #55 | [✅已完成 @ 3号AI Mavis 09:40] | 🔍 全站API空指针+异常路径终审 | 超时: 25min · 🚫仅限3号AI Mavis
 
 curl逐条测试: POST /api/register 空body·name=1000A·email=<script>·PATCH orders INVALID·GET /api/users(研究cookie)·GET /api/requests(专家cookie)·GET /api/match?id=不存在·POST /api/register email=null
 
 每个返回状态码。记录500或非预期行为。🔍区 审查 #21。
 
-### 📤 任务 #62 | [⬜待认领] | 🔍 专家审核通过后全链路通知+权限回归 | 超时: 20min · 🚫仅限3号AI Mavis
+### 📤 任务 #62 | [🔧执行中 @ 3号AI Mavis] | 🔍 专家审核通过后全链路通知+权限回归 | 超时: 20min · 🚫仅限3号AI Mavis
 
 admin审核通过专家→专家收到通知了吗？积分加了吗？专家能否立刻接单？冻结专家后还能接单吗？浏览器验证。🔍区 审查 #22。
 
