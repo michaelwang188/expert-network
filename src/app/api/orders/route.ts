@@ -104,7 +104,7 @@ export async function PATCH(req: Request) {
   if (role === "ADMIN") {
     const terminalStates = ["PAID", "CANCELLED"]
     if (terminalStates.includes(existing.status)) {
-      return NextResponse.json({ error: "已终结订单不可变更" }, { status: 400 })
+      return NextResponse.json({ error: "已终结订单不可变更" }, { status: 409 })
     }
     // PAID 只能从 DONE 来
     if (status === "PAID" && existing.status !== "DONE") {
@@ -191,7 +191,7 @@ export async function PATCH(req: Request) {
     })
 
     if (order === "INSUFFICIENT") {
-      return NextResponse.json({ error: "研究员积分余额不足" }, { status: 400 })
+      return NextResponse.json({ error: "研究员积分余额不足" }, { status: 402 })
     }
     return NextResponse.json(order as any)
   }

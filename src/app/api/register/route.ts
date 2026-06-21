@@ -54,7 +54,7 @@ export async function POST(req: Request) {
 
   const exists = await prisma.user.findUnique({ where: { email } })
   if (exists) {
-    return NextResponse.json({ error: "邮箱已被注册" }, { status: 400 })
+    return NextResponse.json({ error: "邮箱已被注册" }, { status: 409 })
   }
 
   const hashed = await bcrypt.hash(password, 10)

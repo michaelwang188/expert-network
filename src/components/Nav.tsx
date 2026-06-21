@@ -24,14 +24,19 @@ export default function Nav() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [menuOpen, setMenuOpen] = useState(false)
 
+  // M3: 30s轮询替代每次路由切换fetch
   useEffect(() => {
-    if (session) {
+    if (!session) return
+    const fetchUnread = () => {
       fetch("/api/notifications/unread-count")
         .then(res => res.json())
         .then(data => setUnreadCount(data.count || 0))
-        .catch(() => setUnreadCount(0))
+        .catch(() => {})
     }
-  }, [session, pathname])
+    fetchUnread()
+    const interval = setInterval(fetchUnread, 30000)
+    return () => clearInterval(interval)
+  }, [session])
 
   if (!session) return null
   const visibleItems = navItems.filter(i => i.roles.includes(role))
