@@ -1,57 +1,32 @@
-"use client"
+// RSC: 管理员用户列表
+import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth"
+import { redirect } from "next/navigation"
 
-import { useState, useEffect } from "react"
-
-const ROLE_MAP: Record<string, { label: string; color: string }> = {
-  RESEARCHER: { label: "研究员", color: "#185FA5" },
-  EXPERT: { label: "专家", color: "#0F6E56" },
-  ADMIN: { label: "管理员", color: "#A32D2D" },
+const ROLE_LABELS: Record<string, { label: string; color: string }> = {
+  RESEARCHER: { label: "研究员", color: "#185FA5" }, EXPERT: { label: "专家", color: "#0F6E56" }, ADMIN: { label: "管理员", color: "#A32D2D" },
 }
 
-export default function AdminUsersPage() {
-  const [users, setUsers] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState("")
-
-  useEffect(() => {
-    fetch("/api/users")
-      .then(r => r.json())
-      .then(data => { setUsers(data.users || data || []); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
-
-  const filtered = filter ? users.filter(u => u.role === filter) : users
-
+export default async function AdminUsersPage() {
+  const session = await getServerSession(authOptions)
+  if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
+  const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, select: { id: true, name: true, email: true, role: true, orgName: true, points: true, createdAt: true } })
   return (
     <div>
-      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 16 }}>用户管理</h2>
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        <select value={filter} onChange={e => setFilter(e.target.value)}
-          style={{ padding: 8, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 13, background: "#fff" }}>
-          <option value="">全部角色</option>
-          {Object.entries(ROLE_MAP).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
-        </select>
-        <span style={{ fontSize: 13, color: "#888", marginLeft: "auto" }}>共 {filtered.length} 人</span>
+      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 16 }}>用户管理 · {users.length} 人</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {users.map(u => (
+          <div key={u.id} style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 12, fontSize: 13, display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontWeight: 500, flex: 1 }}>{u.name || "未设置"}</span>
+            <span style={{ fontSize: 12, color: "#888", width: 180 }}>{u.email}</span>
+            <span style={{ fontSize: 12, color: "#888", width: 120 }}>{u.orgName || "-"}</span>
+            <span style={{ background: (ROLE_LABELS[u.role]?.color || "#888") + "18", color: ROLE_LABELS[u.role]?.color || "#888", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500 }}>{ROLE_LABELS[u.role]?.label || u.role}</span>
+            <span style={{ fontWeight: 500, width: 60 }}>{u.points}积分</span>
+            <span style={{ fontSize: 12, color: "#aaa", width: 80 }}>{new Date(u.createdAt).toLocaleDateString()}</span>
+          </div>
+        ))}
       </div>
-
-      {loading ? <div style={{ padding: 40, textAlign: "center", color: "#888" }}>加载中...</div> :
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {filtered.map(u => (
-            <div key={u.id} style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 14, display: "flex", alignItems: "center", gap: 12, fontSize: 13 }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 500 }}>{u.name || "未设置姓名"}</div>
-                <div style={{ fontSize: 12, color: "#888" }}>{u.email} · {u.orgName || "无机构"}</div>
-              </div>
-              <span style={{
-                background: (ROLE_MAP[u.role]?.color || "#888") + "18",
-                color: ROLE_MAP[u.role]?.color || "#888",
-                padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500,
-              }}>{ROLE_MAP[u.role]?.label || u.role}</span>
-              <span style={{ fontSize: 12, color: "#888" }}>{new Date(u.createdAt).toLocaleDateString()}</span>
-            </div>
-          ))}
-        </div>
-      }
     </div>
   )
 }
