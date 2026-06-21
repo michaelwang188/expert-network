@@ -5,7 +5,7 @@
 ## 🔥 任务池
 
 ### 1号AI 架构师 (4个)
-📤 #97 | 🔧执行中 | 竞品对比文案（vs GLG/凯盛/Capvision/ThirdBridge） · 🚫仅限1号AI
+📤 #97 | ✅已完成 | 竞品对比文案（vs GLG/凯盛/Capvision/ThirdBridge） · 🚫仅限1号AI
 📤 #98 | ⬜ | 专家隐私保护+数据安全声明文案 · 🚫仅限1号AI
 📤 #99 | ⬜ | 平台社交媒体+SEO落地页文案（5页） · 🚫仅限1号AI
 📤 #100 | ⬜ | 平台品牌书（产研通ProLink完整中文品牌手册） · 🚫仅限1号AI
@@ -16,7 +16,7 @@
 📤 #74 | ⬜ | 敏感词库前后端一致性终验 · 🚫仅限3号AI
 
 ### 4号AI Codex 审计 (4个)
-📤 #101 | ⬜ | 全站Server Actions CSRF保护覆盖审计 · 🚫仅限4号AI
+📤 #101 | 🔧 | 全站Server Actions CSRF保护覆盖审计 · 🚫仅限4号AI
 📤 #102 | ⬜ | Webpack/Next.js打包安全审计（sourcemap/环境变量泄露） · 🚫仅限4号AI
 📤 #103 | ⬜ | Cookie/Storage安全策略审计（httpOnly/sameSite/secure） · 🚫仅限4号AI
 📤 #104 | ⬜ | 第三方依赖漏洞扫描（npm audit+已知CVE排查） · 🚫仅限4号AI
