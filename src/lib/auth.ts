@@ -8,7 +8,7 @@ const loginRateLimit = new Map<string, { count: number; reset: number }>()
 setInterval(() => { const now = Date.now(); for (const [ip, e] of loginRateLimit) { if (now >= e.reset) loginRateLimit.delete(ip) } }, 60000)
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 }, // 7天过期（Codex #174修复）
   pages: {
     signIn: "/login",
     newUser: "/register",
@@ -50,6 +50,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
+          updatedAt: user.updatedAt.getTime(),
         }
       },
     }),
@@ -59,6 +60,16 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = (user as any).role
+        token.updatedAt = (user as any).updatedAt || Date.now()
+      }
+      // Codex #174修复: 每次请求验证用户是否仍存在且角色未变
+      if (token.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { id: true, role: true, updatedAt: true },
+        })
+        if (!dbUser) return {} // 用户已删除，强制重新登录
+        token.role = dbUser.role
       }
       return token
     },
