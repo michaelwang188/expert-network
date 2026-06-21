@@ -56,32 +56,32 @@ export default function RegisterPage() {
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>姓名 *</label>
           <input value={name} onChange={e => setName(e.target.value)} required
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
+            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>邮箱 *</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
+            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>密码 *（至少6位）</label>
           <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
+            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>确认密码 *</label>
           <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6}
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
+            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>机构名称</label>
           <input value={orgName} onChange={e => setOrgName(e.target.value)}
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
+            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>身份 *</label>
           <select value={role} onChange={e => setRole(e.target.value)}
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, border: "0.5px solid #e0dfd8" }}>
+            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }}>
             <option value="RESEARCHER">研究员（公募/私募/券商/PEVC）</option>
             <option value="EXPERT">专家（产业从业者）</option>
           </select>
