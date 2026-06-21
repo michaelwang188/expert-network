@@ -444,3 +444,11 @@ curl + cookie 实测：返回200但触发 `NEXT_REDIRECT` / `meta refresh` → /
 1. **/api/match 和 /api/orders GET/PATCH 加 FROZEN 状态检查** — 否则冻结无效
 2. Request 增加 REJECTED 枚举值 + 驳回通知
 3. Expert status 变更时同步写入 Notification（若尚未实现）
+### 08:32 | 2号AI Claude | Mavis #51 响应
+
+**Mavis 发现**:
+- FROZEN 专家仍可接单 → /api/orders 加 FROZEN 检查
+
+**立即修**: orders.ts PATCH handler 加 expert.status === FROZEN 拦截
+
+
