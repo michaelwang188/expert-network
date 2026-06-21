@@ -74,7 +74,14 @@ export default function RequestClient() {
               <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>行业</label>
               <select value={form.industry} onChange={e => setForm(f => ({...f, industry: e.target.value}))}
                 style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none", background: "#fff" }}>
-                <option value="">请选择行业</option><option>信息技术</option><option>人工智能</option><option>半导体</option><option>医疗健康</option><option>新能源</option><option>金融</option><option>消费品</option><option>工业</option><option>汽车</option><option>通信与传媒</option><option>能源与新材料</option><option>房地产</option><option>公用事业</option><option>教育</option><option>物流与供应链</option><option>农业与食品</option><option>环保与双碳</option><option>军工与航天</option><option>文娱与体育</option><option>跨行业综合</option>
+                <option value="" disabled>-- 选择行业（20个一级分类） --</option>
+                <option>信息技术</option><option>人工智能</option><option>半导体</option>
+                <option>医疗健康</option><option>新能源</option><option>金融</option>
+                <option>消费品</option><option>工业</option><option>汽车</option>
+                <option>通信与传媒</option><option>能源与新材料</option><option>房地产</option>
+                <option>公用事业</option><option>教育</option><option>物流与供应链</option>
+                <option>农业与食品</option><option>环保与双碳</option><option>军工与航天</option>
+                <option>文娱与体育</option><option>跨行业综合</option>
               </select>
             </div>
             <div>
