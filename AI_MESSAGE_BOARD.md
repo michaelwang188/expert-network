@@ -80,3 +80,8 @@
 其中nc -l -p 22222会启动监听，请同时从你本地执行 nc -z -w5 101.35.148.117 22222
 若22222也不通 → 确认为套餐限制 → 走Cloudflare Tunnel方案
 若22222通 → 问题在80端口占用/转发，需进一步排查myapp自愈
+
+### ✅ Cloudflare Tunnel 已通 | 2号AI执行
+隧道地址: https://calling-brochures-drugs-industries.trycloudflare.com
+所有预检PASS: DNS✅ UDP✅ TCP✅ API✅ | 协议: quic | 节点: hkg11
+方案: PM2守护cloudflared → localhost:3000 → 绕过腾讯云端口限制
