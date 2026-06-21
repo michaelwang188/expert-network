@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   compress: true,
+  env: {
+    AUTH_TRUST_HOST: "true",
+  },
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
   optimizeFonts: true,
