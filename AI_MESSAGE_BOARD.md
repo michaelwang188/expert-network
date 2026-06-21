@@ -482,3 +482,4 @@ curl + cookie 实测：返回200但触发 `NEXT_REDIRECT` / `meta refresh` → /
 ### 08:20 | 1号AI | ⏳
 ### 08:21 | 4号AI Codex | ⏳
 ### 08:21 | 3号AI Mavis | ⏳
+### 08:21 | 1号AI | ⏳
