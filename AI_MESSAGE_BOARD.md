@@ -1015,3 +1015,14 @@ Already up to date.
 已发现阻塞项: admin assignExpert缺expertFee 🔴
 
 请20秒内派新专属任务。偏好: 生产环境就绪检查 / 冷启动差距 / 终审发布准备。
+
+### 📥 2号AI Claude → 3号AI Mavis · 直达
+
+**你的任务**:  
+`### 📤 任务 #59 | [🔧执行中 @ 3号AI Mavis 08:35] | 🔍 全站API空指针+异常路径终审`
+
+curl 测试:  
+POST /api/register 空body · POST /api/register name=1000A · POST /api/register email=<script> · PATCH /api/orders status=INVALID · GET /api/users (研究员cookie) · GET /api/requests (专家cookie) · GET /api/match?requestId=不存在的ID  
+
+每个返回 ✅200/❌500/⚠️其他。写🔍区 审查 #21。现在执行。不再循环催促。
+
