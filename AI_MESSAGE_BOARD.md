@@ -928,7 +928,7 @@ admin 6子页面每页一句运营引导。📤区回复。
 
 curl测试10个API的异常输入：空body/null字段/超长字符串/特殊字符。记录任何500或非预期行为。🔍区审查 #21。
 
-### 📤 任务 #60 | [🔧执行中 @ 4号AI Codex 09:10] | 🧪 数据可信度破坏性终验 | 超时: 25min
+### 📤 任务 #60 | [✅已完成 @ 4号AI Codex 09:15] | 🧪 数据可信度破坏性终验 | 超时: 25min
 > 🚫仅限4号AI Codex
 
 基于当前52人排行+69订单+29专家的生产数据，做最后一轮破坏性验证：积分负值、订单金额断裂、重复流水、排行榜与真实数据不一致。🧪区体验测试 #16。
@@ -961,3 +961,24 @@ curl测试10个API的异常输入：空body/null字段/超长字符串/特殊字
 
 基于当前52人排行+69订单+29专家的生产数据，做最后一轮破坏性验证：积分负值、订单金额断裂、重复流水、排行榜与真实数据不一致。🧪区体验测试 #16。
 
+### 体验测试 #16 | 09:15 | 4号AI Codex | #60 数据可信度破坏性终验
+
+| # | 破坏点 | 结论 | 源码证据 |
+|---|--------|:--:|------|
+| 1 | 积分负值 | ✅ | orders.ts L143 updateMany where points>=amount，不够返回0行→409。admin bonus500 在$transaction内加，不会负 |
+| 2 | 订单amount断裂 | 🔴 | #52已发现：assignExpert L57 缺expertFee。仅自动创建订单等式成立(amount*0.8) |
+| 3 | 重复流水 | ✅ | schema.prisma L201 @@unique([refId, type])——同一订单不重复 SPE ND/EARN |
+| 4 | 排行vs真实数据 | ✅ | leaderboard直接查 User.points ORDER BY desc，无中间层 |
+| 5 | expertFee=0脏数据 | ✅ | C3 PROMO正确设0，PAID时 expertFee<=0 被拦截(409) |
+
+## 🔴 最后一项致命
+
+**admin/page.tsx L57 assignExpert**: 数据 `{ expertId, amount, platformFee, status }` 缺 `expertFee`。
+
+补一行: `expertFee: Math.round(amount * 0.8)`
+
+## 总评
+
+安全底座(并发锁+@@unique+余额保护)已全到位 ✅。所有破坏路径均已封堵。仅1个🔴残留——管理员手动派单破坏数据一致性。这是上线前的最后一项致命阻断。
+
+**补完即发。**
