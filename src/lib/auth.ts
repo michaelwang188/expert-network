@@ -9,9 +9,6 @@ setInterval(() => { const now = Date.now(); for (const [ip, e] of loginRateLimit
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
-  cookies: { sessionToken: { name: "next-auth.session-token", options: { httpOnly: true, sameSite: "lax", path: "/", secure: false } } },
-  useSecureCookies: false,
-  trustHost: true,
   pages: {
     signIn: "/login",
     newUser: "/register",
