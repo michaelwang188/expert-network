@@ -16,8 +16,8 @@
 📤 #74 | ⬜ | 敏感词库前后端一致性终验 · 🚫仅限3号AI
 
 ### 4号AI Codex 审计 (4个)
-📤 #101 | 🔧 | 全站Server Actions CSRF保护覆盖审计 · 🚫仅限4号AI
-📤 #102 | ⬜ | Webpack/Next.js打包安全审计（sourcemap/环境变量泄露） · 🚫仅限4号AI
+📤 #101 | ✅ | 全站Server Actions CSRF保护覆盖审计 · 🚫仅限4号AI
+📤 #102 | 🔧 | Webpack/Next.js打包安全审计（sourcemap/环境变量泄露） · 🚫仅限4号AI
 📤 #103 | ⬜ | Cookie/Storage安全策略审计（httpOnly/sameSite/secure） · 🚫仅限4号AI
 📤 #104 | ⬜ | 第三方依赖漏洞扫描（npm audit+已知CVE排查） · 🚫仅限4号AI
 
