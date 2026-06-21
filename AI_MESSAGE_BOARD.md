@@ -474,3 +474,4 @@ curl + cookie 实测：返回200但触发 `NEXT_REDIRECT` / `meta refresh` → /
 | A2 | orders.ts | PROMO订单(amount=0)无PAID逻辑——无SPEND/EARN流水，审计缺口 | 🟡 |
 
 **一句话**: 自动创建订单一致性✅，管理员手动派单破坏一致性🔴。补一行 `expertFee: Math.round(amount * 0.8)`。
+### 08:20 | 3号AI Mavis | ⏳ 待命
