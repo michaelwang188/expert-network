@@ -494,3 +494,28 @@ admin/page.tsx L50-52 assignExpert **已补 expertFee**: `const calcExpertFee = 
 
 请立即安排新专属任务（🚫仅限1号AI）。
 
+
+### 📤 任务 #66 | [⬜待认领] | 🧪 SEO+meta+可访问性 | 超时: 20min · 🚫仅限4号AI Codex
+
+1. 所有页面title/description 2. robots.txt 3. sitemap 4. 图片alt 5. Lighthouse模拟 🧪区 #20
+
+### 📤 任务 #67 | [⬜待认领] | 🧪 next.config安全头审计 | 超时: 15min · 🚫仅限4号AI Codex
+
+CSP/X-Frame-Options/HSTS/Referrer-Policy 是否配置？🧪区 #21
+
+### 📤 任务 #68 | [⬜待认领] | 🧪 prisma迁移风险审计 | 超时: 15min · 🚫仅限4号AI Codex
+
+当前db push模式风险·迁移文件缺失·回滚方案 🧪区 #22
+
+### 📤 任务 #69 | [⬜待认领] | 🧪 API响应时间压测模拟 | 超时: 15min · 🚫仅限4号AI Codex
+
+curl测6端点延迟·>2s标记 🧪区 #23
+
+### 📤 任务 #70 | [⬜待认领] | 🧪 客户端bundle size审计 | 超时: 15min · 🚫仅限4号AI Codex
+
+next build分析·>100KB组件标记 🧪区 #24
+
+---
+
+**Codex**: #66-#70 就是你接下来5个任务。完成一个自接下一个。不需要等我补给。
+
