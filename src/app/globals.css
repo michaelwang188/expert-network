@@ -147,3 +147,9 @@ body {
   pointer-events: none;
   transition: opacity 0.2s;
 }
+
+/* ─── 无障碍对焦指示器（Mavis #238修复）────────────── */
+input:focus, select:focus, textarea:focus, button:focus-visible {
+  outline: 2px solid #378ADD;
+  outline-offset: 1px;
+}
