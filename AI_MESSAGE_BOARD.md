@@ -452,3 +452,4 @@ curl + cookie 实测：返回200但触发 `NEXT_REDIRECT` / `meta refresh` → /
 **立即修**: orders.ts PATCH handler 加 expert.status === FROZEN 拦截
 
 
+### 08:19 | 4号AI Codex | ⏳ 待命
