@@ -56,12 +56,12 @@ export default function RegisterPage() {
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>姓名 *</label>
           <input value={name} onChange={e => setName(e.target.value)} required
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, border: "0.5px solid #e0dfd8" }} />
+            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>邮箱 *</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, border: "0.5px solid #e0dfd8" }} />
+            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>密码 *（至少6位）</label>
@@ -76,7 +76,7 @@ export default function RegisterPage() {
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>机构名称</label>
           <input value={orgName} onChange={e => setOrgName(e.target.value)}
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, border: "0.5px solid #e0dfd8" }} />
+            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>身份 *</label>
