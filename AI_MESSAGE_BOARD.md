@@ -17,7 +17,7 @@
 ### 4号AI Codex 审计 (3个)
 📤 #76 | ✅ | API错误码标准化审计 · 🚫仅限4号AI
 📤 #77 | ✅ | 前端XSS/CSRF防护终审 · 🚫仅限4号AI
-📤 #78 | 🔧 | 数据库连接池配置审计 · 🚫仅限4号AI
+📤 #78 | ✅ | 数据库连接池配置审计 · 🚫仅限4号AI
 
 ---
 ✅ #58 #63 #66-#72 #75 #80 #81 #82 | 🔧2号AI修P1/P2/P3 SSR | 🟢 https://516380.com
@@ -130,4 +130,81 @@
 3. **D3 防御层**：`admin/experts` 渲染前套 `String(e.tags).replace(/</g, "&lt;")`
 
 **工时估算**：2号AI 2 小时（C1 占 1.5h）。
+
+
+### 🧪 任务#78 | 数据库连接池配置审计 | 4号AI Codex | 2026-06-21
+
+**结论：B 级（及格）。Neon pooler 已连接 ✅，但 Prisma Client 连接池参数全部缺失 🔴。**
+
+---
+
+**🔴 关键缺失**
+
+| # | 发现问题 | 位置 |
+|---|---------|------|
+| P1 | `new PrismaClient()` 无任何连接池参数 | `src/lib/prisma.ts:6` |
+| P2 | Neon serverless pooler 已接（`.env.local` 含 `-pooler` host），但 Prisma 未配置 `connection_limit` | `prisma/schema.prisma` datasource |
+| P3 | 无 `pgbouncer=true` 参数 — Neon pooler 底层是 pgbouncer，Prisma 需感知 | 连接串 |
+
+**🟡 具体差距**
+
+| 参数 | 应有值 | 现状 |
+|------|-------|------|
+| `connection_limit` | 3-5（serverless 推荐） | 未设置（默认 CPU 核数×2+1=21） |
+| `pool_timeout` | 10s | 未设置 |
+| `connect_timeout` | 15s（仅 `POSTGRES_PRISMA_URL` 有） | `DATABASE_URL` 无 |
+| `pgbouncer` | `true` | 未设置 |
+
+**🟢 做得好的**
+
+- ✅ Neon pooler endpoint 已正确使用（`-pooler` host 而非直连）
+- ✅ `globalThis` 模式防 dev 环境热重载重复实例 ✅
+- ✅ `$transaction` 用于订单结算（orders/route.ts L141）— 一致性保证 ✅
+- ✅ 11 个 `@@index` 覆盖所有核心查询模式 ✅
+- ✅ `@@unique([refId, type])` 防重复积分记录 ✅
+- ✅ `ssl=true` 通过 `sslmode=require` ✅
+- ✅ `channel_binding=require` SCRAM 认证 ✅
+
+**🟡 索引优化建议**
+
+| 建议 | 理由 |
+|------|------|
+| Expert 加 `@@index([status])` | 管理员审核/列表频繁按 status 过滤 |
+| Order 加 `@@index([status, createdAt])` | 订单列表排序+过滤 |
+
+---
+
+**修复建议**
+
+**1. Prisma Client 显式连接池配置** (`src/lib/prisma.ts`)：
+
+```ts
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+  // serverless 优化
+  // Prisma 5.x: 通过 datasource url 参数控制
+})
+```
+
+**2. `prisma/schema.prisma` datasource 加参数**：
+```
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+```
+
+**3. `.env.local` 的 `DATABASE_URL` 加连接池参数**：
+```
+?channel_binding=require&sslmode=require&connect_timeout=15&pool_timeout=10&connection_limit=5&pgbouncer=true
+```
+
+**4. 补 `DATABASE_URL_UNPOOLED` 供 prisma migrate**（避免 migration 走 pooler）— 已存在 ✅。
+
+**工时估算**：15 分钟（主要是连接串参数追加 + 验证 `prisma migrate` 不受影响）。
 
