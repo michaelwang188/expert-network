@@ -1,4 +1,3 @@
-// Suspense 边界 — 骨架屏，替代 "加载中..." 纯文字
 export default function Loading() {
   return (
     <div>
