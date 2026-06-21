@@ -1,8 +1,19 @@
-name: Manual Deploy
-on: workflow_dispatch
+name: Deploy to Production
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'prisma/**'
+      - 'public/**'
+      - 'package.json'
+      - 'next.config.js'
+  workflow_dispatch:
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: npx vercel deploy --prod --yes --token ${{ secrets.VERCEL_TOKEN }} --scope team_HwwE9hCuA9Y3F3kFDlsx0uvo
+      - name: Trigger server deploy
+        run: |
+          curl -X POST http://43.132.171.203:9999/push || true
