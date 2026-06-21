@@ -1,14 +1,12 @@
 "use client"
-
-export default function ErrorPage({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }) {
   return (
-    <div style={{ textAlign: "center", padding: "80px 20px" }}>
-      <div style={{ fontSize: 64, marginBottom: 12 }}>⚠️</div>
-      <h1 style={{ fontSize: 20, fontWeight: 500, color: "#A32D2D", marginBottom: 8 }}>页面加载出错</h1>
-      <p style={{ fontSize: 14, color: "#888", marginBottom: 8 }}>{error.message || "发生未知错误"}</p>
-      <button onClick={reset} style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, background: "#185FA5", color: "#fff", fontSize: 14, fontWeight: 500, border: "none", cursor: "pointer" }}>
-        重试
-      </button>
+    <div style={{ minHeight: "60vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center", padding: 40 }}>
+      <div style={{ fontSize: 72, marginBottom: 16 }}>⚙️</div>
+      <h1 style={{ fontSize: 28, fontWeight: 600, color: "#2c2c2a", margin: "0 0 8px" }}>服务器开小差了</h1>
+      <p style={{ fontSize: 15, color: "#888", margin: "0 0 8px", lineHeight: 1.7, maxWidth: 400 }}>我们的技术团队已收到异常通知，正在紧急排查中。</p>
+      <p style={{ fontSize: 13, color: "#aaa", margin: "0 0 32px" }}>请稍后重试，或联系客服获取帮助。</p>
+      <button onClick={reset} style={{ padding: "10px 24px", borderRadius: 8, background: "#185FA5", color: "#fff", fontSize: 14, border: "none", cursor: "pointer", fontWeight: 500 }}>重试页面</button>
     </div>
   )
 }
