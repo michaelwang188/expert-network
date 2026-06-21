@@ -35,7 +35,6 @@ export default function RegisterPage() {
       setError(data.error || "注册失败")
       setLoading(false)
     } else {
-      // 🆕 注册成功后自动登录，不再跳登录页
       const result = await signIn("credentials", { email, password, redirect: false })
       if (result?.ok) {
         router.push("/dashboard")
@@ -46,6 +45,8 @@ export default function RegisterPage() {
     }
   }
 
+  const inputStyle = { width: "100%" as const, padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }
+
   return (
     <div style={{ maxWidth: 440, margin: "60px auto", padding: 24 }}>
       <div style={{ textAlign: "center", marginBottom: 28 }}>
@@ -55,33 +56,27 @@ export default function RegisterPage() {
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>姓名 *</label>
-          <input value={name} onChange={e => setName(e.target.value)} required
-            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
+          <input value={name} onChange={e => setName(e.target.value)} required style={inputStyle} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>邮箱 *</label>
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
-            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={inputStyle} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>密码 *（至少6位）</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6}
-            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} style={inputStyle} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>确认密码 *</label>
-          <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6}
-            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
+          <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6} style={inputStyle} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>机构名称</label>
-          <input value={orgName} onChange={e => setOrgName(e.target.value)}
-            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }} />
+          <input value={orgName} onChange={e => setOrgName(e.target.value)} style={inputStyle} />
         </div>
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>身份 *</label>
-          <select value={role} onChange={e => setRole(e.target.value)}
-            style={{ width: "100%", padding: 10, borderRadius: 8, fontSize: 14 }}>
+          <select value={role} onChange={e => setRole(e.target.value)} style={inputStyle}>
             <option value="RESEARCHER">研究员（公募/私募/券商/PEVC）</option>
             <option value="EXPERT">专家（产业从业者）</option>
           </select>
