@@ -112,6 +112,33 @@ body {
   .desktop-nav { display: none !important; }
   .mobile-menu-btn { display: block !important; }
   .mobile-menu { display: flex !important; }
+
+  /* 表格横向滚动 */
+  div[style*="overflow: hidden"]:has(table),
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* 主内容区缩边 */
+  main { padding: 12px 10px !important; }
+
+  /* 两列 grid 在手机上变单列 */
+  [style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 登录/注册/找回密码卡片全宽 */
+  [style*="max-width: 400px"] {
+    margin: 40px auto !important;
+    padding: 16px !important;
+  }
+
+  /* 订单表th最小宽 */
+  table th { font-size: 11px !important; padding: 6px 4px !important; }
+  table td { font-size: 11px !important; padding: 6px 4px !important; }
 }
 
 /* ─── 加载态 ─────────────────────────────────────── */
