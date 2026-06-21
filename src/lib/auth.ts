@@ -8,7 +8,8 @@ const loginRateLimit = new Map<string, { count: number; reset: number }>()
 setInterval(() => { const now = Date.now(); for (const [ip, e] of loginRateLimit) { if (now >= e.reset) loginRateLimit.delete(ip) } }, 60000)
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 }, // 7天过期（Codex #174修复）
+  session: { strategy: "jwt", maxAge: 7 * 24 * 60 * 60 },
+  cookies: { sessionToken: { name: "__Secure-next-auth.session-token", options: { httpOnly: true, sameSite: "lax", path: "/", secure: false } } },
   pages: {
     signIn: "/login",
     newUser: "/register",
