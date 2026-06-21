@@ -11,7 +11,43 @@
 📤 #218 | 🔧 | 专家端新手入门体系文案(视频脚本+文字) · 🚫仅限1号AI
 📤 #219 | 🔧 | 季度营销活动全案(4季度·12个节日) · 🚫仅限1号AI
 📤 #181 | 🔧 | 专家冻结解冻全链路回归 · 🚫仅限3号AI
-📤 #220 | 🔧 | 🚨Chrome无法访问516380·排查HSTS/SOCKS/代理 · 🚫仅限3号AI
+📤 #220 | 🔧 | Chrome访问516380完整排查 · 🚫仅限3号AI
+
+---
+## 📋 Mavis专属任务 #220 — Chrome访问516380故障完整移交
+
+### 背景
+网站 https://516380.com 已从Vercel迁移到腾讯云香港服务器(101.35.148.117)。
+Safari可以正常访问。**Chrome无法访问**（显示"无法访问此网站"）。
+
+### 你的Chrome测试环境
+这台Chrome是你用来做测试的，之前访问过Vercel旧站。不要在Chrome里清浏览数据（你的测试记录要保留）。
+
+### 我已完成的操作（供你参考，不需要重做）
+1. ✅ 清除了Chrome的TransportSecurity文件（HSTS缓存）
+2. ✅ 清除了Chrome Preferences中15条516380相关条目（站点权限、媒体偏好等）
+3. ✅ 系统SOCKS代理bypass已添加 516380.com 和 101.35.148.117
+4. ✅ Hiddify配置文件中添加了直连规则：516380.com → direct
+5. ✅ 多次重启Chrome（含--disable-hsts参数）
+
+### 当前根因判断
+Chrome走的是SOCKS代理(127.0.0.1:12334)，SOCKS协议本身不支持域名bypass列表。
+系统级的HTTP/HTTPS代理bypass对SOCKS无效。Hiddify的sing-box内核需要**读到配置后重启内核**，
+直连规则才能在SOCKS层生效。
+
+### 需要你做的
+1. 验证Hiddify的sing-box内核是否已加载516380直连规则
+   - 检查 `~/Library/Application Support/app.hiddify.com/current-config.json` 中 route.rules[0] 是否含 516380.com
+2. 如果可以，重启Hiddify应用（完全退出再打开），使sing-box重新加载配置
+3. 重启后验证：Chrome访问 http://516380.com 能否正常打开
+4. 如果仍不行，考虑在Chrome里安装SwitchyOmega插件，单独给516380.com设置直连规则
+5. 把你的发现写入 reports/task-220.md
+
+### 验证方式
+- 成功标准：Chrome能打开 http://516380.com，看到产研通首页
+- Safari一直可以访问，可作为对照
+- curl --noproxy '*' http://516380.com 返回HTTP 308 = 服务器本身正常
+
 📤 #182 | 🔧 | 新用户注册全流程回归 · 🚫仅限3号AI
 📤 #211 | ✅ | HTTPS证书配置验证审计 · 🚫仅限4号AI
 📤 #212 | ✅ | 腾讯云香港节点安全基线审计 · 🚫仅限4号AI
