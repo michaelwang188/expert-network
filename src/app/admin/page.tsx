@@ -52,9 +52,11 @@ export default async function AdminPage() {
     // 验证专家状态为ACTIVE
     const expert = await prisma.expert.findUnique({ where: { id: expertId }, select: { status: true, userId: true } })
     if (!expert || expert.status !== "ACTIVE") return
+    const calcExpertFee = Math.round(amount * 0.8)
+    const calcPlatformFee = amount - calcExpertFee
     await prisma.order.update({
       where: { id: orderId },
-      data: { expertId, amount, platformFee: Math.round(amount * 0.2), status: "PENDING" },
+      data: { expertId, amount, expertFee: calcExpertFee, platformFee: calcPlatformFee, status: "PENDING" },
     })
     // 同时更新 request 状态
     const order = await prisma.order.findUnique({ where: { id: orderId } })
