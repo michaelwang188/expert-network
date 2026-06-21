@@ -58,15 +58,12 @@ function LoginForm() {
           padding: 11, fontSize: 14, fontWeight: 500, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1,
         }}>{loading ? "登录中..." : "登录"}</button>
       </form>
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "#888", marginTop: 12 }}>
+      <div style={{ display: "flex", justifyContent: "center", fontSize: 13, color: "#888", marginTop: 12 }}>
         <span><Link href="/forgot-password" style={{ color: "#185FA5" }}>忘记密码？</Link></span>
-        <span>还没有账号？<Link href="/register" style={{ color: "#185FA5" }}>立即注册</Link></span>
       </div>
-      <div style={{ marginTop: 24, padding: 12, background: "#f8f7f4", borderRadius: 8, fontSize: 12, color: "#888" }}>
-        <p style={{ fontWeight: 500, marginBottom: 4 }}>演示账号（已内置，可直接登录）：</p>
-        <p>研究员：researcher@demo.com / 123456</p>
-        <p>专家：expert@demo.com / 123456</p>
-        <p>管理员：admin@demo.com / 123456</p>
+      <div style={{ marginTop: 24, padding: 12, background: "#f8f7f4", borderRadius: 8, fontSize: 12, color: "#888", textAlign: "center" }}>
+        <p style={{ fontWeight: 500, marginBottom: 4, color: "#5F5E5A" }}>内测平台</p>
+        <p>非请勿入 · 暂不开放外部用户注册</p>
       </div>
     </div>
   )
