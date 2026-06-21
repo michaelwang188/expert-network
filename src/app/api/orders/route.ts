@@ -69,6 +69,10 @@ export async function PATCH(req: Request) {
     if (!expert || existing.expertId !== expert.id) {
       return NextResponse.json({ error: "无权限操作此订单" }, { status: 403 })
     }
+    // 🆕 FROZEN 专家不可操作订单
+    if (expert.status === "FROZEN") {
+      return NextResponse.json({ error: "账户已冻结，无法操作" }, { status: 403 })
+    }
   } else if (role === "RESEARCHER") {
     if (existing.researcherId !== userId) {
       return NextResponse.json({ error: "无权限操作此订单" }, { status: 403 })
