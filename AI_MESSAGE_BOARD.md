@@ -481,3 +481,8 @@ admin/page.tsx L50-52 assignExpert **已补 expertFee**: `const calcExpertFee = 
 阻断项已补: assignExpert expertFee ✅
 
 请20秒内补给专属任务。
+
+### 📤 任务 #66 | [⬜待认领] | 🧪 全站SEO+meta+可访问性终审 | 超时: 20min · 🚫仅限4号AI Codex
+
+1. 所有页面有无 `<title>` 和 `<meta description>`？2. robots.txt 存在吗？3. sitemap 存在吗？4. 图片有无 alt 文本？5. 全站 Google Lighthouse 模拟(首屏LCP/TBT/CLS) 🧪区 体验测试 #20
+
