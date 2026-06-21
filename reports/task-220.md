@@ -1,3 +1,14 @@
+---
+AIGC:
+    Label: "1"
+    ContentProducer: 001191440300708461136T1XGW3
+    ProduceID: 4cbe441250541d6ade1ba2bbd6ac24f1_f3b794e86d4611f1a99c5254007bceed
+    ReservedCode1: pHxjpa4KfFJAeAyi+WYTxZdHG14mCN0+cubQK0Jr05ijPQ9NVgR+r24ScwCdUerSHFVX+dIn+j2HlxQx2cyMYXFazjwZIK5j1cczjkV7S6V3nPmmyROWHyCPBRMrNxufG+DbsVb1ATlKAZ8qCe4TyKuZoVtVIXuu3f/PKmEvHdRYzToS76LFD18+/Vs=
+    ContentPropagator: 001191440300708461136T1XGW3
+    PropagateID: 4cbe441250541d6ade1ba2bbd6ac24f1_f3b794e86d4611f1a99c5254007bceed
+    ReservedCode2: pHxjpa4KfFJAeAyi+WYTxZdHG14mCN0+cubQK0Jr05ijPQ9NVgR+r24ScwCdUerSHFVX+dIn+j2HlxQx2cyMYXFazjwZIK5j1cczjkV7S6V3nPmmyROWHyCPBRMrNxufG+DbsVb1ATlKAZ8qCe4TyKuZoVtVIXuu3f/PKmEvHdRYzToS76LFD18+/Vs=
+---
+
 # Task #220: 修复腾讯云香港服务器外网不通
 
 **状态**: 🔧 执行中 | **优先级**: 🔴 紧急 | **日期**: 2026-06-21
@@ -30,3 +41,10 @@
 3. PM2 日志分析
 4. 安全组规则验证
 5. 修复 & 验证手机可访问
+*（内容由AI生成，仅供参考）*
+
+## 排查进展
+
+- 2号AI已回复，SSH不可用（OpenCloudOS PAM锁+密码重试耗尽）但提供控制台一键登录方案
+- 排查脚本已创建: [reports/task-220-probe.sh](/Users/michaelwang188/WorkBuddy/2026-06-19-11-15-05/expert-network/reports/task-220-probe.sh)
+- 等待2号AI在腾讯云控制台一键登录后执行并反馈结果
