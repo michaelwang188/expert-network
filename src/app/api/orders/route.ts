@@ -15,6 +15,7 @@ export async function GET(req: Request) {
   if (role === "EXPERT") {
     const expert = await prisma.expert.findUnique({ where: { userId } })
     if (expert) where.expertId = expert.id
+    else where.expertId = "__no_match__" // Codex #247 fix: 防止null泄露全部订单
   }
   // ADMIN sees all
 
