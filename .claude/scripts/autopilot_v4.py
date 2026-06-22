@@ -384,12 +384,39 @@ def run_executor():
     return True
 
 
+# 质检API失败状态（持久化文件，跨重启生效）
+_INSPECTOR_STATE_FILE = PROJECT_DIR / ".workbuddy" / "inspector_state.json"
+_INSPECTOR_RETRY_SEC = 120     # API失败后重试间隔：2分钟
+_INSPECTOR_BOARD_BACKOFF = 3600  # 消息板告警：每小时最多1次
+
+def _load_inspector_state():
+    try:
+        if _INSPECTOR_STATE_FILE.exists():
+            return json.loads(_INSPECTOR_STATE_FILE.read_text())
+    except: pass
+    return {"last_api_fail": 0, "last_board_fail": 0}
+
+def _save_inspector_state(state):
+    try:
+        _INSPECTOR_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _INSPECTOR_STATE_FILE.write_text(json.dumps(state))
+    except: pass
+
 def run_inspector():
-    """3号AI：扫新commit→审查→写报告"""
-    # Get last commit not by inspector
+    """3号AI：扫新commit→审查→写报告
+    15秒轮询不变（协作心跳），仅控制API调用频率"""
+    # Step 1: 查最近commit（免费·本地·每次轮询都跑）
     commits = bash("git log --oneline -5")[0]
     if ROLES["inspector"]["emoji"] in commits:
-        return  # Already reviewed
+        return  # 已有审查记录，跳过
+
+    now = time.time()
+    state = _load_inspector_state()
+    last_fail = state.get("last_api_fail", 0)
+
+    # Step 2: 如果上次API失败了，还没到重试间隔 → 跳过（不浪费API调用）
+    if last_fail > 0 and now - last_fail < _INSPECTOR_RETRY_SEC:
+        return
 
     log(f"🔍 质检扫描...")
 
@@ -407,7 +434,12 @@ def run_inspector():
 
     resp = claude_api(sys, prompt, tools=INSPECTOR_TOOLS, max_tokens=3000)
     if not resp:
-        reply_to_board("inspector", "⚠️ 质检API失败")
+        state["last_api_fail"] = now
+        if now - state.get("last_board_fail", 0) > _INSPECTOR_BOARD_BACKOFF:
+            reply_to_board("inspector", "⚠️ 质检API失败")
+            state["last_board_fail"] = now
+        _save_inspector_state(state)
+        log("  质检API失败（2分钟后重试）")
         return
 
     for block in resp.get("content", []):
