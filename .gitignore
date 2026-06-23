@@ -47,3 +47,6 @@ tsconfig.tsbuildinfo
 
 # Old backup directories (keep local, dont push)
 deploy_local.sh
+prisma/package.json
+prisma/seed.mjs
+prisma/dev.db

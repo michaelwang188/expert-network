@@ -22,10 +22,18 @@ export default async function ExpertsPage(props: any) {
     { tags: { contains: search } }, { topics: { contains: search } },
   ]
 
-  const [experts, total] = await Promise.all([
-    prisma.expert.findMany({ where, skip: (currentPage - 1) * 20, take: 20, orderBy: { completedOrders: "desc" } }),
-    prisma.expert.count({ where }),
-  ])
+  let experts: any[] = []
+  let total = 0
+  try {
+    const result = await Promise.all([
+      prisma.expert.findMany({ where, skip: (currentPage - 1) * 20, take: 20, orderBy: { completedOrders: "desc" } }),
+      prisma.expert.count({ where }),
+    ])
+    experts = result[0]
+    total = result[1]
+  } catch (e) {
+    console.error("专家库查询失败:", (e as Error).message)
+  }
 
   const INDUSTRIES = ["AI算力", "新能源", "半导体", "MLCC", "创新药", "消费电子"]
   const ROLE_TYPES = ["研发", "供应链", "渠道", "管理", "政策"]
