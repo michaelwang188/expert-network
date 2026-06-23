@@ -8,14 +8,21 @@ export default async function AdminPage() {
   const session = await getServerSession(authOptions)
   if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
 
-  const [pendingExperts, allExperts, pendingOrders, allOrders, complianceLogs] = await Promise.all([
-    prisma.expert.findMany({ where: { reviewStatus: "PENDING_REVIEW" }, orderBy: { createdAt: "desc" } }),
-    prisma.expert.findMany({ orderBy: { createdAt: "desc" } }),
-    // 待派单：订单expertId为null（未指派专家）
-    prisma.order.findMany({ where: { expertId: null }, orderBy: { createdAt: "desc" }, include: { researcher: true, request: true } }),
-    prisma.order.findMany({ orderBy: { createdAt: "desc" }, include: { researcher: true, expert: true, request: true } }),
-    prisma.complianceLog.findMany({ orderBy: { createdAt: "desc" }, take: 20 }),
-  ])
+  let pendingExperts: any[] = [], allExperts: any[] = [], pendingOrders: any[] = [], allOrders: any[] = [], complianceLogs: any[] = []
+  try {
+    const r = await Promise.allSettled([
+      prisma.expert.findMany({ where: { reviewStatus: "PENDING_REVIEW" }, orderBy: { createdAt: "desc" } }),
+      prisma.expert.findMany({ orderBy: { createdAt: "desc" } }),
+      prisma.order.findMany({ where: { expertId: null }, orderBy: { createdAt: "desc" }, include: { researcher: true, request: true } }),
+      prisma.order.findMany({ orderBy: { createdAt: "desc" }, include: { researcher: true, expert: true, request: true } }),
+      prisma.complianceLog.findMany({ orderBy: { createdAt: "desc" }, take: 20 }),
+    ])
+    if (r[0].status === "fulfilled") pendingExperts = r[0].value
+    if (r[1].status === "fulfilled") allExperts = r[1].value
+    if (r[2].status === "fulfilled") pendingOrders = r[2].value
+    if (r[3].status === "fulfilled") allOrders = r[3].value
+    if (r[4].status === "fulfilled") complianceLogs = r[4].value
+  } catch {}
 
   // Server Actions — 均含管理员权限二次校验（防CSRF）
   async function approveExpert(formData: FormData) {
