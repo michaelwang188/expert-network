@@ -73,15 +73,6 @@ model Expert {
   completedOrders Int    @default(0)
   rating         Float   @default(0)
 
-  // 三级合规审核
-  reviewStatus  ReviewStatus @default(PENDING_REVIEW)
-  idCardUrl     String?
-  badgeUrl      String?
-  employmentProofUrl String?
-  reviewedBy    String?
-  reviewedAt    DateTime?
-  reviewNote    String?
-
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -98,14 +89,6 @@ enum ExpertStatus {
   ACTIVE
   FROZEN
   INACTIVE
-}
-
-enum ReviewStatus {
-  PENDING_REVIEW
-  APPROVED
-  REJECTED
-  INFO_NEEDED
-  SUSPENDED
 }
 
 // ===== 调研需求 =====

@@ -9,7 +9,7 @@ export default async function AdminPage() {
   if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
 
   const [pendingExperts, allExperts, pendingOrders, allOrders, complianceLogs] = await Promise.all([
-    prisma.expert.findMany({ where: { status: "PENDING" }, orderBy: { createdAt: "desc" } }),
+    prisma.expert.findMany({ where: { reviewStatus: "PENDING_REVIEW" }, orderBy: { createdAt: "desc" } }),
     prisma.expert.findMany({ orderBy: { createdAt: "desc" } }),
     // 待派单：订单expertId为null（未指派专家）
     prisma.order.findMany({ where: { expertId: null }, orderBy: { createdAt: "desc" }, include: { researcher: true, request: true } }),
@@ -23,7 +23,11 @@ export default async function AdminPage() {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
-    const approved = await prisma.expert.update({ where: { id }, data: { status: "ACTIVE", idVerified: true, empVerified: true, complianceSig: true } })
+    const adminId = (s.user as any).id
+    const approved = await prisma.expert.update({
+      where: { id },
+      data: { reviewStatus: "APPROVED", status: "ACTIVE", idVerified: true, empVerified: true, complianceSig: true, reviewedBy: adminId, reviewedAt: new Date() }
+    })
     // 通知 + 积分奖励(审计流水记录)
     const bonusAmount = 500
     await prisma.$transaction(async (tx) => {
@@ -38,7 +42,12 @@ export default async function AdminPage() {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
-    await prisma.expert.update({ where: { id }, data: { status: "INACTIVE" } })
+    const reason = formData.get("reason") as string || "未通过审核"
+    const adminId = (s.user as any).id
+    await prisma.expert.update({
+      where: { id },
+      data: { reviewStatus: "REJECTED", status: "INACTIVE", reviewedBy: adminId, reviewedAt: new Date(), reviewNote: reason }
+    })
     revalidatePath("/admin")
   }
   async function assignExpert(formData: FormData) {
@@ -124,19 +133,30 @@ export default async function AdminPage() {
       <Section title={`专家资质审核（${pendingExperts.length} 位待审）`} mb={20}>
         {pendingExperts.length === 0 && <Empty>暂无待审核专家</Empty>}
         {pendingExperts.map(e => (
-          <div key={e.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: 12, borderBottom: "0.5px solid #f1efe8", fontSize: 13 }}>
-            <div>
-              <div style={{ fontWeight: 500 }}>{e.title}</div>
-              <div style={{ fontSize: 12, color: "#888" }}>{e.org} · {e.region} · 从业{e.years}年</div>
-              <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>擅长：{e.tags}</div>
-            </div>
-            <div style={{ marginLeft: "auto", display: "flex", gap: 6 }}>
-              <form action={approveExpert}><input type="hidden" name="id" value={e.id} />
-                <button type="submit" style={{ padding: "5px 12px", background: "#0F6E56", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>通过</button>
-              </form>
-              <form action={rejectExpert}><input type="hidden" name="id" value={e.id} />
-                <button type="submit" style={{ padding: "5px 12px", background: "#FCEBEB", color: "#A32D2D", border: "0.5px solid #f4b8b8", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>驳回</button>
-              </form>
+          <div key={e.id} style={{ padding: 12, borderBottom: "0.5px solid #f1efe8", fontSize: 13 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 4 }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 500 }}>{e.realName} — {e.title}</div>
+                <div style={{ fontSize: 12, color: "#888" }}>{e.org} · {e.region} · 从业{e.years}年</div>
+                <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{e.industry1} / {e.industry2} · {e.tags}</div>
+                {(e.idCardUrl || e.badgeUrl) && (
+                  <div style={{ fontSize: 11, color: "#185FA5", marginTop: 4 }}>
+                    {e.idCardUrl && <span>📄身份证 </span>}
+                    {e.badgeUrl && <span>🪪工牌 </span>}
+                    {e.employmentProofUrl && <span>📋任职证明 </span>}
+                  </div>
+                )}
+              </div>
+              <div style={{ display: "flex", gap: 4, flexDirection: "column", alignItems: "flex-end" }}>
+                <form action={approveExpert}><input type="hidden" name="id" value={e.id} />
+                  <button type="submit" style={{ padding: "5px 14px", background: "#0F6E56", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer", width: 80 }}>✅ 通过</button>
+                </form>
+                <form action={rejectExpert} style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                  <input type="hidden" name="id" value={e.id} />
+                  <input type="text" name="reason" placeholder="理由" style={{ width: 80, padding: "4px 6px", border: "0.5px solid #d0cec6", borderRadius: 4, fontSize: 11 }} />
+                  <button type="submit" style={{ padding: "5px 10px", background: "#FCEBEB", color: "#A32D2D", border: "0.5px solid #f4b8b8", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>❌ 驳回</button>
+                </form>
+              </div>
             </div>
           </div>
         ))}
