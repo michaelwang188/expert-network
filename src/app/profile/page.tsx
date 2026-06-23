@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import ProfileEditor from "./ProfileEditor"
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions)
@@ -78,6 +79,8 @@ export default async function ProfilePage() {
           </div>
         )}
       </div>
+
+      <ProfileEditor user={{ name: user?.name ?? null, orgName: user?.orgName ?? null, title: user?.title ?? null }} />
 
       {/* 最近订单 */}
       <RecentOrders userId={userId} role={role} />
