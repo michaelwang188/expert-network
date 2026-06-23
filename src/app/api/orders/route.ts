@@ -206,5 +206,46 @@ export async function PATCH(req: Request) {
       completedAt: status === "DONE" ? new Date() : undefined,
     },
   })
+
+  // 🔔 通知：状态变更时给相关人员发站内通知
+  try {
+    const notificationType = status === "ACTIVE" ? "ORDER_ASSIGNED"
+      : status === "DONE" ? "ORDER_COMPLETED"
+      : status === "CANCELLED" ? "ORDER_CANCELLED"
+      : null
+
+    if (notificationType) {
+      // 通知接收方：ACTIVE通知专家，DONE/CANCELLED通知研究员
+      const notifyUserId = status === "ACTIVE" ? existing.expert?.user?.id
+        : existing.researcherId
+
+      if (notifyUserId) {
+        const titleMap: Record<string, string> = {
+          ORDER_ASSIGNED: "新订单指派",
+          ORDER_COMPLETED: "订单已完成",
+          ORDER_CANCELLED: "订单已取消",
+        }
+        const msgMap: Record<string, string> = {
+          ORDER_ASSIGNED: `您有一个新订单 (#${orderId.slice(-6)}) 已指派给您，请确认接单`,
+          ORDER_COMPLETED: `订单 (#${orderId.slice(-6)}) 已完成，请等待管理员结算确认`,
+          ORDER_CANCELLED: `订单 (#${orderId.slice(-6)}) 已被取消`,
+        }
+
+        await prisma.notification.create({
+          data: {
+            userId: notifyUserId,
+            type: notificationType,
+            title: titleMap[notificationType],
+            message: msgMap[notificationType],
+            refId: orderId,
+          },
+        })
+      }
+    }
+  } catch (e) {
+    // 通知创建失败不影响订单状态变更
+    console.error("通知创建失败:", (e as Error).message)
+  }
+
   return NextResponse.json(order)
 }
