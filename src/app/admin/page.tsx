@@ -101,6 +101,16 @@ export default async function AdminPage() {
     await prisma.complianceLog.update({ where: { id }, data: { handled: true } })
     revalidatePath("/admin")
   }
+  async function settleEarly(formData: FormData) {
+    "use server"
+    const s = await getServerSession(authOptions)
+    if (!s || (s.user as any).role !== "ADMIN") return
+    const orderId = formData.get("orderId") as string
+    try {
+      await fetch(`https://516380.com/api/orders`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId, status: "PAID" }) })
+    } catch {}
+    revalidatePath("/admin")
+  }
 
   return (
     <div>
@@ -166,7 +176,7 @@ export default async function AdminPage() {
       <Section title="全部订单" mb={20}>
         {allOrders.length === 0 && <Empty>暂无订单</Empty>}
         {allOrders.map(o => (
-          <OrderRow key={o.id} o={o} experts={allExperts} confirmOrder={confirmOrder} />
+          <OrderRow key={o.id} o={o} experts={allExperts} confirmOrder={confirmOrder} settleEarly={settleEarly} />
         ))}
       </Section>
 
@@ -237,7 +247,7 @@ function AssignPanel({ order, experts, assignExpert }: any) {
 }
 
 // ── 订单行 ──
-function OrderRow({ o, experts, confirmOrder }: any) {
+function OrderRow({ o, experts, confirmOrder, settleEarly }: any) {
   const STATUS: Record<string, { label: string; color: string }> = {
     PENDING:   { label: "待专家确认", color: "#BA7517" },
     ACTIVE:    { label: "进行中",     color: "#185FA5" },
@@ -246,17 +256,23 @@ function OrderRow({ o, experts, confirmOrder }: any) {
     CANCELLED: { label: "已取消",     color: "#A32D2D" },
   }
   const s = STATUS[o.status] || { label: o.status, color: "#888" }
+  const settleDate = o.completedAt ? new Date(new Date(o.completedAt).getTime() + 7 * 24 * 60 * 60 * 1000) : null
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, padding: 10, borderBottom: "0.5px solid #f1efe8", fontSize: 13 }}>
       <div style={{ fontFamily: "monospace", fontSize: 12, color: "#888", minWidth: 120 }}>{o.orderNo}</div>
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 500 }}>{o.request?.title || o.orderNo}</div>
         <div style={{ fontSize: 12, color: "#888" }}>专家：{o.expert?.title || "未指派"} · 研究员：{o.researcher?.name}</div>
+        {o.status === "DONE" && settleDate && <div style={{ fontSize: 11, color: "#BA7517", marginTop: 2 }}>预计结算：{settleDate.toLocaleDateString("zh-CN")}</div>}
+        {o.status === "PAID" && o.paidAt && <div style={{ fontSize: 11, color: "#0F6E56", marginTop: 2 }}>已结算：{new Date(o.paidAt).toLocaleDateString("zh-CN")}</div>}
       </div>
       <div style={{ fontWeight: 500, minWidth: 80 }}>{o.amount}积分</div>
       <span style={{ background: s.color + "18", color: s.color, padding: "2px 8px", borderRadius: 10, fontSize: 11, fontWeight: 500, minWidth: 80, textAlign: "center" }}>{s.label}</span>
       {o.status === "PENDING" && o.expertId && (
         <form action={confirmOrder}><input type="hidden" name="orderId" value={o.id} /><button type="submit" style={{ padding: "4px 10px", background: "#0F6E56", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>确认开始</button></form>
+      )}
+      {o.status === "DONE" && (
+        <form action={settleEarly}><input type="hidden" name="orderId" value={o.id} /><button type="submit" style={{ padding: "4px 10px", background: "#185FA5", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>提前结算</button></form>
       )}
     </div>
   )
