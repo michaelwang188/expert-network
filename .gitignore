@@ -46,3 +46,4 @@ tsconfig.tsbuildinfo
 .workbuddy/*.json
 
 # Old backup directories (keep local, dont push)
+deploy_local.sh
