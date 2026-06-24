@@ -18,9 +18,12 @@ model User {
   password    String
   role        Role     @default(RESEARCHER)
   avatar      String?
+  points      Int       @default(0)   // 公益积分余额
   orgName     String?
   title       String?
-  points      Int       @default(0)   // 公益积分余额
+  phone       String?
+  region      String?
+  source      String   @default("user")  // "user"=真实用户, "seed"=演示数据, "migrate"=存量迁移
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -244,4 +247,17 @@ model Notification {
 
   @@index([userId, read])
   @@index([createdAt])
+}
+
+// ===== 密码重置令牌 =====
+model ResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([email, used])
 }

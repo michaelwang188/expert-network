@@ -7,6 +7,7 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+  const [resetLink, setResetLink] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -19,7 +20,12 @@ export default function ForgotPasswordPage() {
         body: JSON.stringify({ email }),
       })
       const data = await res.json()
-      if (res.ok) { setSent(true) } else { setError(data.error || "操作失败") }
+      if (res.ok) {
+        setSent(true)
+        if (data._dev_reset_link) setResetLink(data._dev_reset_link)
+      } else {
+        setError(data.error || "操作失败")
+      }
     } catch { setError("网络错误，请重试") }
     setLoading(false)
   }
@@ -30,8 +36,18 @@ export default function ForgotPasswordPage() {
       {sent ? (
         <div style={{ background: "#EAF3DE", border: "0.5px solid #97C459", borderRadius: 10, padding: 24, textAlign: "center" }}>
           <div style={{ fontSize: 36, marginBottom: 8 }}>📧</div>
-          <p style={{ fontSize: 14, color: "#3B6D11", marginBottom: 16 }}>如果该邮箱已注册，密码已重置为 123456，请登录后修改</p>
-          <Link href="/login" style={{ padding: "8px 24px", background: "#185FA5", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14 }}>返回登录</Link>
+          <p style={{ fontSize: 14, color: "#3B6D11", marginBottom: 16 }}>
+            密码重置链接已发送到您的邮箱，请查收后按照指引重置密码。
+          </p>
+          {resetLink && (
+            <div style={{ marginTop: 8, padding: 10, background: "#fff", borderRadius: 8, fontSize: 12 }}>
+              <p style={{ color: "#888", marginBottom: 4 }}>未收到邮件？点击下方链接直接重置：</p>
+              <a href={resetLink} style={{ color: "#185FA5", wordBreak: "break-all" }}>{resetLink}</a>
+            </div>
+          )}
+          <div style={{ marginTop: 16 }}>
+            <Link href="/login" style={{ padding: "8px 24px", background: "#185FA5", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14, display: "inline-block" }}>返回登录</Link>
+          </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -44,7 +60,7 @@ export default function ForgotPasswordPage() {
           <button type="submit" disabled={loading} style={{
             background: "#185FA5", color: "#fff", border: "none", borderRadius: 8,
             padding: 11, fontSize: 14, fontWeight: 500, cursor: loading ? "not-allowed" : "pointer",
-          }}>{loading ? "发送中..." : "重置密码"}</button>
+          }}>{loading ? "发送中..." : "发送重置链接"}</button>
           <Link href="/login" style={{ textAlign: "center", fontSize: 13, color: "#888" }}>← 返回登录</Link>
         </form>
       )}
