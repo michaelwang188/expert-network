@@ -1,52 +1,42 @@
-# dependencies
-node_modules/
-
-# next.js build output
-.next/
-
-# environment variables
-.env
-.env*.local
 
 # IDE
-.vscode/
-.idea/
-
+# Local runtime state
 # OS
-.DS_Store
-Thumbs.db
-
+# Old backup directories (keep local, dont push)
+# TypeScript build cache
 # debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
+# dependencies
+# environment variables
+# launchd plists (contain API keys)
+# local backups (may contain secrets)
+# next.js build output
 # prisma
-prisma/dev.db
+*.plist
+.DS_Store
+.backups/
+.env
+.env*
+.env*.local
+.idea/
+.next/
+.vercel
+.vscode/
+.workbuddy/
+.workbuddy/*.json
+.workbuddy/*.log
 COLLABORATION_HANDOFF.md
 SESSION_HANDOFF.md
 SSH_PUSH_GUIDE.md
-push-to-github.sh
-push-to-github-fixed.sh
-.vercel
-.env*
-
-# local backups (may contain secrets)
-.backups/
-.workbuddy/
-
-# launchd plists (contain API keys)
-*.plist
-
-# TypeScript build cache
-tsconfig.tsbuildinfo
-
-# Local runtime state
-.workbuddy/*.log
-.workbuddy/*.json
-
-# Old backup directories (keep local, dont push)
+Thumbs.db
 deploy_local.sh
+node_modules/
+npm-debug.log*
+prisma/dev.db
 prisma/package.json
 prisma/seed.mjs
-prisma/dev.db
+push-to-github-fixed.sh
+push-to-github.sh
+src/app/admin/page.tsx.bak
+tsconfig.tsbuildinfo
+yarn-debug.log*
+yarn-error.log*
