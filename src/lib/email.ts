@@ -92,6 +92,7 @@ export async function sendResetEmail(to: string, resetUrl: string): Promise<bool
         </div>
       `,
     })
+    console.log(`[EMAIL] ✅ 已通过SMTP发送至 ${to}`)
     return true
   } catch (e) {
     console.error(`[EMAIL] 发送失败 (${to}):`, (e as Error).message)
