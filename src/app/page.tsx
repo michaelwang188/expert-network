@@ -2,10 +2,13 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { prisma } from "@/lib/prisma"
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
   if (session) redirect("/dashboard")
+
+  const activeExperts = await prisma.expert.count({ where: { status: "ACTIVE" } })
 
   return (
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #f8f7f4 0%, #eae8e1 100%)" }}>
@@ -28,10 +31,13 @@ export default async function Home() {
         <h1 style={{ fontSize: 36, fontWeight: 600, color: "#2c2c2a", lineHeight: 1.3, margin: "0 0 16px" }}>
           连接研究员与产业链专家<br/>让每一次调研都有价值
         </h1>
-        <p style={{ fontSize: 16, color: "#888", lineHeight: 1.7, margin: "0 0 40px" }}>
+        <p style={{ fontSize: 16, color: "#888", lineHeight: 1.7, margin: "0 0 20px" }}>
           覆盖 AI 算力 · 新能源 · 半导体 · 创新药 · 消费电子等赛道<br/>
-          平台撮合调研需求与行业专家，合规管控 + 积分结算，让产业调研安全高效
+          平台撮合调研需求与行业专家，合规管控 + 积分结算
         </p>
+        <div style={{ fontSize: 15, fontWeight: 500, color: "#185FA5", marginBottom: 28 }}>
+          🎯 平台已有 <strong style={{ fontSize: 20 }}>{activeExperts}</strong> 位行业专家
+        </div>
         <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
           <Link href="/register" style={{ padding: "12px 32px", borderRadius: 10, background: "#0F6E56", color: "#fff", fontSize: 15, fontWeight: 500, textDecoration: "none" }}>
             注册加入
@@ -42,8 +48,23 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* 三步玩法 */}
+      <div style={{ maxWidth: 780, margin: "64px auto 0", padding: "0 20px" }}>
+        <div style={{ fontSize: 18, fontWeight: 600, color: "#2c2c2a", textAlign: "center", marginBottom: 24 }}>
+          🔬 一个好的调研问题，比十个答案都重要
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          <StepCard num="1" title="提交需求" desc="描述调研主题、预算和提纲，平台审核合规" />
+          <StepCard num="2" title="智能匹配" desc="管理员匹配合适的行业专家，安排访谈" />
+          <StepCard num="3" title="访谈完成" desc="专家接单→访谈→积分结算，高效安全" />
+        </div>
+        <div style={{ textAlign: "center", marginTop: 20 }}>
+          <span style={{ fontSize: 13, color: "#888" }}>首次使用无需积分即可发起调研</span>
+        </div>
+      </div>
+
       {/* 30秒理解积分 */}
-      <div style={{ maxWidth: 720, margin: "48px auto 0", padding: "0 20px", textAlign: "center" }}>
+      <div style={{ maxWidth: 720, margin: "64px auto 0", padding: "0 20px", textAlign: "center" }}>
         <div style={{ fontSize: 14, fontWeight: 500, color: "#5F5E5A", marginBottom: 16 }}>平台用积分交易，不用现金</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           <MiniCard emoji="💰" title="研究员" desc="购买积分 → 支付访谈费用" />
@@ -53,23 +74,21 @@ export default async function Home() {
       </div>
 
       {/* Three columns */}
-      <div style={{ maxWidth: 960, margin: "80px auto 0", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, padding: "0 20px 80px" }}>
-        <FeatureCard
-          emoji="🔬"
-          title="研究员"
-          desc="发布产业调研需求，智能匹配行业专家。合规提纲审核，积分支付访谈费用，全流程留痕可追溯。"
-        />
-        <FeatureCard
-          emoji="🧠"
-          title="行业专家"
-          desc="自主定价积分费率，设置可选档期。完成访谈积累积分，参与行业影响力排行榜。"
-        />
-        <FeatureCard
-          emoji="🛡️"
-          title="合规先行"
-          desc="敏感词自动阻断、提纲预审、全程留痕归档。内幕信息零容忍，保障双方合规权益。"
-        />
+      <div style={{ maxWidth: 960, margin: "64px auto 0", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, padding: "0 20px 80px" }}>
+        <FeatureCard emoji="🔬" title="研究员" desc="发布产业调研需求，智能匹配行业专家。合规提纲审核，积分支付访谈费用，全流程留痕可追溯。" />
+        <FeatureCard emoji="🧠" title="行业专家" desc="自主定价积分费率，设置可选档期。完成访谈积累积分，参与行业影响力排行榜。" />
+        <FeatureCard emoji="🛡️" title="合规先行" desc="敏感词自动阻断、提纲预审、全程留痕归档。内幕信息零容忍，保障双方合规权益。" />
       </div>
+    </div>
+  )
+}
+
+function StepCard({ num, title, desc }: { num: string; title: string; desc: string }) {
+  return (
+    <div style={{ textAlign: "center", padding: 16, background: "#fff", borderRadius: 10, border: "0.5px solid #e8e6df" }}>
+      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#185FA5", color: "#fff", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 10px" }}>{num}</div>
+      <div style={{ fontSize: 14, fontWeight: 500, color: "#2c2c2a", marginBottom: 4 }}>{title}</div>
+      <div style={{ fontSize: 12, color: "#888", lineHeight: 1.6 }}>{desc}</div>
     </div>
   )
 }
