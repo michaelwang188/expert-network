@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import crypto from "crypto"
-import { sendResetEmail, isEmailConfigured } from "@/lib/email"
+import { sendResetEmail, sendWelcomeEmail, isEmailConfigured } from "@/lib/email"
 
 export async function POST(req: Request) {
   try {
@@ -11,11 +11,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "请输入有效邮箱" }, { status: 400 })
     }
 
-    // 不泄露用户是否存在（无论是否注册，统一返回成功信息）
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
-      // 关键安全措施：不返回任何区别信息
-      return NextResponse.json({ ok: true, message: "如果该邮箱已注册，将收到重置邮件" })
+      // 未注册邮箱 → 发引导注册邮件
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.get("host") || "516380.com"}`
+      await sendWelcomeEmail(email, baseUrl)
+      return NextResponse.json({ ok: true, message: "该邮箱尚未注册，已发送新用户指引邮件，欢迎加入！" })
     }
 
     // 生成重置令牌

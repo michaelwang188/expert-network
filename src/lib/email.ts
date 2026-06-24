@@ -100,6 +100,49 @@ export async function sendResetEmail(to: string, resetUrl: string): Promise<bool
   }
 }
 
+/**
+ * 发送新用户欢迎注册邮件
+ */
+export async function sendWelcomeEmail(to: string, siteUrl: string): Promise<boolean> {
+  const t = getTransporter()
+  const registerUrl = `${siteUrl}/register`
+
+  if (!t) {
+    console.log(`[EMAIL] 欢迎注册 (收件人: ${to}): ${registerUrl}`)
+    return true
+  }
+
+  try {
+    await t.sendMail({
+      from: smtp.from,
+      to,
+      subject: "欢迎来到产研通ProLink · 注册指引",
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2 style="color: #185FA5;">👋 欢迎来到产研通</h2>
+          <p>您好，</p>
+          <p>您尝试使用此邮箱找回密码，但我们发现该邮箱尚未注册平台账号。</p>
+          <p style="text-align: center; margin: 24px 0;">
+            <a href="${registerUrl}" style="display: inline-block; background: #185FA5; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">立即注册 →</a>
+          </p>
+          <div style="background: #f8f7f4; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 13px; color: #5F5E5A;">
+            <p style="margin: 0 0 8px; font-weight: 500;">产研通为您提供：</p>
+            <p style="margin: 0; line-height: 1.8;">✅ 10,000+ 各行业产业专家<br/>✅ 合规安全的专家访谈对接<br/>✅ 公益积分体系，降低调研成本</p>
+          </div>
+          <p style="font-size: 12px; color: #888;">如果您没有操作过，请忽略此邮件。</p>
+          <hr style="border: none; border-top: 0.5px solid #e0dfd8;" />
+          <p style="font-size: 11px; color: #aaa;">产研通ProLink · 产业专家对接平台</p>
+        </div>
+      `,
+    })
+    console.log(`[EMAIL] ✅ 已发送欢迎邮件至 ${to}`)
+    return true
+  } catch (e) {
+    console.error(`[EMAIL] 发送欢迎邮件失败 (${to}):`, (e as Error).message)
+    return false
+  }
+}
+
 export function isEmailConfigured(): boolean {
   return isConfigured
 }
