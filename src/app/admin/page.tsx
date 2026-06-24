@@ -27,6 +27,7 @@ export default async function AdminPage() {
   // Server Actions — 均含管理员权限二次校验（防CSRF）
   async function approveExpert(formData: FormData) {
     "use server"
+    try {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
@@ -42,6 +43,7 @@ export default async function AdminPage() {
       const after = await tx.user.update({ where: { id: approved.userId }, data: { points: { increment: bonusAmount } }, select: { points: true } })
       await tx.pointsTransaction.create({ data: { userId: approved.userId, amount: bonusAmount, type: "ADMIN_ADJUST", description: "专家审核通过·首单福利积分", refId: id, balance: after.points } })
     })
+    } catch (e: any) { console.error("审批专家失败:", e.message) }
     revalidatePath("/admin")
   }
   async function rejectExpert(formData: FormData) {
@@ -61,6 +63,7 @@ export default async function AdminPage() {
   }
   async function assignExpert(formData: FormData) {
     "use server"
+    try {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const orderId = formData.get("orderId") as string
@@ -92,6 +95,7 @@ export default async function AdminPage() {
         refId: orderId,
       },
     })
+    } catch (e: any) { console.error("派单失败:", e.message) }
     revalidatePath("/admin")
   }
   async function confirmOrder(formData: FormData) {
@@ -121,7 +125,7 @@ export default async function AdminPage() {
     const orderId = formData.get("orderId") as string
     try {
       await fetch(`https://516380.com/api/orders`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId, status: "PAID" }) })
-    } catch {}
+    } catch (e: any) { console.error("提前结算失败:", e.message) }
     revalidatePath("/admin")
   }
 

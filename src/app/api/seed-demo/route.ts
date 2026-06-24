@@ -275,12 +275,21 @@ export async function POST() {
       })
     }
 
+    // ===== 管理员账户 =====
+    const adminExists = await prisma.user.findUnique({ where: { email: "admin@prolink.com" } })
+    if (!adminExists) {
+      await prisma.user.create({
+        data: { email: "admin@prolink.com", name: "平台管理员", password: pw, role: "ADMIN", source: "seed" },
+      })
+    }
+
     return NextResponse.json({
       message: "演示数据填充完成",
       researchers: rUsers.length,
       experts: experts.length,
       requests: reqs.length,
       orders: 10,
+      admin: "admin@prolink.com / 123456",
     })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
