@@ -51,9 +51,7 @@ export default async function ExpertsPage(props: any) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 12 }}>
           {experts.map((e: any) => (
             <Link key={e.id} href={`/experts/${e.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-              <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16, cursor: "pointer", transition: "border-color .15s" }}
-                onMouseEnter={(ev) => (ev.currentTarget.style.borderColor = "#378ADD")}
-                onMouseLeave={(ev) => (ev.currentTarget.style.borderColor = "#e0dfd8")}>
+              <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 10, padding: 16, cursor: "pointer", transition: "border-color .15s" }}>
                 <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
                   <div style={{ width: 42, height: 42, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 500, background: "#E6F1FB", color: "#185FA5", flexShrink: 0 }}>{(e.title || "专")[0]}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
