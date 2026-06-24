@@ -7,8 +7,11 @@ export async function POST() {
   try {
     const pw = await bcrypt.hash("123456", 10)
 
-    // 清理旧seed数据 — 使用source字段，不再枚举邮箱
-    const oldSeedUsers = await prisma.user.findMany({ where: { source: "seed" }, select: { id: true } })
+    // 清理旧seed数据 — 按source="seed" + @demo.com邮箱双重识别
+    const oldSeedUsers = await prisma.user.findMany({
+      where: { OR: [{ source: "seed" }, { email: { contains: "@demo.com" } }] },
+      select: { id: true },
+    })
     const oldIds = oldSeedUsers.map(u => u.id)
     if (oldIds.length > 0) {
       await prisma.order.deleteMany({ where: { researcherId: { in: oldIds } } })
