@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { isAdmin } from "@/lib/roles"
 import { matchExperts } from "@/lib/matching"
 
 // GET /api/match?requestId=xxx — 获取某需求的专家推荐（仅研究员+管理员）
@@ -9,7 +10,7 @@ export async function GET(req: Request) {
   if (!session) return NextResponse.json({ error: "未登录" }, { status: 401 })
 
   const role = (session.user as any).role
-  if (role !== "RESEARCHER" && role !== "ADMIN") {
+  if (role !== "RESEARCHER" && !isAdmin(role)) {
     return NextResponse.json({ error: "无权限" }, { status: 403 })
   }
 

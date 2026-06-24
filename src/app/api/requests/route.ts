@@ -2,11 +2,12 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { isAdmin } from "@/lib/roles"
 
 // GET — 管理员查看所有需求（需登录+管理员权限）
 export async function GET() {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") {
+  if (!session || !isAdmin((session.user as any).role)) {
     return NextResponse.json({ error: "无权限" }, { status: 403 })
   }
   const requests = await prisma.request.findMany({
@@ -131,7 +132,7 @@ export async function POST(req: Request) {
 // PATCH — 管理员修改需求状态（需登录+管理员权限）
 export async function PATCH(req: Request) {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") {
+  if (!session || !isAdmin((session.user as any).role)) {
     return NextResponse.json({ error: "无权限" }, { status: 403 })
   }
   const { requestId, status } = await req.json()

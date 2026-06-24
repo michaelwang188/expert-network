@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { isAdmin } from "@/lib/roles"
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING: { label: "待确认", color: "#BA7517" }, ACTIVE: { label: "进行中", color: "#185FA5" },
@@ -11,7 +12,7 @@ const STATUS_MAP: Record<string, { label: string; color: string }> = {
 
 export default async function AdminOrdersPage() {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
+  if (!session || !isAdmin((session.user as any).role)) redirect("/dashboard")
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: "desc" }, include: { researcher: { select: { name: true } }, expert: { select: { title: true, org: true } } },
   })

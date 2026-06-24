@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { isSuperAdmin } from "@/lib/roles"
 import { exec } from "child_process"
 
 const DEPLOY_KEY = "prolink-deploy-2026"
@@ -17,7 +18,7 @@ async function run(cmd: string): Promise<string> {
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
   const deployKey = req.headers.get("x-deploy-key")
-  const isAdmin = session && (session.user as any).role === "ADMIN"
+  const isAdmin = session && isSuperAdmin((session.user as any).role)
   const isWebhook = deployKey === DEPLOY_KEY
 
   if (!isAdmin && !isWebhook) {

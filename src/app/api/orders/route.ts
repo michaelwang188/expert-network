@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { isAdmin } from "@/lib/roles"
 
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions)
@@ -83,8 +84,8 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "无权限执行此操作" }, { status: 403 })
     }
   }
-  // ADMIN 不受角色限制，但需遵守状态机
-  if (role !== "ADMIN") {
+  // 管理员不受角色限制，但需遵守状态机
+  if (!isAdmin(role)) {
     // 非管理员：状态机保护
     const allowedTransitions: Record<string, string[]> = {
       PENDING: ["ACTIVE", "CANCELLED"],
@@ -102,7 +103,7 @@ export async function PATCH(req: Request) {
   }
 
   // 管理员状态机：防止非法跳转
-  if (role === "ADMIN") {
+  if (isAdmin(role)) {
     const terminalStates = ["PAID", "CANCELLED"]
     if (terminalStates.includes(existing.status)) {
       return NextResponse.json({ error: "已终结订单不可变更" }, { status: 409 })

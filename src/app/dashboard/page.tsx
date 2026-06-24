@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { isAdmin } from "@/lib/roles"
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -14,7 +15,7 @@ export default async function DashboardPage() {
     <div>
       {role === "RESEARCHER" && <ResearcherDashboard userId={userId} />}
       {role === "EXPERT" && <ExpertDashboard userId={userId} />}
-      {role === "ADMIN" && <AdminDashboard />}
+      {isAdmin(role) && <AdminDashboard />}
     </div>
   )
 }

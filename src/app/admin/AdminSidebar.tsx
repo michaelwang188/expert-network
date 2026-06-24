@@ -2,18 +2,27 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-
-const LINKS = [
-  { href: "/admin", label: "总览", emoji: "📊" },
-  { href: "/admin/experts", label: "专家管理", emoji: "👥" },
-  { href: "/admin/orders", label: "订单管理", emoji: "📋" },
-  { href: "/admin/users", label: "用户管理", emoji: "👤" },
-  { href: "/admin/review", label: "提纲审核", emoji: "🔍" },
-  { href: "/admin/audit", label: "合规日志", emoji: "🛡️" },
-]
+import { useSession } from "next-auth/react"
+import { isSuperAdmin } from "@/lib/roles"
 
 export default function AdminSidebar() {
+  const { data: session } = useSession()
+  const role = (session?.user as any)?.role
   const pathname = usePathname()
+
+  const LINKS = [
+    { href: "/admin", label: "总览", emoji: "📊" },
+    { href: "/admin/experts", label: "专家管理", emoji: "👥" },
+    { href: "/admin/orders", label: "订单管理", emoji: "📋" },
+  ]
+  // 用户管理仅超级管理员可见
+  if (isSuperAdmin(role)) {
+    LINKS.push({ href: "/admin/users", label: "用户管理", emoji: "👤" })
+  }
+  LINKS.push(
+    { href: "/admin/review", label: "提纲审核", emoji: "🔍" },
+    { href: "/admin/audit", label: "合规日志", emoji: "🛡️" },
+  )
 
   return (
     <nav style={{

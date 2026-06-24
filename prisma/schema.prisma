@@ -38,6 +38,7 @@ enum Role {
   RESEARCHER
   EXPERT
   ADMIN
+  SUPER_ADMIN
 }
 
 // ===== 专家档案 =====

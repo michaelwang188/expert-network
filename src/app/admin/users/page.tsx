@@ -3,14 +3,15 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { isSuperAdmin } from "@/lib/roles"
 
 const ROLE_LABELS: Record<string, { label: string; color: string }> = {
-  RESEARCHER: { label: "研究员", color: "#185FA5" }, EXPERT: { label: "专家", color: "#0F6E56" }, ADMIN: { label: "管理员", color: "#A32D2D" },
+  RESEARCHER: { label: "研究员", color: "#185FA5" }, EXPERT: { label: "专家", color: "#0F6E56" }, ADMIN: { label: "管理员", color: "#A32D2D" }, SUPER_ADMIN: { label: "超级管理员", color: "#8B0000" },
 }
 
 export default async function AdminUsersPage() {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
+  if (!session || !isSuperAdmin((session.user as any).role)) redirect("/dashboard")
   const users = await prisma.user.findMany({ orderBy: { createdAt: "desc" }, select: { id: true, name: true, email: true, role: true, orgName: true, points: true, createdAt: true } })
   return (
     <div>

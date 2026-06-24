@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { isAdmin, ROLE_LABEL } from "@/lib/roles"
 import ProfileEditor from "./ProfileEditor"
 
 export default async function ProfilePage() {
@@ -35,7 +36,7 @@ export default async function ProfilePage() {
     }
   }
 
-  const ROLE_LABELS: Record<string, string> = { RESEARCHER: "研究员", EXPERT: "专家", ADMIN: "管理员" }
+  const ROLE_LABELS: Record<string, string> = { RESEARCHER: "研究员", EXPERT: "专家", ADMIN: "管理员", SUPER_ADMIN: "超级管理员" }
 
   return (
     <div style={{ maxWidth: 680 }}>
@@ -50,7 +51,7 @@ export default async function ProfilePage() {
             <div style={{ fontSize: 16, fontWeight: 500 }}>{user?.name || "未设置姓名"}</div>
             <div style={{ fontSize: 13, color: "#888" }}>{user?.email}</div>
           </div>
-          <span style={{ marginLeft: "auto", background: "#E6F1FB", color: "#185FA5", padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 500 }}>
+          <span style={{ marginLeft: "auto", background: (ROLE_LABEL[role]?.bg || "#E6F1FB"), color: (ROLE_LABEL[role]?.color || "#185FA5"), padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 500 }}>
             {ROLE_LABELS[role] || role}
           </span>
         </div>
@@ -105,7 +106,7 @@ async function RecentOrders({ userId, role }: { userId: string; role: string }) 
     if (expert) where.expertId = expert.id
     else return null
   }
-  if (role === "ADMIN") return null
+  if (isAdmin(role)) return null
 
   const orders = await prisma.order.findMany({
     where,

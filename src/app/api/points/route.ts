@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { isAdmin } from "@/lib/roles"
 
 // GET — 积分余额 + 排行榜（排行榜公开，余额需登录）
 export async function GET(req: Request) {
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
     // 管理员可以查任意用户的交易记录
     const targetUserId = searchParams.get("userId")
     const role = (session.user as any).role
-    const queryUserId = (role === "ADMIN" && targetUserId) ? targetUserId : userId
+    const queryUserId = (isAdmin(role) && targetUserId) ? targetUserId : userId
     const txs = await prisma.pointsTransaction.findMany({
       where: { userId: queryUserId },
       orderBy: { createdAt: "desc" },

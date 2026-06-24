@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, useEffect } from "react"
+import { isAdmin, ROLE_LABEL } from "@/lib/roles"
 
 const navItems: { href: string; label: string; roles: string[] }[] = [
   { href: "/dashboard", label: "数据看板", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
@@ -13,8 +14,8 @@ const navItems: { href: string; label: string; roles: string[] }[] = [
   { href: "/orders", label: "订单管理", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/notifications", label: "通知", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
   { href: "/leaderboard", label: "积分排行", roles: ["RESEARCHER", "EXPERT", "ADMIN"] },
-  { href: "/compliance", label: "合规中心", roles: ["ADMIN"] },
-  { href: "/admin", label: "平台管理", roles: ["ADMIN"] },
+  { href: "/compliance", label: "合规中心", roles: ["ADMIN", "SUPER_ADMIN"] },
+  { href: "/admin", label: "平台管理", roles: ["ADMIN", "SUPER_ADMIN"] },
 ]
 
 export default function Nav() {
@@ -82,8 +83,8 @@ export default function Nav() {
           <Link href="/profile" style={{ color: "#185FA5", textDecoration: "none", fontSize: 13, whiteSpace: "nowrap" }}>
             {session.user?.name || session.user?.email}
           </Link>
-          <span style={{ background: role === "ADMIN" ? "#FCEBEB" : role === "EXPERT" ? "#E1F5EE" : "#E6F1FB", color: role === "ADMIN" ? "#A32D2D" : role === "EXPERT" ? "#0F6E56" : "#185FA5", padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500, whiteSpace: "nowrap" }}>
-            {role === "ADMIN" ? "管理员" : role === "EXPERT" ? "专家" : "研究员"}
+          <span style={{ background: (ROLE_LABEL[role]?.bg || "#E6F1FB"), color: (ROLE_LABEL[role]?.color || "#185FA5"), padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500, whiteSpace: "nowrap" }}>
+            {ROLE_LABEL[role]?.label || role}
           </span>
           <button onClick={() => signOut()} style={{ background: "none", border: "0.5px solid #e0dfd8", borderRadius: 8, padding: "4px 10px", cursor: "pointer", fontSize: 12, color: "#5F5E5A", whiteSpace: "nowrap" }}>退出</button>
 

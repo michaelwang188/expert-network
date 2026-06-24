@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useSession } from "next-auth/react"
+import { isAdmin } from "@/lib/roles"
 
 const STATUS_MAP: Record<string, { label: string; color: string }> = {
   PENDING:   { label: "待确认", color: "#BA7517" },
@@ -124,7 +125,7 @@ export default function OrdersClient({ initialOrders, role }: { initialOrders: a
                     {o.status === "ACTIVE" && (
                       <button onClick={() => handleAction(o.id, "DONE")} style={{ padding: "4px 10px", background: "#0F6E56", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>标记完成</button>
                     )}
-                    {o.status === "DONE" && role === "ADMIN" && (
+                    {o.status === "DONE" && isAdmin(role) && (
                       <button onClick={() => handleAction(o.id, "PAID")} style={{ padding: "4px 10px", background: "#BA7517", color: "#fff", border: "none", borderRadius: 6, fontSize: 12, cursor: "pointer" }}>确认结算</button>
                     )}
                     {["PENDING", "ACTIVE"].includes(o.status) && (

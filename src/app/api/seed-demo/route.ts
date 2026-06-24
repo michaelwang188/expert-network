@@ -282,7 +282,7 @@ export async function POST() {
     const adminExists = await prisma.user.findUnique({ where: { email: "admin@prolink.com" } })
     if (!adminExists) {
       await prisma.user.create({
-        data: { email: "admin@prolink.com", name: "平台管理员", password: pw, role: "ADMIN", source: "seed" },
+        data: { email: "admin@prolink.com", name: "老板(超级管理员)", password: pw, role: "SUPER_ADMIN", source: "seed" },
       })
     }
 

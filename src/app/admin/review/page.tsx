@@ -3,11 +3,12 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import { isAdmin } from "@/lib/roles"
 import ReviewClient from "./ReviewClient"
 
 export default async function AdminReviewPage() {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
+  if (!session || !isAdmin((session.user as any).role)) redirect("/dashboard")
 
   const requests = await prisma.request.findMany({
     orderBy: { createdAt: "desc" },

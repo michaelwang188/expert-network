@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const expert = await prisma.expert.findUnique({ where: { userId: user.id } })
     if (!expert) return NextResponse.json({ error: "创建失败" }, { status: 500 })
 
-    const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } })
+    const admins = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPER_ADMIN"] } }, select: { id: true } })
     for (const admin of admins) {
       await prisma.notification.create({
         data: {

@@ -89,7 +89,7 @@ export async function POST(req: Request) {
       }
     })
     // 通知所有管理员：有新专家待审核
-    const admins = await prisma.user.findMany({ where: { role: "ADMIN" }, select: { id: true } })
+    const admins = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPER_ADMIN"] } }, select: { id: true } })
     for (const admin of admins) {
       await prisma.notification.create({
         data: {

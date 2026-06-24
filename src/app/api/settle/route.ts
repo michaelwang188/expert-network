@@ -2,12 +2,13 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { isAdmin } from "@/lib/roles"
 
 // POST /api/settle — 自动结算已到期的T+7订单（可被cron调用）
 // 规则：DONE 状态且 completedAt + 7天 ≤ now() 的订单自动变PAID
 export async function POST() {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") {
+  if (!session || !isAdmin((session.user as any).role)) {
     return NextResponse.json({ error: "无权限" }, { status: 403 })
   }
   const now = new Date()

@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
+import { isAdmin, isSuperAdmin } from "@/lib/roles"
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
-  if (!session || (session.user as any).role !== "ADMIN") redirect("/dashboard")
+  if (!session || !isAdmin((session.user as any).role)) redirect("/dashboard")
 
   let pendingExperts: any[] = [], allExperts: any[] = [], pendingOrders: any[] = [], allOrders: any[] = [], complianceLogs: any[] = []
   try {
@@ -29,7 +30,7 @@ export default async function AdminPage() {
     "use server"
     try {
     const s = await getServerSession(authOptions)
-    if (!s || (s.user as any).role !== "ADMIN") return
+    if (!s || !isAdmin((s.user as any).role)) return
     const id = formData.get("id") as string
     const adminId = (s.user as any).id
     const approved = await prisma.expert.update({
@@ -50,7 +51,7 @@ export default async function AdminPage() {
     "use server"
     try {
     const s = await getServerSession(authOptions)
-    if (!s || (s.user as any).role !== "ADMIN") return
+    if (!s || !isAdmin((s.user as any).role)) return
     const id = formData.get("id") as string
     const reason = formData.get("reason") as string || "未通过审核"
     const adminId = (s.user as any).id
@@ -65,7 +66,7 @@ export default async function AdminPage() {
     "use server"
     try {
     const s = await getServerSession(authOptions)
-    if (!s || (s.user as any).role !== "ADMIN") return
+    if (!s || !isAdmin((s.user as any).role)) return
     const orderId = formData.get("orderId") as string
     const expertId = formData.get("expertId") as string
     const amount = parseInt(formData.get("amount") as string)
@@ -102,7 +103,7 @@ export default async function AdminPage() {
     "use server"
     try {
     const s = await getServerSession(authOptions)
-    if (!s || (s.user as any).role !== "ADMIN") return
+    if (!s || !isAdmin((s.user as any).role)) return
     const orderId = formData.get("orderId") as string
     await prisma.order.update({ where: { id: orderId }, data: { status: "ACTIVE", confirmedAt: new Date() } })
     } catch (e: any) { console.error("确认订单失败:", e.message) }
@@ -112,7 +113,7 @@ export default async function AdminPage() {
     "use server"
     try {
     const s = await getServerSession(authOptions)
-    if (!s || (s.user as any).role !== "ADMIN") return
+    if (!s || !isAdmin((s.user as any).role)) return
     const id = formData.get("id") as string
     await prisma.complianceLog.update({ where: { id }, data: { handled: true } })
     } catch (e: any) { console.error("合规处理失败:", e.message) }
@@ -121,7 +122,7 @@ export default async function AdminPage() {
   async function settleEarly(formData: FormData) {
     "use server"
     const s = await getServerSession(authOptions)
-    if (!s || (s.user as any).role !== "ADMIN") return
+    if (!s || !isAdmin((s.user as any).role)) return
     const orderId = formData.get("orderId") as string
     try {
       await fetch(`https://516380.com/api/orders`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId, status: "PAID" }) })
