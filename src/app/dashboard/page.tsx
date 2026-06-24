@@ -33,43 +33,20 @@ async function ResearcherDashboard({ userId }: { userId: string }) {
     <div>
       <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>我的工作台</h2>
 
-      {myRequests === 0 ? null : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
           <StatCard label="账户积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
           <StatCard label="我的调研需求" value={myRequests.toString()} sub="条已提交" />
           <StatCard label="我的订单" value={myOrders.toString()} sub="笔" />
           <StatCard label="可预约专家" value={activeExperts.toString()} sub="位活跃" />
         </div>
-      )}
 
       {myRequests === 0 ? (
-        <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 12, padding: 40 }}>
-          <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ fontSize: 36, marginBottom: 8 }}>🔬</div>
-            <div style={{ fontSize: 17, fontWeight: 600, color: "#2c2c2a", marginBottom: 4 }}>
-              {user?.name || "研究员"}，欢迎
-            </div>
-            <div style={{ fontSize: 14, color: "#5F5E5A", marginBottom: 14 }}>
-              一个好的调研问题，比十个答案都重要
-            </div>
-            <div style={{ fontSize: 13, color: "#888", lineHeight: 1.7, maxWidth: 480, margin: "0 auto" }}>
-              平台已有 <strong style={{ color: "#185FA5" }}>{activeExperts}</strong> 位行业专家。首次使用无需积分即可发起调研
-            </div>
+        <>
+          <div style={{ background: "#E6F1FB", border: "0.5px solid #b8d4f4", borderRadius: 10, padding: 12, marginBottom: 16, fontSize: 13, color: "#185FA5", textAlign: "center" }}>
+            🔬 首次使用？<Link href="/request" style={{ fontWeight: 500 }}>发起调研需求</Link>，即可与行业专家对接
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>
-            <StepCard num="1" title="提交需求" desc="描述调研主题、预算和提纲" />
-            <StepCard num="2" title="平台匹配" desc="管理员匹配最适合的专家" />
-            <StepCard num="3" title="访谈完成" desc="专家接单→访谈→结算积分" />
-          </div>
-          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-            <Link href="/request" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, background: "#185FA5", color: "#fff", fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
-              发起调研需求
-            </Link>
-            <Link href="/experts" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, border: "0.5px solid #d0cec6", color: "#5F5E5A", fontSize: 14, textDecoration: "none" }}>
-              先看看专家
-            </Link>
-          </div>
-        </div>
+          <QuickLinks />
+        </>
       ) : (
         <QuickLinks />
       )}
@@ -181,16 +158,6 @@ async function AdminDashboard() {
 }
 
 // ─── 通用 ─────────────────────────────────────────
-function StepCard({ num, title, desc }: { num: string; title: string; desc: string }) {
-  return (
-    <div style={{ textAlign: "center", padding: 12, background: "#f8f7f4", borderRadius: 8 }}>
-      <div style={{ width: 24, height: 24, borderRadius: "50%", background: "#185FA5", color: "#fff", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 6px" }}>{num}</div>
-      <div style={{ fontSize: 13, fontWeight: 500, marginBottom: 2 }}>{title}</div>
-      <div style={{ fontSize: 11, color: "#888", lineHeight: 1.4 }}>{desc}</div>
-    </div>
-  )
-}
-
 function QuickLinks() {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
