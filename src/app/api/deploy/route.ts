@@ -25,7 +25,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const out = await run('cd /opt/prolink && git pull && npx prisma generate && rm -rf .next && npm run build 2>&1 | tail -5 && pm2 restart prolink')
+    const out = await run('cd /opt/prolink && git pull && npx prisma generate && npx prisma db push && rm -rf .next && npm run build 2>&1 | tail -5 && pm2 restart prolink')
     return NextResponse.json({ ok: true, output: out })
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: String(e) }, { status: 500 })
