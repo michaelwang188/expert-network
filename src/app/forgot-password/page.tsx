@@ -7,12 +7,15 @@ export default function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const [resetLink, setResetLink] = useState("")
+  const [devLink, setDevLink] = useState("")
+  const [devLoading, setDevLoading] = useState(false)
+  const [devError, setDevError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError("")
+    setDevLink("")
     try {
       const res = await fetch("/api/forgot-password", {
         method: "POST",
@@ -22,12 +25,26 @@ export default function ForgotPasswordPage() {
       const data = await res.json()
       if (res.ok) {
         setSent(true)
-        if (data._dev_reset_link) setResetLink(data._dev_reset_link)
       } else {
         setError(data.error || "操作失败")
       }
     } catch { setError("网络错误，请重试") }
     setLoading(false)
+  }
+
+  const fetchDevLink = async () => {
+    setDevLoading(true)
+    setDevError("")
+    try {
+      const res = await fetch(`/api/forgot-password/dev-link?email=${encodeURIComponent(email)}`)
+      const data = await res.json()
+      if (res.ok) {
+        setDevLink(data.resetLink)
+      } else {
+        setDevError(data.error || "获取失败")
+      }
+    } catch { setDevError("网络错误") }
+    setDevLoading(false)
   }
 
   return (
@@ -39,12 +56,30 @@ export default function ForgotPasswordPage() {
           <p style={{ fontSize: 14, color: "#3B6D11", marginBottom: 16 }}>
             密码重置链接已发送到您的邮箱，请查收后按照指引重置密码。
           </p>
-          {resetLink && (
-            <div style={{ marginTop: 8, padding: 10, background: "#fff", borderRadius: 8, fontSize: 12 }}>
-              <p style={{ color: "#888", marginBottom: 4 }}>未收到邮件？点击下方链接直接重置：</p>
-              <a href={resetLink} style={{ color: "#185FA5", wordBreak: "break-all" }}>{resetLink}</a>
+          <p style={{ fontSize: 12, color: "#888", marginBottom: 16 }}>
+            如未收到邮件，请检查垃圾邮件箱。
+          </p>
+          {/* 测试环境调试工具 — 仅限seed邮箱可点击 */}
+          <details style={{ marginTop: 12, textAlign: "left", fontSize: 12, color: "#888" }}>
+            <summary style={{ cursor: "pointer", color: "#aaa", fontSize: 11 }}>测试环境调试</summary>
+            <div style={{ marginTop: 8, padding: 10, background: "#fff", borderRadius: 8 }}>
+              <p style={{ color: "#888", marginBottom: 6 }}>点击按钮获取重置链接（仅限测试账号）：</p>
+              <button
+                onClick={fetchDevLink}
+                disabled={devLoading}
+                style={{
+                  padding: "6px 14px", background: devLoading ? "#ccc" : "#185FA5", color: "#fff",
+                  border: "none", borderRadius: 6, fontSize: 12, cursor: devLoading ? "not-allowed" : "pointer",
+                }}
+              >{devLoading ? "获取中..." : "获取测试重置链接"}</button>
+              {devLink && (
+                <div style={{ marginTop: 8 }}>
+                  <a href={devLink} style={{ color: "#185FA5", wordBreak: "break-all", fontSize: 11 }}>{devLink}</a>
+                </div>
+              )}
+              {devError && <p style={{ color: "#A32D2D", marginTop: 6, fontSize: 11 }}>{devError}</p>}
             </div>
-          )}
+          </details>
           <div style={{ marginTop: 16 }}>
             <Link href="/login" style={{ padding: "8px 24px", background: "#185FA5", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14, display: "inline-block" }}>返回登录</Link>
           </div>

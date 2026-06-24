@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { isAdmin } from "@/lib/roles"
 
 export default async function ExpertDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -78,7 +79,7 @@ export default async function ExpertDetailPage({ params }: { params: Promise<{ i
           🔒 联系方式：<strong>已加密 | 订单确认后可见</strong>
         </div>
 
-        {(session.user as any).role === "RESEARCHER" && (
+        {(isAdmin((session.user as any).role) || (session.user as any).role === "RESEARCHER") && (
           <Link href={`/request?expertId=${expert.id}`} style={{
             display:"inline-block", background:"#185FA5", color:"#fff", textDecoration:"none",
             padding:"10px 20px", borderRadius:8, fontSize:14, fontWeight:500,

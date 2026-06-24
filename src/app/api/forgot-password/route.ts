@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import crypto from "crypto"
+import { sendResetEmail, isEmailConfigured } from "@/lib/email"
 
 export async function POST(req: Request) {
   try {
@@ -10,9 +11,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "请输入有效邮箱" }, { status: 400 })
     }
 
+    // 不泄露用户是否存在（无论是否注册，统一返回成功信息）
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) {
-      // 不泄露用户是否存在，但友好测试阶段更透明
+      // 关键安全措施：不返回任何区别信息
       return NextResponse.json({ ok: true, message: "如果该邮箱已注册，将收到重置邮件" })
     }
 
@@ -30,17 +32,23 @@ export async function POST(req: Request) {
       data: { email, token, expiresAt },
     })
 
-    // 友好测试模式：直接返回重置链接（生产环境不返回）
-    const resetUrl = `${process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.get("host") || "516380.com"}`}/reset-password?token=${token}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${req.headers.get("host") || "516380.com"}`
+    const resetUrl = `${baseUrl}/reset-password?token=${token}`
+
+    // 发送邮件（无SMTP时日志输出）
+    await sendResetEmail(email, resetUrl)
+
+    const configured = isEmailConfigured()
 
     return NextResponse.json({
       ok: true,
-      message: "密码重置链接已发送到您的邮箱",
-      // 测试环境下直接返回链接，方便友好测试用户
-      _dev_reset_link: resetUrl,
-      _dev_token: token,
+      message: configured
+        ? "密码重置链接已发送到您的邮箱，请查收"
+        : "密码重置链接已发送到您的邮箱，请查收",
+      // ⚠️ 永不返回token或reset链接给客户端！
     })
   } catch (e: any) {
-    return NextResponse.json({ error: "服务暂时不可用" }, { status: 500 })
+    console.error("[forgot-password]", e.message)
+    return NextResponse.json({ error: "服务暂时不可用，请稍后重试" }, { status: 500 })
   }
 }
