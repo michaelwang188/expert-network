@@ -46,6 +46,7 @@ export default async function AdminPage() {
   }
   async function rejectExpert(formData: FormData) {
     "use server"
+    try {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
@@ -55,6 +56,7 @@ export default async function AdminPage() {
       where: { id },
       data: { reviewStatus: "REJECTED", status: "INACTIVE", reviewedBy: adminId, reviewedAt: new Date(), reviewNote: reason }
     })
+    } catch (e: any) { console.error("驳回专家失败:", e.message) }
     revalidatePath("/admin")
   }
   async function assignExpert(formData: FormData) {
@@ -94,18 +96,22 @@ export default async function AdminPage() {
   }
   async function confirmOrder(formData: FormData) {
     "use server"
+    try {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const orderId = formData.get("orderId") as string
     await prisma.order.update({ where: { id: orderId }, data: { status: "ACTIVE", confirmedAt: new Date() } })
+    } catch (e: any) { console.error("确认订单失败:", e.message) }
     revalidatePath("/admin")
   }
   async function handleCompliance(formData: FormData) {
     "use server"
+    try {
     const s = await getServerSession(authOptions)
     if (!s || (s.user as any).role !== "ADMIN") return
     const id = formData.get("id") as string
     await prisma.complianceLog.update({ where: { id }, data: { handled: true } })
+    } catch (e: any) { console.error("合规处理失败:", e.message) }
     revalidatePath("/admin")
   }
   async function settleEarly(formData: FormData) {
