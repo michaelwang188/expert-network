@@ -5,6 +5,11 @@ import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import ExpertFilters from "./ExpertFilters"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "专家库",
+}
 
 export default async function ExpertsPage(props: any) {
   const searchParams = props.searchParams || {}

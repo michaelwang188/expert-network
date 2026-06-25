@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "平台管理",
+}
 import { isAdmin, isSuperAdmin } from "@/lib/roles"
 
 export default async function AdminPage() {

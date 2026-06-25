@@ -2,6 +2,12 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "连接研究员与产业链专家",
+  description: "产研通 ProLink — 产业专家调研对接平台。覆盖 AI 算力·新能源·半导体·创新药·消费电子，合规管控 + 积分结算。",
+}
 import { prisma } from "@/lib/prisma"
 
 export default async function Home() {

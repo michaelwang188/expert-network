@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import OrdersClient from "./OrdersClient"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "订单管理",
+}
 
 export default async function OrdersPage() {
   const session = await getServerSession(authOptions)

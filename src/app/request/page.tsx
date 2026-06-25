@@ -3,6 +3,11 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import RequestClient from "./RequestClient"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "发起调研",
+}
 
 export default async function RequestPage() {
   const session = await getServerSession(authOptions)

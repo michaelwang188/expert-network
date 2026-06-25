@@ -2,6 +2,11 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { redirect } from "next/navigation"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "个人中心",
+}
 import { isAdmin, ROLE_LABEL } from "@/lib/roles"
 import ProfileEditor from "./ProfileEditor"
 
