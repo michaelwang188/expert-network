@@ -23,6 +23,7 @@ model User {
   title       String?
   phone       String?
   region      String?
+  sponsorTier String?                     // 赞助人等级: "CO_FOUNDER", "CO_SPONSOR", null
   source      String   @default("user")  // "user"=真实用户, "seed"=演示数据, "migrate"=存量迁移
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -37,6 +38,7 @@ model User {
 enum Role {
   RESEARCHER
   EXPERT
+  INVESTOR
   ADMIN
   SUPER_ADMIN
 }
@@ -231,6 +233,7 @@ enum PointType {
   EARN_LABOR    // 劳动贡献获得（专家完成访谈）
   EARN_CASH     // 现金兑换获得（研究员购买积分）
   SPEND_ORDER   // 订单支出（研究员支付访谈费用）
+  WELCOME_BONUS // 注册欢迎积分（200分）
   ADMIN_ADJUST  // 管理员调整
 }
 

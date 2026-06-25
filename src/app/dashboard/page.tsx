@@ -20,6 +20,7 @@ export default async function DashboardPage() {
     <div>
       {role === "RESEARCHER" && <ResearcherDashboard userId={userId} />}
       {role === "EXPERT" && <ExpertDashboard userId={userId} />}
+      {role === "INVESTOR" && <InvestorDashboard userId={userId} />}
       {isAdmin(role) && <AdminDashboard />}
     </div>
   )
@@ -144,6 +145,46 @@ async function ExpertDashboard({ userId }: { userId: string }) {
       ) : (
         <QuickLinks />
       )}
+    </div>
+  )
+}
+
+// ─── 投资人 Dashboard ─────────────────────────────
+async function InvestorDashboard({ userId }: { userId: string }) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { points: true, name: true } })
+  const activeExperts = await prisma.expert.count({ where: { status: "ACTIVE" } })
+
+  return (
+    <div>
+      <h2 style={{ fontSize: 16, fontWeight: 500, marginBottom: 20 }}>投资工作台</h2>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12, marginBottom: 20 }}>
+        <StatCard label="账户积分余额" value={user?.points?.toLocaleString() || "0"} sub="积分" />
+        <StatCard label="平台活跃专家" value={activeExperts.toString()} sub="位可预约" />
+      </div>
+
+      <div style={{ background: "#fff", border: "0.5px solid #e0dfd8", borderRadius: 12, padding: 32, marginBottom: 20 }}>
+        <div style={{ textAlign: "center", marginBottom: 20 }}>
+          <div style={{ fontSize: 36, marginBottom: 8 }}>📊</div>
+          <div style={{ fontSize: 15, fontWeight: 500, color: "#2c2c2a", marginBottom: 4 }}>
+            {user?.name || "投资人"}，欢迎你
+          </div>
+          <div style={{ fontSize: 13, color: "#888", lineHeight: 1.7, maxWidth: 480, margin: "0 auto" }}>
+            平台有 <strong style={{ color: "#185FA5" }}>{activeExperts}</strong> 位行业专家。
+            浏览专家库了解各赛道专家资源，也可关注积分排行榜了解社区活跃度。
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+          <Link href="/experts" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, background: "#185FA5", color: "#fff", fontSize: 14, fontWeight: 500, textDecoration: "none" }}>
+            浏览专家库
+          </Link>
+          <Link href="/leaderboard" style={{ display: "inline-block", padding: "10px 28px", borderRadius: 8, border: "0.5px solid #d0cec6", color: "#5F5E5A", fontSize: 14, textDecoration: "none" }}>
+            积分排行榜
+          </Link>
+        </div>
+      </div>
+
+      <QuickLinks />
     </div>
   )
 }

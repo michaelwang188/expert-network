@@ -79,6 +79,7 @@ export default function RegisterPage() {
           <select value={role} onChange={e => setRole(e.target.value)} style={inputStyle}>
             <option value="RESEARCHER">研究员（公募/私募/券商/PEVC）</option>
             <option value="EXPERT">专家（产业从业者）</option>
+            <option value="INVESTOR">投资人/投资机构</option>
           </select>
           <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>管理员账号由平台分配，如需开通请联系客服</div>
         </div>

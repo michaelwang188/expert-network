@@ -7,13 +7,13 @@ import { useState, useEffect } from "react"
 import { isAdmin, ROLE_LABEL } from "@/lib/roles"
 
 const navItems: { href: string; label: string; roles: string[] }[] = [
-  { href: "/dashboard", label: "数据看板", roles: ["RESEARCHER", "EXPERT", "ADMIN", "SUPER_ADMIN"] },
-  { href: "/experts", label: "专家库", roles: ["RESEARCHER", "ADMIN", "SUPER_ADMIN"] },
+  { href: "/dashboard", label: "数据看板", roles: ["RESEARCHER", "EXPERT", "INVESTOR", "ADMIN", "SUPER_ADMIN"] },
+  { href: "/experts", label: "专家库", roles: ["RESEARCHER", "INVESTOR", "ADMIN", "SUPER_ADMIN"] },
   { href: "/experts/edit", label: "我的资料", roles: ["EXPERT"] },
   { href: "/request", label: "发起调研", roles: ["RESEARCHER"] },
-  { href: "/orders", label: "订单管理", roles: ["RESEARCHER", "EXPERT", "ADMIN", "SUPER_ADMIN"] },
-  { href: "/notifications", label: "通知", roles: ["RESEARCHER", "EXPERT", "ADMIN", "SUPER_ADMIN"] },
-  { href: "/leaderboard", label: "积分排行", roles: ["RESEARCHER", "EXPERT", "ADMIN", "SUPER_ADMIN"] },
+  { href: "/orders", label: "订单管理", roles: ["RESEARCHER", "EXPERT", "INVESTOR", "ADMIN", "SUPER_ADMIN"] },
+  { href: "/notifications", label: "通知", roles: ["RESEARCHER", "EXPERT", "INVESTOR", "ADMIN", "SUPER_ADMIN"] },
+  { href: "/leaderboard", label: "积分排行", roles: ["RESEARCHER", "EXPERT", "INVESTOR", "ADMIN", "SUPER_ADMIN"] },
   { href: "/compliance", label: "合规中心", roles: ["ADMIN", "SUPER_ADMIN"] },
   { href: "/admin", label: "平台管理", roles: ["ADMIN", "SUPER_ADMIN"] },
 ]

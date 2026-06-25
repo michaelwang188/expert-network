@@ -49,8 +49,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "邮箱地址过长" }, { status: 400 })
   }
 
-  // 安全限制：只允许注册 RESEARCHER 或 EXPERT，禁止注册 ADMIN
-  const safeRole = role === "EXPERT" ? "EXPERT" : "RESEARCHER"
+  // 安全限制：只允许注册 RESEARCHER、EXPERT、INVESTOR，禁止注册 ADMIN
+  const ALLOWED_ROLES = ["EXPERT", "INVESTOR"]
+  const safeRole = ALLOWED_ROLES.includes(role) ? role : "RESEARCHER"
 
   const exists = await prisma.user.findUnique({ where: { email } })
   if (exists) {
@@ -65,6 +66,36 @@ export async function POST(req: Request) {
       name,
       orgName,
       role: safeRole,
+    },
+  })
+
+  // 注册欢迎积分：所有新用户统一赠送 200 公益积分
+  const WELCOME_POINTS = 200
+  await prisma.$transaction(async (tx) => {
+    const after = await tx.user.update({
+      where: { id: user.id },
+      data: { points: { increment: WELCOME_POINTS } },
+      select: { points: true },
+    })
+    await tx.pointsTransaction.create({
+      data: {
+        userId: user.id,
+        amount: WELCOME_POINTS,
+        type: "WELCOME_BONUS",
+        description: "注册欢迎积分",
+        refId: user.id,
+        balance: after.points,
+      },
+    })
+  })
+  // 发送欢迎通知
+  await prisma.notification.create({
+    data: {
+      userId: user.id,
+      type: "WELCOME_BONUS",
+      title: "欢迎加入产研通",
+      message: `恭喜您成功注册！已为您赠送 ${WELCOME_POINTS} 公益积分，可用于发起调研或参加调研会议。`,
+      refId: user.id,
     },
   })
 

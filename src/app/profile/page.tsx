@@ -7,7 +7,7 @@ import type { Metadata } from "next"
 export const metadata: Metadata = {
   title: "个人中心",
 }
-import { isAdmin, ROLE_LABEL } from "@/lib/roles"
+import { isAdmin, ROLE_LABEL, isSponsor, getSponsorLabel } from "@/lib/roles"
 import ProfileEditor from "./ProfileEditor"
 
 export default async function ProfilePage() {
@@ -19,8 +19,11 @@ export default async function ProfilePage() {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, email: true, name: true, role: true, orgName: true, title: true, createdAt: true, points: true },
+    select: { id: true, email: true, name: true, role: true, orgName: true, title: true, createdAt: true, points: true, sponsorTier: true },
   })
+
+  // 赞助人标签
+  const sponsorBadge = user?.sponsorTier ? getSponsorLabel(user.sponsorTier) : null
 
   // 各自角色的统计数据
   let stats: any = {}
@@ -30,6 +33,9 @@ export default async function ProfilePage() {
       prisma.order.count({ where: { researcherId: userId, status: "DONE" } }),
     ])
     stats = { totalOrders, completedOrders }
+  } else if (role === "INVESTOR") {
+    const totalOrders = await prisma.order.count({ where: { researcherId: userId } })
+    stats = { totalOrders }
   } else if (role === "EXPERT") {
     const expert = await prisma.expert.findUnique({ where: { userId } })
     if (expert) {
@@ -41,7 +47,7 @@ export default async function ProfilePage() {
     }
   }
 
-  const ROLE_LABELS: Record<string, string> = { RESEARCHER: "研究员", EXPERT: "专家", ADMIN: "管理员", SUPER_ADMIN: "超级管理员" }
+  const ROLE_LABELS: Record<string, string> = { RESEARCHER: "研究员", EXPERT: "专家", INVESTOR: "投资人", ADMIN: "管理员", SUPER_ADMIN: "超级管理员" }
 
   return (
     <div style={{ maxWidth: 680 }}>
@@ -56,9 +62,16 @@ export default async function ProfilePage() {
             <div style={{ fontSize: 16, fontWeight: 500 }}>{user?.name || "未设置姓名"}</div>
             <div style={{ fontSize: 13, color: "#888" }}>{user?.email}</div>
           </div>
-          <span style={{ marginLeft: "auto", background: (ROLE_LABEL[role]?.bg || "#E6F1FB"), color: (ROLE_LABEL[role]?.color || "#185FA5"), padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 500 }}>
-            {ROLE_LABELS[role] || role}
-          </span>
+          <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
+            {sponsorBadge && (
+              <span style={{ background: sponsorBadge.color + "18", color: sponsorBadge.color, padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 500 }}>
+                {sponsorBadge.label}
+              </span>
+            )}
+            <span style={{ background: (ROLE_LABEL[role]?.bg || "#E6F1FB"), color: (ROLE_LABEL[role]?.color || "#185FA5"), padding: "2px 10px", borderRadius: 10, fontSize: 12, fontWeight: 500 }}>
+              {ROLE_LABELS[role] || role}
+            </span>
+          </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, fontSize: 13 }}>
@@ -73,6 +86,12 @@ export default async function ProfilePage() {
             <StatBox label="总订单" value={stats.totalOrders || 0} />
             <StatBox label="已完成" value={stats.completedOrders || 0} />
             <StatBox label="完成率" value={(stats.totalOrders > 0 ? Math.round(stats.completedOrders / stats.totalOrders * 100) : 0) + "%"} />
+          </div>
+        )}
+
+        {role === "INVESTOR" && (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(1,1fr)", gap: 12, marginTop: 20, paddingTop: 20, borderTop: "0.5px solid #f1efe8" }}>
+            <StatBox label="参与活动" value={stats.totalOrders || 0} />
           </div>
         )}
 
@@ -111,7 +130,7 @@ async function RecentOrders({ userId, role }: { userId: string; role: string }) 
     if (expert) where.expertId = expert.id
     else return null
   }
-  if (isAdmin(role)) return null
+  if (isAdmin(role) || role === "INVESTOR") return null
 
   const orders = await prisma.order.findMany({
     where,

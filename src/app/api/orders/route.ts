@@ -18,6 +18,7 @@ export async function GET(req: Request) {
     if (expert) where.expertId = expert.id
     else where.expertId = "__no_match__" // Codex #247 fix: 防止null泄露全部订单
   }
+  if (role === "INVESTOR") where.researcherId = userId
   // ADMIN sees all
 
   const orders = await prisma.order.findMany({
