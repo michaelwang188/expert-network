@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { validatePassword } from "@/lib/password-policy"
 
 // 简单内存限速：同IP 10秒内最多3次注册
 const rateLimit = new Map<string, { count: number; reset: number }>()
@@ -39,8 +40,9 @@ export async function POST(req: Request) {
   if (name.length > 100 || orgName.length > 200) {
     return NextResponse.json({ error: "姓名或机构名称过长" }, { status: 400 })
   }
-  if (password.length < 6) {
-    return NextResponse.json({ error: "密码至少6位" }, { status: 400 })
+  const pwCheck = validatePassword(password)
+  if (!pwCheck.ok) {
+    return NextResponse.json({ error: pwCheck.message }, { status: 400 })
   }
   if (!/^[^\s@<>\"'&]+@[^\s@<>\"'&]+\.[^\s@<>\"'&]+$/.test(email)) {
     return NextResponse.json({ error: "邮箱格式不正确" }, { status: 400 })

@@ -1,7 +1,16 @@
 import type { NextAuthOptions } from "next-auth"
+import type { JWT } from "next-auth/jwt"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { isWeakPassword } from "@/lib/password-policy"
+
+// 扩展JWT类型以支持needsPasswordChange
+declare module "next-auth/jwt" {
+  interface JWT {
+    needsPasswordChange?: boolean
+  }
+}
 
 // 登录限速: 同IP 15秒内最多5次尝试
 const loginRateLimit = new Map<string, { count: number; reset: number }>()
@@ -51,6 +60,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           role: user.role,
           updatedAt: user.updatedAt.getTime(),
+          needsPasswordChange: isWeakPassword(credentials.password), // 登录时检测密码是否达标
         }
       },
     }),
@@ -61,6 +71,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id
         token.role = (user as any).role
         token.updatedAt = (user as any).updatedAt || Date.now()
+        token.needsPasswordChange = (user as any).needsPasswordChange || false
       }
       // Codex #174修复: 每次请求验证用户是否仍存在且角色未变
       if (token.id) {
@@ -77,6 +88,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         ;(session.user as any).id = token.id as string
         ;(session.user as any).role = token.role as string
+        ;(session.user as any).needsPasswordChange = token.needsPasswordChange || false
       }
       return session
     },

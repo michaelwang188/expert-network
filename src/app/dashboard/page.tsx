@@ -15,9 +15,16 @@ export default async function DashboardPage() {
   if (!session) redirect("/login")
   const role = (session.user as any).role
   const userId = (session.user as any).id
+  const needsPasswordChange = (session.user as any).needsPasswordChange
 
   return (
     <div>
+      {needsPasswordChange && (
+        <div style={{ maxWidth: 800, margin: "0 auto 16px", background: "#FFF3E0", border: "0.5px solid #FFB74D", borderRadius: 8, padding: "12px 16px", fontSize: 14, lineHeight: 1.6 }}>
+          ⚠️ 当前密码强度较低，存在安全风险。
+          <a href="/settings/password" style={{ color: "#E65100", fontWeight: 600, marginLeft: 8 }}>立即修改密码 →</a>
+        </div>
+      )}
       {role === "RESEARCHER" && <ResearcherDashboard userId={userId} />}
       {role === "EXPERT" && <ExpertDashboard userId={userId} />}
       {role === "INVESTOR" && <InvestorDashboard userId={userId} />}

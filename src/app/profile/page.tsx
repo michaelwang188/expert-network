@@ -103,6 +103,11 @@ export default async function ProfilePage() {
             <StatBox label="费率" value={stats.ratePoints?.toLocaleString() + " 积分/h"} />
           </div>
         )}
+        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "0.5px solid #f1efe8", textAlign: "center" }}>
+          <a href="/settings/password" style={{ fontSize: 13, color: "#185FA5", textDecoration: "none" }}>
+            🔒 修改密码
+          </a>
+        </div>
       </div>
 
       <ProfileEditor user={{ name: user?.name ?? null, orgName: user?.orgName ?? null, title: user?.title ?? null }} />
