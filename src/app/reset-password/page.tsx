@@ -1,21 +1,18 @@
 "use client"
 import { useState, useEffect, useCallback } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { signIn } from "next-auth/react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { PasswordInput } from "@/components/PasswordInput"
 
 export default function ResetPasswordPage() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
 
-  const [status, setStatus] = useState<"loading" | "invalid" | "valid" | "done" | "auto-login">("loading")
+  const [status, setStatus] = useState<"loading" | "invalid" | "valid" | "resetting">("loading")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [error, setError] = useState("")
-  const [autoLoginFailed, setAutoLoginFailed] = useState(false)
 
   // 验证令牌
   const checkToken = useCallback(async () => {
@@ -37,31 +34,50 @@ export default function ResetPasswordPage() {
     }
     if (password !== confirm) { setError("两次密码输入不一致"); return }
     setError("")
+    setStatus("resetting")
+
     try {
+      // 1. 重置密码
       const res = await fetch("/api/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || "重置失败"); return }
+      if (!res.ok) { setError(data.error || "重置失败"); setStatus("valid"); return }
 
-      // 重置成功 → 尝试自动登录（解决邮件内置浏览器cookie限制）
-      setStatus("auto-login")
-      const loginRes = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      })
-      if (loginRes?.ok) {
-        router.push("/dashboard")
-        router.refresh()
-      } else {
-        // 自动登录失败（cookie被沙箱）→ 显示引导
-        setAutoLoginFailed(true)
-        setStatus("done")
+      // 2. 用真实表单提交登录（不是 fetch）
+      //    先获取 CSRF token（NextAuth 需要）
+      const csrfRes = await fetch("/api/auth/csrf")
+      const { csrfToken } = await csrfRes.json()
+
+      // 3. 构建隐藏表单并提交 — 真实的浏览器 POST 请求
+      //    通过 HTTP 响应头设置 cookie，而不是通过 JS
+      const form = document.createElement("form")
+      form.method = "POST"
+      form.action = "/api/auth/callback/credentials"
+      form.style.display = "none"
+
+      const addField = (name: string, value: string) => {
+        const input = document.createElement("input")
+        input.type = "hidden"
+        input.name = name
+        input.value = value
+        form.appendChild(input)
       }
-    } catch { setError("网络错误，请重试") }
+
+      addField("csrfToken", csrfToken)
+      addField("email", email)
+      addField("password", password)
+      addField("callbackUrl", "/dashboard")
+
+      document.body.appendChild(form)
+      form.submit()
+      // form.submit() 会触发浏览器页面跳转，后续代码不会执行
+    } catch {
+      setError("网络错误，请重试")
+      setStatus("valid")
+    }
   }
 
   if (status === "loading") return (
@@ -77,31 +93,11 @@ export default function ResetPasswordPage() {
     </div>
   )
 
-  if (status === "auto-login") return (
+  if (status === "resetting") return (
     <div style={{ maxWidth: 400, margin: "80px auto", padding: 24, textAlign: "center" }}>
       <div style={{ width: 32, height: 32, borderRadius: "50%", border: "3px solid #f1efe8", borderTopColor: "#185FA5", margin: "0 auto 12px", animation: "spin 0.6s linear infinite" }}></div>
       <div style={{ fontSize: 15, color: "#888" }}>密码已重置，正在自动登录...</div>
       <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-    </div>
-  )
-
-  if (status === "done") return (
-    <div style={{ maxWidth: 400, margin: "80px auto", padding: 24, textAlign: "center" }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-      <h1 style={{ fontSize: 18, fontWeight: 500, marginBottom: 8 }}>密码已重置</h1>
-      <p style={{ fontSize: 14, color: "#888", marginBottom: 8 }}>新密码已生效，自动登录未成功。</p>
-      <div style={{ background: "#FFF8E1", border: "0.5px solid #FFE082", borderRadius: 8, padding: "10px 14px", margin: "12px 0 20px", fontSize: 13, color: "#F57F17", textAlign: "left", lineHeight: 1.7 }}>
-        ⚠️ 当前浏览器限制了自动登录。<br/>
-        请复制下面链接，在 <strong>Safari 或 Chrome</strong> 中打开并用新密码登录：<br/>
-        <span style={{ fontSize: 11, color: "#185FA5", wordBreak: "break-all", userSelect: "all" }}>https://516380.com/login</span>
-      </div>
-      <a href="https://516380.com/login" target="_blank" rel="noopener noreferrer"
-        style={{ display: "inline-block", padding: "10px 24px", background: "#185FA5", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 14, fontWeight: 500 }}>
-        在浏览器中打开登录 →
-      </a>
-      <div style={{ marginTop: 12 }}>
-        <Link href="/login" style={{ fontSize: 13, color: "#888", textDecoration: "none" }}>或在此页面中登录</Link>
-      </div>
     </div>
   )
 
@@ -113,7 +109,7 @@ export default function ResetPasswordPage() {
         <PasswordInput value={password} onChange={setPassword} label="新密码" minLength={8} placeholder="至少8位，含大小写字母和数字" />
         <PasswordInput value={confirm} onChange={setConfirm} label="确认新密码" minLength={8} placeholder="再次输入新密码" />
         {error && <div style={{ color: "#A32D2D", fontSize: 13, background: "#FCEBEB", padding: 8, borderRadius: 8 }}>{error}</div>}
-        <button type="submit" style={{ background: "#185FA5", color: "#fff", border: "none", borderRadius: 8, padding: 11, fontSize: 14, fontWeight: 500, cursor: "pointer" }}>确认重置</button>
+        <button type="submit" style={{ background: "#185FA5", color: "#fff", border: "none", borderRadius: 8, padding: 11, fontSize: 14, fontWeight: 500, cursor: "pointer" }}>确认重置并登录</button>
         <Link href="/login" style={{ textAlign: "center", fontSize: 13, color: "#888" }}>← 返回登录</Link>
       </form>
     </div>
