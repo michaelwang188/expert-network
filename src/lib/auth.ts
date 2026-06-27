@@ -22,9 +22,17 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     newUser: "/register",
   },
-  // ⚠️ 注意：不设 cookies 配置，用 NextAuth 默认值
-  // 手动设 secure: true 会导致 Cloudflare→源站(HTTP)的 cookie 被浏览器拒绝（登录/登出均异常）
-  // 邮件内置浏览器问题由重置成功页的引导文字解决
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",    // 兼容 QQ邮箱等跨站 WebView
+        path: "/",
+        secure: true,         // sameSite=none 要求 secure=true
+      },
+    },
+  },
   providers: [
     CredentialsProvider({
       name: "密码登录",
