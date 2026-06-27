@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
 export async function POST() {
+  // 生产环境禁止访问
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "生产环境不可用" }, { status: 404 })
+  }
   try {
     const existing = await prisma.user.findUnique({ where: { email: "admin@demo.com" } })
     if (existing) {

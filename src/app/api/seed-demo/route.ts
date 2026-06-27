@@ -4,6 +4,10 @@ import bcrypt from "bcryptjs"
 
 // 演示数据清理方式：通过source="seed"字段识别，无需枚举邮箱
 export async function POST() {
+  // 生产环境禁止访问
+  if (process.env.NODE_ENV === "production") {
+    return NextResponse.json({ error: "生产环境不可用" }, { status: 404 })
+  }
   try {
     const pw = await bcrypt.hash("123456", 10)
 

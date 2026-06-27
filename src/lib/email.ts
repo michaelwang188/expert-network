@@ -69,7 +69,7 @@ function getTransporter(): nodemailer.Transporter | null {
 export async function sendResetEmail(to: string, resetUrl: string): Promise<boolean> {
   const t = getTransporter()
   if (!t) {
-    console.log(`[EMAIL] 密码重置链接 (收件人: ${to}): ${resetUrl}`)
+    if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] 密码重置链接 (收件人: ${to}): ${resetUrl}`)
     return true
   }
 
@@ -92,10 +92,10 @@ export async function sendResetEmail(to: string, resetUrl: string): Promise<bool
         </div>
       `,
     })
-    console.log(`[EMAIL] ✅ 已通过SMTP发送至 ${to}`)
+    if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] ✅ 已通过SMTP发送至 ${to}`)
     return true
   } catch (e) {
-    console.error(`[EMAIL] 发送失败 (${to}):`, (e as Error).message)
+    if (process.env.NODE_ENV !== "production") console.error(`[EMAIL] 发送失败 (${to}):`, (e as Error).message)
     return false
   }
 }
@@ -108,7 +108,7 @@ export async function sendWelcomeEmail(to: string, siteUrl: string): Promise<boo
   const registerUrl = `${siteUrl}/register`
 
   if (!t) {
-    console.log(`[EMAIL] 欢迎注册 (收件人: ${to}): ${registerUrl}`)
+    if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] 欢迎注册 (收件人: ${to}): ${registerUrl}`)
     return true
   }
 
@@ -135,10 +135,10 @@ export async function sendWelcomeEmail(to: string, siteUrl: string): Promise<boo
         </div>
       `,
     })
-    console.log(`[EMAIL] ✅ 已发送欢迎邮件至 ${to}`)
+    if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] ✅ 已发送欢迎邮件至 ${to}`)
     return true
   } catch (e) {
-    console.error(`[EMAIL] 发送欢迎邮件失败 (${to}):`, (e as Error).message)
+    if (process.env.NODE_ENV !== "production") console.error(`[EMAIL] 发送欢迎邮件失败 (${to}):`, (e as Error).message)
     return false
   }
 }
