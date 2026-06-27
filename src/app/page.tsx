@@ -39,7 +39,7 @@ export default async function Home() {
         </h1>
         <p style={{ fontSize: 16, color: "#888", lineHeight: 1.7, margin: "0 0 20px" }}>
           覆盖 AI 算力 · 新能源 · 半导体 · 创新药 · 消费电子等赛道<br/>
-          平台撮合调研需求与行业专家，合规管控 + 现金结算
+          平台撮合调研需求与行业专家，合规管控 + 积分结算
         </p>
         <div style={{ fontSize: 15, fontWeight: 500, color: "#185FA5", marginBottom: 28 }}>
           🎯 平台已有 <strong style={{ fontSize: 20 }}>{activeExperts}</strong> 位行业专家
