@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { PasswordInput } from "@/components/PasswordInput"
 
 export default function ChangePasswordPage() {
   const { data: session, status } = useSession()
@@ -70,41 +71,10 @@ export default function ChangePasswordPage() {
         密码需至少8位，包含大写字母、小写字母和数字。
       </p>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>当前密码 *</label>
-          <input
-            type="password"
-            value={currentPassword}
-            onChange={e => setCurrentPassword(e.target.value)}
-            required
-            style={inputStyle}
-            autoFocus={!needsChange}
-          />
-        </div>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>新密码 *</label>
-          <input
-            type="password"
-            value={newPassword}
-            onChange={e => setNewPassword(e.target.value)}
-            required
-            minLength={8}
-            style={inputStyle}
-            autoFocus={needsChange}
-          />
-        </div>
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>确认新密码 *</label>
-          <input
-            type="password"
-            value={confirmPassword}
-            onChange={e => setConfirmPassword(e.target.value)}
-            required
-            minLength={8}
-            style={inputStyle}
-          />
-        </div>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        <PasswordInput value={currentPassword} onChange={setCurrentPassword} label="当前密码 *" autoFocus={!needsChange} minLength={1} />
+        <PasswordInput value={newPassword} onChange={setNewPassword} label="新密码 *" autoFocus={needsChange} minLength={8} />
+        <PasswordInput value={confirmPassword} onChange={setConfirmPassword} label="确认新密码 *" minLength={8} />
 
         {message && (
           <div style={{ padding: "8px 12px", borderRadius: 6, marginBottom: 16, fontSize: 13, background: message.type === "ok" ? "#E8F5E9" : "#FFEBEE", color: message.type === "ok" ? "#2E7D32" : "#C62828" }}>
@@ -137,6 +107,4 @@ function LoadingView() {
   )
 }
 
-const inputStyle: React.CSSProperties = {
-  width: "100%", padding: "8px 12px", fontSize: 14, border: "0.5px solid #d0cec6", borderRadius: 6, outline: "none", boxSizing: "border-box",
-}
+

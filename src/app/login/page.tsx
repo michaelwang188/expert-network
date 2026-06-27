@@ -4,6 +4,7 @@ import { signIn } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useState, Suspense } from "react"
 import Link from "next/link"
+import { PasswordInput } from "@/components/PasswordInput"
 
 function LoginForm() {
   const router = useRouter()
@@ -47,11 +48,12 @@ function LoginForm() {
           <input type="email" required value={email} onChange={e => setEmail(e.target.value)}
             style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none" }} />
         </div>
-        <div>
-          <label style={{ fontSize: 12, color: "#888", marginBottom: 4, display: "block" }}>密码</label>
-          <input type="password" required value={password} onChange={e => setPassword(e.target.value)}
-            style={{ width: "100%", padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14, outline: "none" }} />
-        </div>
+        <PasswordInput
+          value={password}
+          onChange={setPassword}
+          label="密码"
+          placeholder="请输入密码"
+        />
         {error && <div style={{ color: "#A32D2D", fontSize: 13, background: "#FCEBEB", padding: 8, borderRadius: 8 }}>{error}</div>}
         <button type="submit" disabled={loading} style={{
           background: "#185FA5", color: "#fff", border: "none", borderRadius: 8,

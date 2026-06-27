@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
+import { PasswordInput } from "@/components/PasswordInput"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -62,14 +63,8 @@ export default function RegisterPage() {
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>邮箱 *</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required style={inputStyle} />
         </div>
-        <div>
-          <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>密码 *（至少6位）</label>
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} style={inputStyle} />
-        </div>
-        <div>
-          <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>确认密码 *</label>
-          <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required minLength={6} style={inputStyle} />
-        </div>
+        <PasswordInput value={password} onChange={setPassword} label="密码 *（至少8位，含大小写字母和数字）" minLength={8} />
+        <PasswordInput value={confirmPassword} onChange={setConfirmPassword} label="确认密码 *" minLength={8} />
         <div>
           <label style={{ fontSize: 12, color: "#888", display: "block", marginBottom: 4 }}>机构名称</label>
           <input value={orgName} onChange={e => setOrgName(e.target.value)} style={inputStyle} />
