@@ -3,6 +3,10 @@ import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { validatePassword } from "@/lib/password-policy"
 
+function getSecret(): string {
+  return process.env.NEXTAUTH_SECRET || "dev-secret-do-not-use-in-prod"
+}
+
 // GET — 验证令牌是否有效
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
@@ -48,7 +52,39 @@ export async function POST(req: Request) {
     await prisma.user.update({ where: { email: record.email }, data: { password: hashed } })
     await prisma.resetToken.update({ where: { id: record.id }, data: { used: true } })
 
-    return NextResponse.json({ ok: true, message: "密码已重置成功" })
+    // 重置成功后直接生成 session JWT，让浏览器设置 cookie，无需再登录
+    const { SignJWT } = await import("jose")
+    const secret = new TextEncoder().encode(getSecret())
+    const now = Math.floor(Date.now() / 1000)
+    const sessionToken = await new SignJWT({
+      sub: user.id,
+      name: user.name,
+      email: user.email,
+      picture: null,
+      role: user.role,
+      needsPasswordChange: false, // 已设置强密码，不需要变更
+      iat: now,
+      exp: now + 7 * 24 * 60 * 60,  // 7天
+      jti: crypto.randomUUID(),
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .sign(secret)
+
+    const response = NextResponse.json({ ok: true, autoLogin: true, message: "密码已重置" })
+    response.cookies.set("__Secure-next-auth.session-token", sessionToken, {
+      httpOnly: true,
+      secure: true,
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    })
+    // 也设置非 secure 版本的 cookie（兼容开发环境）
+    response.cookies.set("next-auth.session-token", sessionToken, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60,
+    })
+    return response
   } catch (e: any) {
     return NextResponse.json({ error: "重置失败，请重试" }, { status: 500 })
   }

@@ -22,17 +22,8 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     newUser: "/register",
   },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "none",    // 兼容 QQ邮箱等跨站 WebView
-        path: "/",
-        secure: true,         // sameSite=none 要求 secure=true
-      },
-    },
-  },
+  // 不设 cookies 配置，使用 NextAuth 默认值
+  // 注意：不添加 sameSite 属性，防止 QQ邮箱旧内核不认识 None 而丢弃整个 cookie
   providers: [
     CredentialsProvider({
       name: "密码登录",

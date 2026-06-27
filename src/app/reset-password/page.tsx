@@ -1,10 +1,11 @@
 "use client"
 import { useState, useEffect, useCallback } from "react"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { PasswordInput } from "@/components/PasswordInput"
 
 export default function ResetPasswordPage() {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
 
@@ -37,43 +38,23 @@ export default function ResetPasswordPage() {
     setStatus("resetting")
 
     try {
-      // 1. 重置密码
       const res = await fetch("/api/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),
       })
       const data = await res.json()
+      if (res.ok && data.autoLogin) {
+        // 重置成功 + session cookie 已通过 API 响应设置
+        // 直接跳转 dashboard
+        window.location.href = "/dashboard"
+        return
+      }
       if (!res.ok) { setError(data.error || "重置失败"); setStatus("valid"); return }
 
-      // 2. 用真实表单提交登录（不是 fetch）
-      //    先获取 CSRF token（NextAuth 需要）
-      const csrfRes = await fetch("/api/auth/csrf")
-      const { csrfToken } = await csrfRes.json()
-
-      // 3. 构建隐藏表单并提交 — 真实的浏览器 POST 请求
-      //    通过 HTTP 响应头设置 cookie，而不是通过 JS
-      const form = document.createElement("form")
-      form.method = "POST"
-      form.action = "/api/auth/callback/credentials"
-      form.style.display = "none"
-
-      const addField = (name: string, value: string) => {
-        const input = document.createElement("input")
-        input.type = "hidden"
-        input.name = name
-        input.value = value
-        form.appendChild(input)
-      }
-
-      addField("csrfToken", csrfToken)
-      addField("email", email)
-      addField("password", password)
-      addField("callbackUrl", "/dashboard")
-
-      document.body.appendChild(form)
-      form.submit()
-      // form.submit() 会触发浏览器页面跳转，后续代码不会执行
+      // 兜底：没有 autoLogin 标志，引导用户去登录
+      setError("密码已重置，请尝试登录")
+      setStatus("valid")
     } catch {
       setError("网络错误，请重试")
       setStatus("valid")
