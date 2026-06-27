@@ -115,6 +115,19 @@ body {
   .mobile-menu-btn { display: block !important; }
   .mobile-menu { display: flex !important; }
 
+  /* 导航栏用户名溢出截断 */
+  a[href="/profile"] {
+    max-width: 100px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* 导航右侧区域自动换行 */
+  [style*="margin-left: auto"][style*="display: flex"][style*="align-items: center"][style*="gap: 8"] {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+
   /* 表格横向滚动 */
   div[style*="overflow: hidden"]:has(table),
   table {

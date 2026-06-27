@@ -80,7 +80,7 @@ export default function Nav() {
         </div>
 
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-          <Link href="/profile" style={{ color: "#185FA5", textDecoration: "none", fontSize: 13, whiteSpace: "nowrap" }}>
+          <Link href="/profile" style={{ color: "#185FA5", textDecoration: "none", fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: 140 }}>
             {session.user?.name || session.user?.email}
           </Link>
           <span style={{ background: (ROLE_LABEL[role]?.bg || "#E6F1FB"), color: (ROLE_LABEL[role]?.color || "#185FA5"), padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500, whiteSpace: "nowrap" }}>
