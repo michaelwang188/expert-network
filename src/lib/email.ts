@@ -82,9 +82,14 @@ export async function sendResetEmail(to: string, resetUrl: string): Promise<bool
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2 style="color: #185FA5;">密码重置</h2>
           <p>您好，</p>
-          <p>我们收到了您的密码重置请求。请点击下方链接重置密码，该链接有效期1小时：</p>
+          <p>我们收到了您的密码重置请求。请点击下方按钮重置密码，该链接有效期1小时：</p>
           <p style="text-align: center; margin: 24px 0;">
-            <a href="${resetUrl}" style="display: inline-block; background: #185FA5; color: #fff; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px;">重置密码</a>
+            <a href="${resetUrl}" style="display: inline-block; background: #185FA5; color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-size: 15px;">重置密码</a>
+          </p>
+          <p style="font-size: 12px; color: #888; background: #FFF8E1; padding: 10px; border-radius: 6px;">
+            ⚠️ 如果出现「继续访问」页面，请点击「继续访问」即可。<br/>
+            如按钮无法点击，请复制以下链接到 Safari/Chrome 中打开：<br/>
+            <span style="font-size: 11px; color: #185FA5; word-break: break-all;">${resetUrl}</span>
           </p>
           <p style="font-size: 12px; color: #888;">如果您没有请求重置密码，请忽略此邮件。</p>
           <hr style="border: none; border-top: 0.5px solid #e0dfd8;" />
