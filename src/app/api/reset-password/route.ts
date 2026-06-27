@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { validatePassword } from "@/lib/password-policy"
 
 // GET — 验证令牌是否有效
 export async function GET(req: Request) {
@@ -25,8 +26,12 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { token, password } = body
 
-    if (!token || !password || password.length < 6) {
-      return NextResponse.json({ error: "密码至少6位" }, { status: 400 })
+    if (!token || !password) {
+      return NextResponse.json({ error: "请提供密码" }, { status: 400 })
+    }
+    const pwCheck = validatePassword(password)
+    if (!pwCheck.ok) {
+      return NextResponse.json({ error: pwCheck.message }, { status: 400 })
     }
 
     const record = await prisma.resetToken.findUnique({ where: { token } })
