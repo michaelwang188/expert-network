@@ -79,7 +79,7 @@ body {
   }
 
   /* 侧边栏隐藏，改用顶部tab */
-  aside, [style*="width: 200"] {
+  aside, [style*="width: 200"], [style*="width: 180"] {
     display: none;
   }
 
@@ -125,6 +125,16 @@ body {
   /* 主内容区缩边 */
   main { padding: 12px 10px !important; }
 
+  /* 管理后台flex布局→纵向堆叠 */
+  [style*="display: flex"][style*="gap: 24"][style*="align-items: flex-start"] {
+    flex-direction: column !important;
+  }
+
+  /* 管理后台各管理页面表单：横向布局→纵向 */
+  [style*="display: flex"][style*="gap: 8"][style*="align-items: center"] {
+    flex-wrap: wrap;
+  }
+
   /* 两列 grid 在手机上变单列 */
   [style*="grid-template-columns: 1fr 1fr"] {
     grid-template-columns: 1fr !important;
@@ -139,6 +149,19 @@ body {
   /* 订单表th最小宽 */
   table th { font-size: 11px !important; padding: 6px 4px !important; }
   table td { font-size: 11px !important; padding: 6px 4px !important; }
+
+  /* 管理员列表项内联按钮区 */
+  [style*="display: flex"][style*="gap: 4"][style*="align-items: flex-end"],
+  [style*="display: flex"][style*="gap: 8"][style*="flexDirection: column"][style*="align-items: flex-end"] {
+    align-items: stretch !important;
+  }
+  [style*="display: flex"][style*="gap: 4"][style*="align-items: flex-end"] form,
+  [style*="display: flex"][style*="gap: 8"][style*="flexDirection: column"][style*="align-items: flex-end"] form {
+    width: 100%;
+  }
+  [style*="display: flex"][style*="gap: 4"][style*="align-items: flex-end"] button {
+    width: 100%;
+  }
 }
 
 /* ─── 加载态 ─────────────────────────────────────── */

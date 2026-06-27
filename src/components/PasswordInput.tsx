@@ -26,7 +26,7 @@ export function PasswordInput({ value, onChange, placeholder, autoFocus, minLeng
           required
           minLength={minLength}
           style={{
-            width: "100%", padding: "10px 36px 10px 10px", border: "0.5px solid #e0dfd8",
+            width: "100%", padding: "10px 44px 10px 10px", border: "0.5px solid #e0dfd8",
             borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box",
           }}
         />
