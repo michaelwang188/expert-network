@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { PasswordInput } from "@/components/PasswordInput"
 
@@ -9,11 +10,12 @@ export default function ResetPasswordPage() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
 
-  const [status, setStatus] = useState<"loading" | "invalid" | "valid" | "done">("loading")
+  const [status, setStatus] = useState<"loading" | "invalid" | "valid" | "done" | "auto-login">("loading")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [error, setError] = useState("")
+  const [autoLoginFailed, setAutoLoginFailed] = useState(false)
 
   // 验证令牌
   const checkToken = useCallback(async () => {
@@ -42,8 +44,23 @@ export default function ResetPasswordPage() {
         body: JSON.stringify({ token, password }),
       })
       const data = await res.json()
-      if (res.ok) { setStatus("done") }
-      else { setError(data.error || "重置失败") }
+      if (!res.ok) { setError(data.error || "重置失败"); return }
+
+      // 重置成功 → 尝试自动登录（解决邮件内置浏览器cookie限制）
+      setStatus("auto-login")
+      const loginRes = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      })
+      if (loginRes?.ok) {
+        router.push("/dashboard")
+        router.refresh()
+      } else {
+        // 自动登录失败（cookie被沙箱）→ 显示引导
+        setAutoLoginFailed(true)
+        setStatus("done")
+      }
     } catch { setError("网络错误，请重试") }
   }
 
@@ -60,14 +77,22 @@ export default function ResetPasswordPage() {
     </div>
   )
 
+  if (status === "auto-login") return (
+    <div style={{ maxWidth: 400, margin: "80px auto", padding: 24, textAlign: "center" }}>
+      <div style={{ width: 32, height: 32, borderRadius: "50%", border: "3px solid #f1efe8", borderTopColor: "#185FA5", margin: "0 auto 12px", animation: "spin 0.6s linear infinite" }}></div>
+      <div style={{ fontSize: 15, color: "#888" }}>密码已重置，正在自动登录...</div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+    </div>
+  )
+
   if (status === "done") return (
     <div style={{ maxWidth: 400, margin: "80px auto", padding: 24, textAlign: "center" }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
       <h1 style={{ fontSize: 18, fontWeight: 500, marginBottom: 8 }}>密码已重置</h1>
-      <p style={{ fontSize: 14, color: "#888", marginBottom: 8 }}>新密码已生效，请使用新密码登录。</p>
+      <p style={{ fontSize: 14, color: "#888", marginBottom: 8 }}>新密码已生效，自动登录未成功。</p>
       <div style={{ background: "#FFF8E1", border: "0.5px solid #FFE082", borderRadius: 8, padding: "10px 14px", margin: "12px 0 20px", fontSize: 13, color: "#F57F17", textAlign: "left", lineHeight: 1.7 }}>
-        ⚠️ <strong>如果在当前浏览器无法登录</strong>，这是邮件内置浏览器的限制。<br/>
-        请复制下面链接，在 <strong>Safari 或 Chrome</strong> 中打开登录：<br/>
+        ⚠️ 当前浏览器限制了自动登录。<br/>
+        请复制下面链接，在 <strong>Safari 或 Chrome</strong> 中打开并用新密码登录：<br/>
         <span style={{ fontSize: 11, color: "#185FA5", wordBreak: "break-all", userSelect: "all" }}>https://516380.com/login</span>
       </div>
       <a href="https://516380.com/login" target="_blank" rel="noopener noreferrer"
