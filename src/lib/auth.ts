@@ -22,8 +22,6 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     newUser: "/register",
   },
-  // 不设 cookies 配置，使用 NextAuth 默认值
-  // 注意：不添加 sameSite 属性，防止 QQ邮箱旧内核不认识 None 而丢弃整个 cookie
   providers: [
     CredentialsProvider({
       name: "密码登录",

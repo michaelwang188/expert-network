@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
-import { encode } from "next-auth/jwt"
 import { validatePassword } from "@/lib/password-policy"
 
 // GET — 验证令牌是否有效
@@ -49,34 +48,7 @@ export async function POST(req: Request) {
     await prisma.user.update({ where: { email: record.email }, data: { password: hashed } })
     await prisma.resetToken.update({ where: { id: record.id }, data: { used: true } })
 
-    // 用 NextAuth 自己的 encode 函数生成 session token（与 JWT callback 完全兼容）
-    const secret = process.env.NEXTAUTH_SECRET || "dev-secret-do-not-use-in-prod"
-    const maxAge = 7 * 24 * 60 * 60
-    const sessionToken = await encode({
-      secret,
-      maxAge,
-      token: {
-        sub: user.id,
-        name: user.name || "",
-        email: user.email,
-        picture: null,
-        role: user.role,
-        needsPasswordChange: false,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + maxAge,
-      },
-    })
-
-    const response = NextResponse.json({ ok: true, autoLogin: true, message: "密码已重置" })
-    // 同时设置 __Secure- 和 无前缀 两个版本，兼容 HTTPS 和 HTTP 环境
-    response.cookies.set("next-auth.session-token", sessionToken, {
-      httpOnly: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge,
-      secure: false,
-    })
-    return response
+    return NextResponse.json({ ok: true, message: "密码已重置成功" })
   } catch (e: any) {
     return NextResponse.json({ error: "重置失败，请重试" }, { status: 500 })
   }
