@@ -86,7 +86,7 @@ export default function Nav() {
           <span style={{ background: (ROLE_LABEL[role]?.bg || "#E6F1FB"), color: (ROLE_LABEL[role]?.color || "#185FA5"), padding: "2px 8px", borderRadius: 4, fontSize: 11, fontWeight: 500, whiteSpace: "nowrap" }}>
             {ROLE_LABEL[role]?.label || role}
           </span>
-          <button onClick={() => signOut()} style={{ background: "none", border: "0.5px solid #e0dfd8", borderRadius: 8, padding: "4px 10px", cursor: "pointer", fontSize: 12, color: "#5F5E5A", whiteSpace: "nowrap" }}>退出</button>
+          <button onClick={() => signOut({ callbackUrl: "/login" })} style={{ background: "none", border: "0.5px solid #e0dfd8", borderRadius: 8, padding: "4px 10px", cursor: "pointer", fontSize: 12, color: "#5F5E5A", whiteSpace: "nowrap" }}>退出</button>
 
           {/* 移动端汉堡 */}
           <button onClick={() => setMenuOpen(!menuOpen)} className="mobile-menu-btn" style={{ display: "none", background: "none", border: "none", fontSize: 20, cursor: "pointer", padding: "4px 8px" }}>

@@ -22,35 +22,9 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
     newUser: "/register",
   },
-  // 兼容邮件App内置浏览器（QQ邮箱/iPhone邮件/Gmail 等 WebView 对 cookie 有限制）
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-    callbackUrl: {
-      name: `next-auth.callback-url`,
-      options: {
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-    csrfToken: {
-      name: `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
+  // ⚠️ 注意：不设 cookies 配置，用 NextAuth 默认值
+  // 手动设 secure: true 会导致 Cloudflare→源站(HTTP)的 cookie 被浏览器拒绝（登录/登出均异常）
+  // 邮件内置浏览器问题由重置成功页的引导文字解决
   providers: [
     CredentialsProvider({
       name: "密码登录",
