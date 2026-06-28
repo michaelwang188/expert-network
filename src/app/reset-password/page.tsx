@@ -4,6 +4,26 @@ import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { PasswordInput } from "@/components/PasswordInput"
 
+function ClosePageButton() {
+  const [copied, setCopied] = useState(false)
+  const handleClick = () => {
+    navigator.clipboard.writeText("516380.com").catch(() => {})
+    setCopied(true)
+    try { window.close() } catch {}
+  }
+  return (
+    <button onClick={handleClick} style={{
+      display: "inline-block", padding: "12px 32px", background: copied ? "#E8F5E9" : "#185FA5",
+      color: copied ? "#2E7D32" : "#fff", borderRadius: 8,
+      border: copied ? "0.5px solid #A5D6A7" : "none", cursor: "pointer",
+      fontSize: 15, fontWeight: 500, width: "100%", maxWidth: 320,
+      transition: "all 0.3s",
+    }}>
+      {copied ? "登录域名链接已复制，请手动关闭此标签页" : "我已记住，关闭页面"}
+    </button>
+  )
+}
+
 export default function ResetPasswordPage() {
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
@@ -67,16 +87,17 @@ export default function ResetPasswordPage() {
     <div style={{ maxWidth: 400, margin: "80px auto", padding: 24, textAlign: "center" }}>
       <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
       <h1 style={{ fontSize: 20, fontWeight: 600, color: "#2c2c2a", marginBottom: 8 }}>密码已重置成功</h1>
-      <p style={{ fontSize: 14, color: "#888", lineHeight: 1.7, marginBottom: 20 }}>
-        请使用新密码在<strong>外部浏览器</strong>中登录
+      <p style={{ fontSize: 14, color: "#888", lineHeight: 1.7, marginBottom: 24 }}>
+        新密码已生效。请关闭当前页面，<br/>打开浏览器访问 516380.com 登录。
       </p>
-      <a href="https://516380.com/login" target="_blank" rel="noopener noreferrer"
-        style={{ display: "inline-block", padding: "12px 32px", background: "#185FA5", color: "#fff", borderRadius: 8, textDecoration: "none", fontSize: 15, fontWeight: 500 }}>
-        前往 Safari/Chrome 登录 →
-      </a>
-      <p style={{ fontSize: 12, color: "#aaa", marginTop: 20 }}>
-        此页面可以安全关闭
-      </p>
+
+      <ClosePageButton />
+
+      <div style={{ marginTop: 32, paddingTop: 24, borderTop: "0.5px solid #e0dfd8", fontSize: 13, color: "#888", lineHeight: 2 }}>
+        <div>连接研究员与产业链专家，让每一次调研更有价值</div>
+        <div style={{ fontSize: 12, color: "#aaa" }}>产研通 ProLink · 高效优质的产业专家对接平台</div>
+        <div style={{ fontSize: 12, color: "#185FA5", fontWeight: 500 }}>516380.com 我一路上帮您</div>
+      </div>
     </div>
   )
 

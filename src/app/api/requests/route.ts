@@ -49,12 +49,22 @@ export async function POST(req: Request) {
 
   const { title, industry, subField, duration, form, budget, timeReq, outline, forbidden } = await req.json()
 
+  // 🔴 XSS防护：所有用户输入存储前HTML转义
+  const escapeHtml = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;")
+  const safeTitle = escapeHtml((title || "").slice(0, 200))
+  const safeOutline = escapeHtml((outline || "").slice(0, 5000))
+  const safeSubField = escapeHtml((subField || "").slice(0, 100))
+  const safeDuration = escapeHtml((duration || "60分钟").slice(0, 50))
+  const safeForm = escapeHtml((form || "线上视频").slice(0, 50))
+  const safeTimeReq = escapeHtml((timeReq || "").slice(0, 200))
+  const safeForbidden = escapeHtml((forbidden || "").slice(0, 200))
+
   // 防重复提交：同研究员+同标题+提纲前50字指纹，3分钟内视为重复
-  const outlineFingerprint = (outline || "").slice(0, 50).trim()
+  const outlineFingerprint = safeOutline.slice(0, 50).trim()
   const recentDup = await prisma.request.findFirst({
     where: {
       researcherId: (session.user as any).id,
-      title,
+      title: safeTitle,
       outline: { startsWith: outlineFingerprint },
       createdAt: { gte: new Date(Date.now() - 3 * 60 * 1000) },
     },
@@ -64,12 +74,12 @@ export async function POST(req: Request) {
   }
 
   // 服务端长度校验
-  if ((outline || "").length > 5000 || (title || "").length > 200) {
+  if (safeTitle.length > 200 || safeOutline.length > 5000) {
     return NextResponse.json({ error: "标题或提纲内容过长" }, { status: 400 })
   }
 
-  // 服务端合规检测：发现敏感词 → 阻断提交
-  const found = SENSITIVE.filter(w => (outline || "").includes(w) || (title || "").includes(w))
+  // 服务端合规检测：发现敏感词 → 阻断提交（在转义后的内容上检测）
+  const found = SENSITIVE.filter(w => safeOutline.includes(w) || safeTitle.includes(w))
   if (found.length > 0) {
     return NextResponse.json({
       error: "提纲含敏感词，请修改后重新提交",
@@ -81,12 +91,6 @@ export async function POST(req: Request) {
   const orderNo = "ORD-" + new Date().getFullYear() + "-" + String(Math.floor(1000 + Math.random() * 9000))
 
   // 解析预算：取第一个数字，若含范围则取中间值。防空值
-  const safeOutline = outline || ""
-  const safeSubField = subField || ""
-  const safeDuration = duration || "60分钟"
-  const safeForm = form || "线上视频"
-  const safeTimeReq = timeReq || ""
-  const safeForbidden = forbidden || ""
   let estimatedAmount = 800
   if (budget) {
     const nums = budget.match(/(\d+)/g)
@@ -107,7 +111,8 @@ export async function POST(req: Request) {
 
   const request = await prisma.request.create({
     data: {
-      orderNo, title, industry, subField, duration, form, budget, timeReq, outline, forbidden,
+      orderNo, title: safeTitle, industry, subField: safeSubField, duration: safeDuration,
+      form: safeForm, budget, timeReq: safeTimeReq, outline: safeOutline, forbidden: safeForbidden,
       status: "COMPLIANCE_OK",
       researcherId,
     }

@@ -6,7 +6,7 @@ import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "连接研究员与产业链专家",
-  description: "产研通 ProLink — 产业专家调研对接平台。覆盖 AI 算力·新能源·半导体·创新药·消费电子，合规管控 + 积分结算。",
+  description: "产研通 ProLink — 高效优质的产业专家对接平台。连接研究员与产业链专家，让每一次调研更有价值。覆盖 AI 算力·新能源·半导体·创新药·消费电子。",
 }
 import { prisma } from "@/lib/prisma"
 
@@ -35,12 +35,15 @@ export default async function Home() {
           产业调研·信息撮合平台
         </div>
         <h1 style={{ fontSize: 36, fontWeight: 600, color: "#2c2c2a", lineHeight: 1.3, margin: "0 0 16px" }}>
-          连接研究员与产业链专家<br/>让每一次调研都有价值
+          连接研究员与产业链专家<br/>让每一次调研更有价值
         </h1>
         <p style={{ fontSize: 16, color: "#888", lineHeight: 1.7, margin: "0 0 20px" }}>
           覆盖 AI 算力 · 新能源 · 半导体 · 创新药 · 消费电子等赛道<br/>
           平台撮合调研需求与行业专家，合规管控 + 积分结算
         </p>
+        <div style={{ fontSize: 13, color: "#aaa", marginBottom: 8 }}>
+          516380.com 我一路上帮您
+        </div>
         <div style={{ fontSize: 15, fontWeight: 500, color: "#185FA5", marginBottom: 28 }}>
           🎯 平台已有 <strong style={{ fontSize: 20 }}>{activeExperts}</strong> 位行业专家
         </div>
