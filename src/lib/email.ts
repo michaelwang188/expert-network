@@ -167,7 +167,7 @@ export async function sendVerificationEmail(to: string, verifyUrl: string): Prom
         <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
           <h2 style="color: #185FA5;">验证您的邮箱</h2>
           <p>您好，</p>
-          <p>感谢您注册产研通ProLink！请点击下方按钮验证您的邮箱地址，验证后即可登录：</p>
+          <p>感谢您注册产研通ProLink！请点击下方按钮验证您的邮箱地址：</p>
           <p style="text-align: center; margin: 24px 0;">
             <a href="${verifyUrl}" style="display: inline-block; background: #185FA5; color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-size: 15px;">验证邮箱</a>
           </p>
@@ -175,18 +175,9 @@ export async function sendVerificationEmail(to: string, verifyUrl: string): Prom
             ⚠️ 如按钮无法点击，请复制以下链接到 Safari/Chrome 中打开：<br/>
             <span style="font-size: 11px; color: #185FA5; word-break: break-all;">${verifyUrl}</span>
           </p>
-          <div style="background: #f8f7f4; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 13px; color: #5F5E5A;">
-            <p style="margin: 0 0 8px; font-weight: 500;">验证后您可以：</p>
-            <p style="margin: 0; line-height: 1.8;">
-              🔍 浏览 10,000+ 各行业产业专家<br/>
-              📋 发布调研需求，对接产业一线专家<br/>
-              🏆 参与公益积分体系，用劳动贡献换取专业信息<br/>
-              🤝 与研究员、专家、投资人共建投研社区
-            </p>
-          </div>
-          <p style="font-size: 12px; color: #888;">产研通以公益积分为核心交易单位——"我一路上帮您"，积分可传承给家人和孩子。合规安全，专注产业调研信息撮合。</p>
+          <p style="font-size: 12px; color: #888;">验证后即可登录平台。如果您没有注册产研通，请忽略此邮件。</p>
           <hr style="border: none; border-top: 0.5px solid #e0dfd8;" />
-          <p style="font-size: 11px; color: #aaa;">产研通ProLink · 产业专家对接平台 · 516380.com（我一路上帮您）</p>
+          <p style="font-size: 11px; color: #aaa;">产研通ProLink · 产业专家对接平台</p>
         </div>
       `,
     })
