@@ -78,10 +78,10 @@ export async function POST(req: Request) {
   // 发送邮箱验证邮件
   const siteUrl = process.env.NEXTAUTH_URL || "https://516380.com"
   const verifyUrl = `${siteUrl}/api/verify-email?token=${verificationToken}`
-  const emailSent = await sendVerificationEmail(email, verifyUrl)
+  const emailSent = await sendVerificationEmail(email, verifyUrl, safeRole)
 
-  // 注册欢迎积分：所有新用户统一赠送 200 公益积分
-  const WELCOME_POINTS = 200
+  // 注册欢迎积分：研究员/投资人统一赠送 500 公益积分，专家在审核后发放
+  const WELCOME_POINTS = safeRole === "EXPERT" ? 0 : 500
   await prisma.$transaction(async (tx) => {
     const after = await tx.user.update({
       where: { id: user.id },

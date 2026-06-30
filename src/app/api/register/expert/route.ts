@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     // 发送邮箱验证邮件
     const siteUrl = process.env.NEXTAUTH_URL || "https://516380.com"
     const verifyUrl = `${siteUrl}/api/verify-email?token=${verificationToken}`
-    const emailSent = await sendVerificationEmail(email, verifyUrl)
+    const emailSent = await sendVerificationEmail(email, verifyUrl, "EXPERT")
 
     const admins = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPER_ADMIN"] } }, select: { id: true } })
     for (const admin of admins) {

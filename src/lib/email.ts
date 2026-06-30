@@ -151,7 +151,7 @@ export async function sendWelcomeEmail(to: string, siteUrl: string): Promise<boo
 /**
  * 发送邮箱验证邮件
  */
-export async function sendVerificationEmail(to: string, verifyUrl: string): Promise<boolean> {
+export async function sendVerificationEmail(to: string, verifyUrl: string, role?: string): Promise<boolean> {
   const t = getTransporter()
   if (!t) {
     if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] 验证链接 (收件人: ${to}): ${verifyUrl}`)
@@ -172,10 +172,42 @@ export async function sendVerificationEmail(to: string, verifyUrl: string): Prom
             <a href="${verifyUrl}" style="display: inline-block; background: #185FA5; color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-size: 15px;">验证邮箱</a>
           </p>
           <p style="font-size: 12px; color: #888; background: #FFF8E1; padding: 10px; border-radius: 6px;">
-            ⚠️ 如按钮无法点击，请复制以下链接到 Safari/Chrome 中打开：<br/>
+            ⚠️ 如按钮无法点击，请复制以下链接到外部浏览器中打开：<br/>
             <span style="font-size: 11px; color: #185FA5; word-break: break-all;">${verifyUrl}</span>
           </p>
-          <p style="font-size: 12px; color: #888;">验证后即可登录平台。如果您没有注册产研通，请忽略此邮件。</p>
+
+          <hr style="border: none; border-top: 0.5px solid #ddd;" />
+
+          <div style="margin: 16px 0;">
+            <h3 style="color: #185FA5; font-size: 16px; margin: 0;">516380 = 我一路上帮您</h3>
+          </div>
+
+          <div style="background: #f8f7f4; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 13px; color: #5F5E5A; line-height: 1.8;">
+            <p style="margin: 0 0 8px; font-weight: 500;">我们搭了一个桥：</p>
+            <p style="margin: 0;">让研究员、产业专家、投资人<br/>在一个有信任基础的圈子里，<br/>长期地、可持续地互相帮助。</p>
+          </div>
+
+          <div style="background: #f8f7f4; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 13px; color: #5F5E5A; line-height: 1.8;">
+            <p style="margin: 0 0 8px;"><strong>🔍 研究员</strong> → 找那个恰好知道正确答案的人，获取一手调研信息</p>
+            <p style="margin: 0 0 8px;"><strong>🎯 产业专家</strong> → ${role === 'EXPERT' ? '您的产业经验是一笔可以传承的无形资产，在这里不断积累，也被尊重地、体面地流转/传承' : '您的经验是一笔可以传承的资产，在这里被尊重地、体面地流通'}</p>
+            <p style="margin: 0;"><strong>📊 投资人/机构</strong> → 获取一手产业洞察，为投资决策增加关键维度</p>
+          </div>
+
+          <div style="background: #FAFAF7; border-radius: 8px; padding: 16px; margin: 16px 0; font-size: 13px; color: #5F5E5A; line-height: 1.8;">
+            <p style="margin: 0 0 8px; font-weight: 500;">🏆 公益积分</p>
+            <p style="margin: 0 0 8px; font-size: 12px; color: #888;"><em>公益积分 = 工作时间 × 技能等级</em></p>
+            <p style="margin: 0;">公益积分后续可以在网站内进行流转，获得相应的咨询和服务；在更长远的未来，公益积分还将被允许传承给您的家人和孩子，让更多的良师益友来协助您的家族传承。</p>
+          </div>
+
+          <div style="background: #FFF8E1; border-radius: 8px; padding: 12px; margin: 16px 0; font-size: 12px; color: #8B6914; text-align: center;">
+            🎁 ${role === 'EXPERT' ? '您的注册在审核确认后，将获得 <strong>800 公益积分</strong> 体验礼包，验证后即可使用' : '您将获得 <strong>500 公益积分</strong> 体验礼包，验证后即可使用'}
+          </div>
+
+          <div style="text-align: center; margin: 16px 0; font-size: 12px; color: #999; line-height: 1.6;">
+            <p style="margin: 0;">连接研究员与产业专家智库 · 让每一次调研更有价值</p>
+            <p style="margin: 4px 0 0;"><strong style="color: #185FA5;">516380.com</strong> 我一路上帮您</p>
+          </div>
+
           <hr style="border: none; border-top: 0.5px solid #e0dfd8;" />
           <p style="font-size: 11px; color: #aaa;">产研通ProLink · 产业专家对接平台</p>
         </div>
