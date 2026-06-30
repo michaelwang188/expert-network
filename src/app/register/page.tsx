@@ -1,13 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { PasswordInput } from "@/components/PasswordInput"
 
 export default function RegisterPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -15,6 +12,7 @@ export default function RegisterPage() {
   const [orgName, setOrgName] = useState("")
   const [role, setRole] = useState("RESEARCHER")
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,20 +34,33 @@ export default function RegisterPage() {
       setError(data.error || "注册失败")
       setLoading(false)
     } else {
-      const result = await signIn("credentials", { email, password, redirect: false })
-      if (result?.ok) {
-        router.push("/dashboard")
-        router.refresh()
-      } else {
-        router.push("/login?registered=1")
-      }
+      // 注册成功后不再自动登录，提示查收验证邮件
+      setSuccess(data.message || `注册成功！验证邮件已发送至 ${email}，请查收并点击链接完成验证。`)
+      setLoading(false)
     }
   }
 
+  // 移除未使用的 router
   const inputStyle = { width: "100%" as const, padding: 10, border: "0.5px solid #e0dfd8", borderRadius: 8, fontSize: 14 }
 
   return (
     <div style={{ maxWidth: 440, margin: "60px auto", padding: 24 }}>
+      {success ? (
+        <>
+          <div style={{ textAlign: "center", marginBottom: 28 }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>📧</div>
+            <h1 style={{ fontSize: 20, fontWeight: 500, color: "#185FA5", marginBottom: 8 }}>注册成功</h1>
+            <p style={{ fontSize: 14, color: "#666", lineHeight: 1.6, marginBottom: 8 }}>{success}</p>
+            <p style={{ fontSize: 13, color: "#999", marginTop: 4 }}>没有收到邮件？请检查垃圾邮件箱，或稍后重试。</p>
+          </div>
+          <Link href="/login" style={{
+            display: "block", textAlign: "center", background: "#185FA5", color: "#fff",
+            border: "none", borderRadius: 8, padding: 11, fontSize: 14, fontWeight: 500,
+            textDecoration: "none", marginTop: 8,
+          }}>前往登录</Link>
+        </>
+      ) : (
+      <>
       <div style={{ textAlign: "center", marginBottom: 28 }}>
         <h1 style={{ fontSize: 20, fontWeight: 500, color: "#185FA5", marginBottom: 4 }}>注册账号</h1>
         <p style={{ fontSize: 13, color: "#888" }}>加入产研通 ProLink</p>
@@ -87,6 +98,8 @@ export default function RegisterPage() {
       <p style={{ textAlign: "center", fontSize: 13, color: "#888", marginTop: 16 }}>
         已有账号？<Link href="/login" style={{ color: "#185FA5" }}>去登录</Link>
       </p>
+      </>
+      )}
     </div>
   )
 }

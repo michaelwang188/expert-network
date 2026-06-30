@@ -18,6 +18,7 @@ async function main() {
       password: researcherPassword,
       role: 'RESEARCHER',
       orgName: '腾讯科技',
+      emailVerified: new Date(),
     },
   })
   console.log('✅ 研究员账号创建成功:', researcher.email)
@@ -32,6 +33,7 @@ async function main() {
       name: '李专家',
       password: expertPassword,
       role: 'EXPERT',
+      emailVerified: new Date(),
     },
   })
 
@@ -74,6 +76,7 @@ async function main() {
       password: adminPassword,
       role: 'ADMIN',
       orgName: '产研通 ProLink',
+      emailVerified: new Date(),
     },
   })
   console.log('✅ 管理员账号创建成功:', admin.email)
@@ -92,7 +95,7 @@ async function main() {
     const user = await prisma.user.upsert({
       where: { email: e.email },
       update: { password: pwd },
-      create: { email: e.email, name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title },
+      create: { email: e.email, name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title, emailVerified: new Date() },
     })
     const expert = await prisma.expert.upsert({
       where: { userId: user.id },
@@ -130,7 +133,7 @@ async function main() {
     await prisma.user.upsert({
       where: { email: r.email },
       update: { password: pwd },
-      create: { email: r.email, name: r.name, password: pwd, role: 'RESEARCHER', orgName: r.orgName, title: r.title },
+      create: { email: r.email, name: r.name, password: pwd, role: 'RESEARCHER', orgName: r.orgName, title: r.title, emailVerified: new Date() },
     })
   }
   console.log('✅ 4位研究员创建成功')
@@ -146,7 +149,7 @@ async function main() {
     const user = await prisma.user.upsert({
       where: { email: e.email },
       update: { password: pwd },
-      create: { email: e.email, name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title },
+      create: { email: e.email, name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title, emailVerified: new Date() },
     })
     await prisma.expert.upsert({
       where: { userId: user.id },

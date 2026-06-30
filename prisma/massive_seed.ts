@@ -38,7 +38,7 @@ async function main() {
     const exists = await p.user.findUnique({ where: { email: e.name.toLowerCase() + '@expert.prolink.cn' } })
     if (exists) continue
     const user = await p.user.create({
-      data: { email: e.name.toLowerCase() + '@expert.prolink.cn', name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title, points: rand(3000, 20000) }
+      data: { email: e.name.toLowerCase() + '@expert.prolink.cn', name: e.name, password: pwd, role: 'EXPERT', orgName: e.org, title: e.title, points: rand(3000, 20000), emailVerified: new Date() }
     })
     await p.expert.create({
       data: { userId: user.id, realName: e.realName, title: e.title, org: e.org, years: e.years, region: e.region, industry1: e.industry1, industry2: e.industry2, roleType: e.roleType, tags: e.tags, topics: e.topics, ratePoints: e.ratePoints, rateHour: e.ratePoints, forms: '线上视频', status: 'ACTIVE', idVerified: true, empVerified: true, complianceSig: true, completedOrders: rand(0, 8), rating: rand(30, 50) / 10 }

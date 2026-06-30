@@ -23,7 +23,7 @@ function LoginForm() {
       email, password, redirect: false,
     })
     if (res?.error) {
-      setError("邮箱或密码错误")
+      setError("邮箱或密码错误，或邮箱尚未验证")
       setLoading(false)
     } else {
       router.push("/dashboard")

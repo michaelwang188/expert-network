@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import crypto from "crypto"
 import { validatePassword } from "@/lib/password-policy"
+import { sendVerificationEmail } from "@/lib/email"
 
 // 简单内存限速：同IP 10秒内最多3次注册
 const rateLimit = new Map<string, { count: number; reset: number }>()
@@ -61,6 +63,7 @@ export async function POST(req: Request) {
   }
 
   const hashed = await bcrypt.hash(password, 10)
+  const verificationToken = crypto.randomBytes(32).toString("hex")
   const user = await prisma.user.create({
     data: {
       email,
@@ -68,8 +71,14 @@ export async function POST(req: Request) {
       name,
       orgName,
       role: safeRole,
+      verificationToken,
     },
   })
+
+  // 发送邮箱验证邮件
+  const siteUrl = process.env.NEXTAUTH_URL || "https://516380.com"
+  const verifyUrl = `${siteUrl}/api/verify-email?token=${verificationToken}`
+  const emailSent = await sendVerificationEmail(email, verifyUrl)
 
   // 注册欢迎积分：所有新用户统一赠送 200 公益积分
   const WELCOME_POINTS = 200
@@ -90,13 +99,13 @@ export async function POST(req: Request) {
       },
     })
   })
-  // 发送欢迎通知
+  // 发送验证通知
   await prisma.notification.create({
     data: {
       userId: user.id,
       type: "WELCOME_BONUS",
-      title: "欢迎加入产研通",
-      message: `恭喜您成功注册！已为您赠送 ${WELCOME_POINTS} 公益积分，可用于发起调研或参加调研会议。`,
+      title: "请验证您的邮箱",
+      message: `已向 ${email} 发送了验证邮件，请查收并点击链接完成验证。验证后即可登录并激活 ${WELCOME_POINTS} 公益积分。`,
       refId: user.id,
     },
   })
@@ -140,18 +149,18 @@ export async function POST(req: Request) {
         userId: user.id,
         type: "EXPERT_REGISTERED",
         title: "专家申请已提交",
-        message: "您的专家申请已成功提交，管理员将在1-2个工作日内审核。审核通过后即可接收访谈订单。请先完善您的专家资料以便快速通过审核。",
+        message: "您的专家申请已成功提交，请先验证邮箱。验证后管理员将在1-2个工作日内审核您的资料，审核通过后即可接收访谈订单。",
         refId: user.id,
       }
     })
   }
 
-  const isExpert = safeRole === "EXPERT"
   return NextResponse.json({
     ok: true,
     userId: user.id,
-    message: isExpert
-      ? "专家申请已提交。我们会在1-2个工作日内审核您的资料，审核通过后即可接单。现在您可以先去完善专家资料。"
-      : "注册成功，请登录",
+    emailSent,
+    message: safeRole === "EXPERT"
+      ? `专家申请已提交。验证邮件已发送至 ${email}，请查收并验证邮箱，验证后管理员将审核您的资料。`
+      : `注册成功！验证邮件已发送至 ${email}，请查收并点击链接完成验证。`,
   })
 }

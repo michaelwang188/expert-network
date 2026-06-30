@@ -16,6 +16,8 @@ export default function ExpertRegisterPage() {
   const [files, setFiles] = useState<{ idCard?: File; badge?: File; proof?: File }>({})
   const [agree, setAgree] = useState(false)
   const [error, setError] = useState("")
+  const [submitted, setSubmitted] = useState(false)
+  const [responseMsg, setResponseMsg] = useState("")
 
   const update = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
 
@@ -42,7 +44,8 @@ export default function ExpertRegisterPage() {
       })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error || "提交失败")
-      router.push("/login?registered=expert")
+      setSubmitted(true)
+      setResponseMsg(d.message || `入驻申请已提交！验证邮件已发送至 ${form.email}，请查收并完成验证。`)
     } catch (e: any) { setError(e.message) }
     finally { setSubmitting(false) }
   }
@@ -75,6 +78,21 @@ export default function ExpertRegisterPage() {
 
   return (
     <main style={{ maxWidth: 640, margin: "0 auto", padding: "40px 20px" }}>
+      {submitted ? (
+        <>
+          <div style={{ textAlign: "center", marginTop: 40 }}>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>📧</div>
+            <h1 style={{ fontSize: 22, color: "#1A3C5E", marginBottom: 12 }}>入驻申请已提交</h1>
+            <p style={{ fontSize: 14, color: "#666", lineHeight: 1.6, marginBottom: 8 }}>{responseMsg}</p>
+            <p style={{ fontSize: 13, color: "#999", marginBottom: 24 }}>没有收到邮件？请检查垃圾邮件箱，或稍后重试。</p>
+            <a href="/login" style={{
+              display: "inline-block", background: "#1A3C5E", color: "#fff",
+              padding: "10px 28px", borderRadius: 6, textDecoration: "none", fontSize: 14,
+            }}>前往登录</a>
+          </div>
+        </>
+      ) : (
+      <>
       <h1 style={{ fontSize: 22, color: "#1A3C5E", marginBottom: 4 }}>专家入驻申请</h1>
       <p style={{ fontSize: 13, color: "#999", marginBottom: 24 }}>填写资料并通过三级合规审核后，即可开始接收调研访谈</p>
 
@@ -154,6 +172,8 @@ export default function ExpertRegisterPage() {
           </div>
         </>
       )}
+      </>
+    )}
     </main>
   )
 }

@@ -25,6 +25,8 @@ model User {
   region      String?
   sponsorTier String?                     // 赞助人等级: "CO_FOUNDER", "CO_SPONSOR", null
   source      String   @default("user")  // "user"=真实用户, "seed"=演示数据, "migrate"=存量迁移
+  emailVerified   DateTime?              // 邮箱验证时间，null=未验证
+  verificationToken String?              // 邮箱验证令牌
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -54,6 +54,10 @@ export const authOptions: NextAuthOptions = {
           loginRateLimit.set(email, entry)
           return null
         }
+        // 邮箱验证检查：未验证邮箱不允许登录
+        if (!user.emailVerified) {
+          return null // 静默拒绝，不告知具体原因（安全考虑）
+        }
         return {
           id: user.id,
           email: user.email,

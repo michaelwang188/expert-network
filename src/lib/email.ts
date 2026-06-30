@@ -148,6 +148,47 @@ export async function sendWelcomeEmail(to: string, siteUrl: string): Promise<boo
   }
 }
 
+/**
+ * 发送邮箱验证邮件
+ */
+export async function sendVerificationEmail(to: string, verifyUrl: string): Promise<boolean> {
+  const t = getTransporter()
+  if (!t) {
+    if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] 验证链接 (收件人: ${to}): ${verifyUrl}`)
+    return true
+  }
+
+  try {
+    await t.sendMail({
+      from: smtp.from,
+      to,
+      subject: "产研通ProLink · 验证您的邮箱",
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2 style="color: #185FA5;">验证您的邮箱</h2>
+          <p>您好，</p>
+          <p>感谢您注册产研通ProLink！请点击下方按钮验证您的邮箱地址：</p>
+          <p style="text-align: center; margin: 24px 0;">
+            <a href="${verifyUrl}" style="display: inline-block; background: #185FA5; color: #fff; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-size: 15px;">验证邮箱</a>
+          </p>
+          <p style="font-size: 12px; color: #888; background: #FFF8E1; padding: 10px; border-radius: 6px;">
+            ⚠️ 如按钮无法点击，请复制以下链接到 Safari/Chrome 中打开：<br/>
+            <span style="font-size: 11px; color: #185FA5; word-break: break-all;">${verifyUrl}</span>
+          </p>
+          <p style="font-size: 12px; color: #888;">验证后即可登录平台。如果您没有注册产研通，请忽略此邮件。</p>
+          <hr style="border: none; border-top: 0.5px solid #e0dfd8;" />
+          <p style="font-size: 11px; color: #aaa;">产研通ProLink · 产业专家对接平台</p>
+        </div>
+      `,
+    })
+    if (process.env.NODE_ENV !== "production") console.log(`[EMAIL] ✅ 已验证邮件发送至 ${to}`)
+    return true
+  } catch (e) {
+    if (process.env.NODE_ENV !== "production") console.error(`[EMAIL] 验证邮件发送失败 (${to}):`, (e as Error).message)
+    return false
+  }
+}
+
 export function isEmailConfigured(): boolean {
   return isConfigured
 }

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import crypto from "crypto"
+import { sendVerificationEmail } from "@/lib/email"
 
 export async function POST(req: Request) {
   try {
@@ -23,9 +25,11 @@ export async function POST(req: Request) {
 
     const pts = parseInt(ratePoints) || 500
     const hashedPassword = await bcrypt.hash(password, 10)
+    const verificationToken = crypto.randomBytes(32).toString("hex")
     const user = await prisma.user.create({
       data: {
         email, name, password: hashedPassword, role: "EXPERT",
+        verificationToken,
         expertProfile: {
           create: {
             realName: name, title, org,
@@ -46,6 +50,11 @@ export async function POST(req: Request) {
     const expert = await prisma.expert.findUnique({ where: { userId: user.id } })
     if (!expert) return NextResponse.json({ error: "创建失败" }, { status: 500 })
 
+    // 发送邮箱验证邮件
+    const siteUrl = process.env.NEXTAUTH_URL || "https://516380.com"
+    const verifyUrl = `${siteUrl}/api/verify-email?token=${verificationToken}`
+    const emailSent = await sendVerificationEmail(email, verifyUrl)
+
     const admins = await prisma.user.findMany({ where: { role: { in: ["ADMIN", "SUPER_ADMIN"] } }, select: { id: true } })
     for (const admin of admins) {
       await prisma.notification.create({
@@ -58,7 +67,12 @@ export async function POST(req: Request) {
       })
     }
 
-    return NextResponse.json({ ok: true, expertId: expert.id })
+    return NextResponse.json({
+      ok: true,
+      expertId: expert.id,
+      emailSent,
+      message: `入驻申请已提交。验证邮件已发送至 ${email}，请查收并验证邮箱。验证后管理员将审核您的资料。`,
+    })
   } catch (e: any) {
     console.error("expert register error:", e)
     return NextResponse.json({ error: "注册失败，请稍后重试" }, { status: 500 })

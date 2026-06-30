@@ -65,6 +65,7 @@ export async function POST() {
           email: rEmails[i],
           name: r.name, password: pw, role: "RESEARCHER", points: 25000, orgName: r.org, title: r.title,
           source: "seed",
+          emailVerified: new Date(),
         },
       })
       rUsers.push(u)
@@ -208,6 +209,7 @@ export async function POST() {
         data: {
           email: `${e.p}@demo.com`, name: e.n, password: pw, role: "EXPERT",
           points: e.rt * 2, orgName: e.o, title: e.t, source: "seed",
+          emailVerified: new Date(),
         },
       })
       const ex = await prisma.expert.create({
@@ -286,7 +288,7 @@ export async function POST() {
     const adminExists = await prisma.user.findUnique({ where: { email: "admin@prolink.com" } })
     if (!adminExists) {
       await prisma.user.create({
-        data: { email: "admin@prolink.com", name: "老板(超级管理员)", password: pw, role: "SUPER_ADMIN", source: "seed" },
+        data: { email: "admin@prolink.com", name: "老板(超级管理员)", password: pw, role: "SUPER_ADMIN", source: "seed", emailVerified: new Date() },
       })
     }
 
